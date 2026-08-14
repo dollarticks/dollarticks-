@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DollarTicks — Live Deriv Digit Dashboard</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#080b10;color:#f5f7fa;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:760px;margin:auto;padding:14px}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+  .brand{font-size:24px;font-weight:800;letter-spacing:-.5px}
+  .brand span{color:#18c6d8}
+  .status{font-size:12px;padding:7px 10px;border-radius:999px;background:#171c24;color:#aab4c3}
+  .status.live{color:#62e6a7}
+  .card{background:#10151d;border:1px solid #202733;border-radius:16px;padding:14px;margin-bottom:12px;box-shadow:0 8px 28px rgba(0,0,0,.18)}
+  select,button{width:100%;border:1px solid #2b3442;background:#151b24;color:#fff;border-radius:11px;padding:12px;font-size:15px}
+  button{cursor:pointer;font-weight:700}
+  button.primary{background:#13aebf;border-color:#13aebf;color:#061014}
+  .market{font-weight:800;font-size:18px}
+  .quote{font-size:14px;color:#9da8b8;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}
+  .digit{position:relative;text-align:center;padding:12px 5px;border-radius:50%;aspect-ratio:1;background:#0d1219;border:4px solid #252d39;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:0}
+  .digit strong{font-size:22px}
+  .digit small{font-size:11px;color:#aeb8c7;margin-top:2px}
+  .digit.hot{border-color:#18c6d8}
+  .digit.latest{box-shadow:0 0 0 3px rgba(116,124,255,.28)}
+  .latestBadge{font-size:11px;color:#8d98aa;margin-bottom:8px}
+  .ticks{display:flex;flex-wrap:wrap;gap:6px;max-height:94px;overflow:hidden}
+  .tick{width:30px;height:30px;border-radius:8px;background:#171e28;display:grid;place-items:center;font-weight:800}
+  .tick.new{outline:2px solid #18c6d8}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .metric{padding:12px;background:#0d1219;border-radius:12px}
+  .metric label{display:block;color:#8f9aab;font-size:12px;margin-bottom:4px}
+  .metric b{font-size:20px}
+  .note{font-size:12px;line-height:1.5;color:#8995a6}
+  .footer{text-align:center;color:#697486;font-size:11px;padding:8px 0 18px}
+  @media(max-width:430px){.wrap{padding:10px}.grid{gap:6px}.digit{border-width:3px}.digit strong{font-size:19px}.digit small{font-size:10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Dollar<span>Ticks</span></div>
+    <div id="status" class="status">Connecting…</div>
+  </div>
+
+  <div class="card">
+    <select id="market">
+      <option value="1HZ100V">Volatility 100 (1s)</option>
+      <option value="1HZ75V">Volatility 75 (1s)</option>
+      <option value="1HZ50V">Volatility 50 (1s)</option>
+      <option value="1HZ25V">Volatility 25 (1s)</option>
+      <option value="1HZ10V">Volatility 10 (1s)</option>
+    </select>
+    <div style="height:10px"></div>
+    <div class="market" id="marketName">Volatility 100 (1s)</div>
+    <div class="quote" id="quote">Waiting for tick…</div>
+  </div>
+
+  <div class="card">
+    <div class="latestBadge">LAST DIGIT FREQUENCY — last <b id="countLabel">100</b> ticks</div>
+    <div class="grid" id="digits"></div>
+  </div>
+
+  <div class="card">
+    <div class="latestBadge">LIVE LAST DIGITS</div>
+    <div class="ticks" id="ticks"></div>
+  </div>
+
+  <div class="row">
+    <div class="metric"><label>Most frequent</label><b id="most">—</b></div>
+    <div class="metric"><label>Least frequent</label><b id="least">—</b></div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="latestBadge">OVER / UNDER VIEW</div>
+    <div class="row">
+      <div class="metric"><label>Over 5 (digits 6–9)</label><b id="over5">—</b></div>
+      <div class="metric"><label>Under 5 (digits 0–4)</label><b id="under5">—</b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="note">
+      DollarTicks reads public Deriv tick data and calculates frequencies locally in your browser.
+      These percentages describe recent history; they are <b>not guaranteed predictions</b> of the next tick.
+      This prototype does not place trades or ask for your Deriv password/API token.
+    </div>
+  </div>
+
+  <div class="footer">DollarTicks prototype • Market data powered by Deriv public WebSocket API</div>
+</div>
+
+<script>
+const WS_URL = "wss://api.derivws.com/trading/v1/options/ws/public";
+const marketNames = {
+  "1HZ100V":"Volatility 100 (1s)",
+  "1HZ75V":"Volatility 75 (1s)",
+  "1HZ50V":"Volatility 50 (1s)",
+  "1HZ25V":"Volatility 25 (1s)",
+  "1HZ10V":"Volatility 10 (1s)"
+};
+const MAX = 100;
+let ws = null;
+let history = [];
+let latestDigit = null;
+let reconnectTimer = null;
+
+const $ = id => document.getElementById(id);
+
+function setStatus(text, live=false){
+  $("status").textContent = text;
+  $("status").className = "status" + (live ? " live" : "");
+}
+
+function getDigit(quote, pipSize){
+  const q = String(quote);
+  if (Number.isFinite(Number(pipSize))) {
+    const n = Number(quote);
+    const factor = 10 ** Number(pipSize);
+    return Math.abs(Math.round(n * factor)) % 10;
+  }
+  const clean = q.replace(/[^0-9]/g,"");
+  return clean ? Number(clean.slice(-1)) : null;
+}
+
+function addTick(digit, quote, epoch){
+  if(digit === null || Number.isNaN(digit)) return;
+  latestDigit = digit;
+  history.push(digit);
+  if(history.length > MAX) history.shift();
+  $("quote").textContent = `${quote} • ${new Date(epoch*1000).toLocaleTimeString()}`;
+  render();
+}
+
+function render(){
+  const counts = Array(10).fill(0);
+  history.forEach(d => counts[d]++);
+  $("countLabel").textContent = history.length;
+
+  $("digits").innerHTML = counts.map((c,d)=>{
+    const pct = history.length ? (c/history.length*100) : 0;
+    const hot = c === Math.max(...counts) && c > 0;
+    const latest = d === latestDigit;
+    return `<div class="digit ${hot?'hot':''} ${latest?'latest':''}">
+      <strong>${d}</strong><small>${pct.toFixed(1)}%</small>
+    </div>`;
+  }).join("");
+
+  $("ticks").innerHTML = history.slice().reverse().map((d,i)=>
+    `<div class="tick ${i===0?'new':''}">${d}</div>`).join("");
+
+  const ranked = [...counts.keys()].sort((a,b)=>counts[b]-counts[a]);
+  $("most").textContent = history.length ? `${ranked[0]} (${(counts[ranked[0]]/history.length*100).toFixed(1)}%)` : "—";
+  $("least").textContent = history.length ? `${ranked[ranked.length-1]} (${(counts[ranked[ranked.length-1]]/history.length*100).toFixed(1)}%)` : "—";
+
+  const over = counts.slice(6).reduce((a,b)=>a+b,0);
+  const under = counts.slice(0,5).reduce((a,b)=>a+b,0);
+  $("over5").textContent = history.length ? (over/history.length*100).toFixed(1)+"%" : "—";
+  $("under5").textContent = history.length ? (under/history.length*100).toFixed(1)+"%" : "—";
+}
+
+function connect(){
+  if(ws) try{ws.close()}catch(e){}
+  setStatus("Connecting…");
+  const symbol = $("market").value;
+  $("marketName").textContent = marketNames[symbol] || symbol;
+  history = [];
+  latestDigit = null;
+  render();
+
+  ws = new WebSocket(WS_URL);
+  ws.onopen = () => {
+    setStatus("LIVE", true);
+    ws.send(JSON.stringify({
+      ticks_history: symbol,
+      count: MAX,
+      end: "latest",
+      style: "ticks",
+      subscribe: 1,
+      req_id: 1
+    }));
+  };
+
+  ws.onmessage = event => {
+    try{
+      const data = JSON.parse(event.data);
+      if(data.error){
+        setStatus("API error");
+        console.error(data.error);
+        return;
+      }
+      if(data.msg_type === "history"){
+        const prices = data.history?.prices || [];
+        const times = data.history?.times || [];
+        const pip = data.pip_size;
+        history = [];
+        prices.forEach((q,i)=>{
+          const d = getDigit(q,pip);
+          if(d !== null) history.push(d);
+        });
+        if(history.length > MAX) history = history.slice(-MAX);
+        if(history.length) latestDigit = history[history.length-1];
+        if(prices.length) $("quote").textContent = `${prices[prices.length-1]} • ${new Date(times[times.length-1]*1000).toLocaleTimeString()}`;
+        render();
+      }
+      if(data.msg_type === "tick"){
+        const t = data.tick;
+        const d = getDigit(t.quote, t.pip_size ?? data.pip_size);
+        addTick(d, t.quote, t.epoch);
+      }
+    }catch(err){console.error(err)}
+  };
+
+  ws.onerror = () => setStatus("Connection error");
+  ws.onclose = () => {
+    setStatus("Disconnected");
+    clearTimeout(reconnectTimer);
+    reconnectTimer = setTimeout(connect, 3000);
+  };
+}
+
+$("market").addEventListener("change", connect);
+connect();
+</script>
+</body>
+</html>
