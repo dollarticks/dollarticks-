@@ -5,53 +5,42 @@ export async function onRequest(context) {
   const returnedState = url.searchParams.get("state");
   const error = url.searchParams.get("error");
 
-  const html = (title, message) => `
-    <!DOCTYPE html>
-    <html>
+  const page = (message, status = 400) =>
+    new Response(
+      `<!DOCTYPE html>
+      <html>
       <head>
         <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>${title}</title>
+        <title>DollarTicks</title>
       </head>
-      <body style="font-family:system-ui;padding:30px;background:#080b10;color:white">
+      <body style="font-family:system-ui;background:#080b10;color:white;padding:30px">
         <h2>DollarTicks</h2>
         <p>${message}</p>
         <p>
           <a href="https://dollarticks.pages.dev/"
              style="color:#18c6d8">
-            Return to DollarTicks
+             Return to DollarTicks
           </a>
         </p>
       </body>
-    </html>
-  `;
-
-  if (error) {
-    return new Response(
-      html(
-        "DollarTicks",
-        "Deriv authorization was cancelled or failed."
-      ),
+      </html>`,
       {
-        status: 400,
+        status,
         headers: {
           "Content-Type": "text/html"
         }
       }
     );
+
+  if (error) {
+    return page(
+      "Deriv authorization was cancelled or failed."
+    );
   }
 
   if (!code || !returnedState) {
-    return new Response(
-      html(
-        "DollarTicks",
-        "Missing authorization code or state."
-      ),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "text/html"
-        }
-      }
+    return page(
+      "Missing authorization code or state."
     );
   }
 
@@ -75,32 +64,14 @@ export async function onRequest(context) {
     getCookie("dt_pkce_verifier");
 
   if (!savedState || !codeVerifier) {
-    return new Response(
-      html(
-        "DollarTicks",
-        "OAuth session information is missing. Please connect again."
-      ),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "text/html"
-        }
-      }
+    return page(
+      "OAuth session information is missing. Please connect your Deriv account again."
     );
   }
 
   if (returnedState !== savedState) {
-    return new Response(
-      html(
-        "DollarTicks",
-        "State verification failed. Please connect again."
-      ),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "text/html"
-        }
-      }
+    return page(
+      "State verification failed. Please connect your Deriv account again."
     );
   }
 
@@ -110,35 +81,34 @@ export async function onRequest(context) {
   const redirectUri =
     "https://dollarticks.pages.dev/callback";
 
-  const tokenResponse =
-    await fetch(
-      "https://auth.deriv.com/oauth2/token",
-      {
-        method: "POST",
+  const tokenResponse = await fetch(
+    "https://auth.deriv.com/oauth2/token",
+    {
+      method: "POST",
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
 
-        body: new URLSearchParams({
-          grant_type:
-            "authorization_code",
+      body: new URLSearchParams({
+        grant_type:
+          "authorization_code",
 
-          client_id:
-            clientId,
+        client_id:
+          clientId,
 
-          code:
-            code,
+        code:
+          code,
 
-          code_verifier:
-            codeVerifier,
+        code_verifier:
+          codeVerifier,
 
-          redirect_uri:
-            redirectUri
-        })
-      }
-    );
+        redirect_uri:
+          redirectUri
+      })
+    }
+  );
 
   const tokenData =
     await tokenResponse.json();
@@ -148,36 +118,28 @@ export async function onRequest(context) {
     !tokenData.access_token
   ) {
     console.error(
-      "OAuth token error:",
+      "Deriv OAuth error:",
       tokenData
     );
 
-    return new Response(
-      html(
-        "DollarTicks",
-        "Deriv authorization could not be completed. Please try again."
-      ),
-      {
-        status: 400,
-        headers: {
-          "Content-Type": "text/html"
-        }
-      }
+    return page(
+      "Deriv authorization could not be completed. Please try again."
     );
   }
-
-  /*
-   * Save the OAuth access token in a secure,
-   * HttpOnly cookie so the trading endpoint
-   * can authenticate with Deriv.
-   */
 
   const accessToken =
     tokenData.access_token;
 
+  /*
+   * Store the OAuth token in an HttpOnly cookie.
+   * The browser cannot read this cookie with JavaScript,
+   * but functions/trading.js can receive it automatically.
+   */
+
   const tokenCookie =
-    `dt_access_token=${encodeURIComponent(accessToken)}; ` +
-    `Path=/; Max-Age=3600; Secure; HttpOnly; SameSite=Lax`;
+    "dt_access_token=" +
+    encodeURIComponent(accessToken) +
+    "; Path=/; Max-Age=3500; Secure; HttpOnly; SameSite=Lax";
 
   const stateCookie =
     "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
@@ -189,8 +151,8 @@ export async function onRequest(context) {
     new Headers();
 
   headers.set(
-    "Content-Type",
-    "text/html"
+    "Location",
+    "https://dollarticks.pages.dev/"
   );
 
   headers.append(
@@ -208,14 +170,8 @@ export async function onRequest(context) {
     verifierCookie
   );
 
-  return new Response(
-    html(
-      "DollarTicks",
-      "Deriv account connected successfully."
-    ),
-    {
-      status: 200,
-      headers
-    }
-  );
-          }
+  return new Response(null, {
+    status: 303,
+    headers
+  });
+      }
