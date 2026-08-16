@@ -123,6 +123,11 @@ Return to DollarTicks
   const accessToken =
     tokenData.access_token;
 
+  console.log(
+    "OAuth token received successfully. Token length:",
+    accessToken.length
+  );
+
   const tokenCookie =
     `dt_access_token=${encodeURIComponent(accessToken)}; ` +
     `Path=/; ` +
@@ -164,4 +169,4 @@ Return to DollarTicks
     status: 303,
     headers
   });
-}
+      }
