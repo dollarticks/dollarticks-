@@ -141,8 +141,8 @@ Return to DollarTicks
     new Headers();
 
   headers.set(
-    "Content-Type",
-    "text/html"
+    "Location",
+    "https://dollarticks.pages.dev/trading"
   );
 
   headers.append(
@@ -160,28 +160,8 @@ Return to DollarTicks
     verifierCookie
   );
 
-  return new Response(
-    `<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="1;url=https://dollarticks.pages.dev/">
-<title>DollarTicks</title>
-</head>
-<body style="font-family:system-ui;background:#080b10;color:white;padding:30px">
-<h2>DollarTicks</h2>
-<p>Deriv account connected successfully.</p>
-<p>Returning to DollarTicks...</p>
-<p>
-<a href="https://dollarticks.pages.dev/" style="color:#18c6d8">
-Continue to DollarTicks
-</a>
-</p>
-</body>
-</html>`,
-    {
-      status: 200,
-      headers
-    }
-  );
+  return new Response(null, {
+    status: 303,
+    headers
+  });
 }
