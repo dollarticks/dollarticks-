@@ -5,125 +5,217 @@ export async function onRequest(context) {
   const returnedState = url.searchParams.get("state");
   const error = url.searchParams.get("error");
 
+  const html = (title, message) => `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <title>${title}</title>
+      </head>
+      <body style="font-family:system-ui;padding:30px;background:#080b10;color:white">
+        <h2>DollarTicks</h2>
+        <p>${message}</p>
+        <p>
+          <a href="https://dollarticks.pages.dev/"
+             style="color:#18c6d8">
+            Return to DollarTicks
+          </a>
+        </p>
+      </body>
+    </html>
+  `;
+
   if (error) {
     return new Response(
-      `<h2>DollarTicks</h2><p>Deriv authorization was cancelled or failed.</p>`,
+      html(
+        "DollarTicks",
+        "Deriv authorization was cancelled or failed."
+      ),
       {
         status: 400,
-        headers: { "Content-Type": "text/html" }
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
     );
   }
 
   if (!code || !returnedState) {
     return new Response(
-      "<h2>DollarTicks</h2><p>Missing authorization code or state.</p>",
+      html(
+        "DollarTicks",
+        "Missing authorization code or state."
+      ),
       {
         status: 400,
-        headers: { "Content-Type": "text/html" }
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
     );
   }
 
-  const cookies = context.request.headers.get("Cookie") || "";
+  const cookies =
+    context.request.headers.get("Cookie") || "";
 
-  const getCookie = (name) => {
+  function getCookie(name) {
     const match = cookies.match(
       new RegExp("(^|;\\s*)" + name + "=([^;]*)")
     );
-    return match ? decodeURIComponent(match[2]) : null;
-  };
 
-  const savedState = getCookie("dt_oauth_state");
-  const codeVerifier = getCookie("dt_pkce_verifier");
+    return match
+      ? decodeURIComponent(match[2])
+      : null;
+  }
+
+  const savedState =
+    getCookie("dt_oauth_state");
+
+  const codeVerifier =
+    getCookie("dt_pkce_verifier");
 
   if (!savedState || !codeVerifier) {
     return new Response(
-      "<h2>DollarTicks</h2><p>OAuth session information is missing.</p>",
+      html(
+        "DollarTicks",
+        "OAuth session information is missing. Please connect again."
+      ),
       {
         status: 400,
-        headers: { "Content-Type": "text/html" }
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
     );
   }
 
   if (returnedState !== savedState) {
     return new Response(
-      "<h2>DollarTicks</h2><p>State verification failed.</p>",
+      html(
+        "DollarTicks",
+        "State verification failed. Please connect again."
+      ),
       {
         status: 400,
-        headers: { "Content-Type": "text/html" }
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
     );
   }
 
-  const clientId = "347btQbpUS2La9uhcLb2X";
-  const redirectUri = "https://dollarticks.pages.dev/callback";
+  const clientId =
+    "347btQbpUS2La9uhcLb2X";
 
-  const tokenResponse = await fetch(
-    "https://auth.deriv.com/oauth2/token",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: new URLSearchParams({
-        grant_type: "authorization_code",
-        client_id: clientId,
-        code,
-        code_verifier: codeVerifier,
-        redirect_uri: redirectUri
-      })
-    }
-  );
+  const redirectUri =
+    "https://dollarticks.pages.dev/callback";
 
-  const tokenData = await tokenResponse.json();
+  const tokenResponse =
+    await fetch(
+      "https://auth.deriv.com/oauth2/token",
+      {
+        method: "POST",
 
-  if (!tokenResponse.ok || !tokenData.access_token) {
+        headers: {
+          "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body: new URLSearchParams({
+          grant_type:
+            "authorization_code",
+
+          client_id:
+            clientId,
+
+          code:
+            code,
+
+          code_verifier:
+            codeVerifier,
+
+          redirect_uri:
+            redirectUri
+        })
+      }
+    );
+
+  const tokenData =
+    await tokenResponse.json();
+
+  if (
+    !tokenResponse.ok ||
+    !tokenData.access_token
+  ) {
+    console.error(
+      "OAuth token error:",
+      tokenData
+    );
+
     return new Response(
-      `<h2>DollarTicks</h2>
-       <p>Deriv authorization could not be completed.</p>
-       <p>Please try again.</p>`,
+      html(
+        "DollarTicks",
+        "Deriv authorization could not be completed. Please try again."
+      ),
       {
         status: 400,
-        headers: { "Content-Type": "text/html" }
+        headers: {
+          "Content-Type": "text/html"
+        }
       }
     );
   }
 
-  const headers = new Headers();
+  /*
+   * Save the OAuth access token in a secure,
+   * HttpOnly cookie so the trading endpoint
+   * can authenticate with Deriv.
+   */
 
-  headers.set("Content-Type", "text/html");
+  const accessToken =
+    tokenData.access_token;
 
-  headers.append(
-    "Set-Cookie",
-    `dt_access_token=${encodeURIComponent(tokenData.access_token)}; Path=/; Max-Age=3600; Secure; HttpOnly; SameSite=Lax`
+  const tokenCookie =
+    `dt_access_token=${encodeURIComponent(accessToken)}; ` +
+    `Path=/; Max-Age=3600; Secure; HttpOnly; SameSite=Lax`;
+
+  const stateCookie =
+    "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
+
+  const verifierCookie =
+    "dt_pkce_verifier=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
+
+  const headers =
+    new Headers();
+
+  headers.set(
+    "Content-Type",
+    "text/html"
   );
 
   headers.append(
     "Set-Cookie",
-    "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax"
+    tokenCookie
   );
 
   headers.append(
     "Set-Cookie",
-    "dt_pkce_verifier=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax"
+    stateCookie
+  );
+
+  headers.append(
+    "Set-Cookie",
+    verifierCookie
   );
 
   return new Response(
-    `<html>
-      <head>
-        <title>DollarTicks</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-      </head>
-      <body>
-        <h2>DollarTicks</h2>
-        <p>Deriv account connected successfully.</p>
-        <p><a href="/">Return to DollarTicks</a></p>
-      </body>
-    </html>`,
+    html(
+      "DollarTicks",
+      "Deriv account connected successfully."
+    ),
     {
+      status: 200,
       headers
     }
   );
-  }
+          }
