@@ -17,11 +17,11 @@ export async function onRequest(context) {
       /(?:^|;\s*)dt_access_token=/.test(cookies);
 
     return json({
-      ok: true,
+      ok: hasSession,
       connected: hasSession,
       message: hasSession
         ? "DollarTicks session detected."
-        : "DollarTicks trading endpoint is active, but no Deriv session was detected."
+        : "No Deriv session detected."
     });
   }
 
@@ -392,4 +392,4 @@ export async function onRequest(context) {
       500
     );
   }
-      }
+            }
