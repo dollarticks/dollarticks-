@@ -8,22 +8,21 @@ export async function onRequest(context) {
   const page = (message, status = 400) =>
     new Response(
       `<!DOCTYPE html>
-      <html>
-      <head>
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>DollarTicks</title>
-      </head>
-      <body style="font-family:system-ui;background:#080b10;color:white;padding:30px">
-        <h2>DollarTicks</h2>
-        <p>${message}</p>
-        <p>
-          <a href="https://dollarticks.pages.dev/"
-             style="color:#18c6d8">
-             Return to DollarTicks
-          </a>
-        </p>
-      </body>
-      </html>`,
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DollarTicks</title>
+</head>
+<body style="font-family:system-ui;background:#080b10;color:white;padding:30px">
+<h2>DollarTicks</h2>
+<p>${message}</p>
+<p>
+<a href="https://dollarticks.pages.dev/" style="color:#18c6d8">
+Return to DollarTicks
+</a>
+</p>
+</body>
+</html>`,
       {
         status,
         headers: {
@@ -85,25 +84,19 @@ export async function onRequest(context) {
     "https://auth.deriv.com/oauth2/token",
     {
       method: "POST",
-
       headers: {
         "Content-Type":
           "application/x-www-form-urlencoded"
       },
-
       body: new URLSearchParams({
         grant_type:
           "authorization_code",
-
         client_id:
           clientId,
-
         code:
           code,
-
         code_verifier:
           codeVerifier,
-
         redirect_uri:
           redirectUri
       })
@@ -130,16 +123,13 @@ export async function onRequest(context) {
   const accessToken =
     tokenData.access_token;
 
-  /*
-   * Store the OAuth token in an HttpOnly cookie.
-   * The browser cannot read this cookie with JavaScript,
-   * but functions/trading.js can receive it automatically.
-   */
-
   const tokenCookie =
-    "dt_access_token=" +
-    encodeURIComponent(accessToken) +
-    "; Path=/; Max-Age=3500; Secure; HttpOnly; SameSite=Lax";
+    `dt_access_token=${encodeURIComponent(accessToken)}; ` +
+    `Path=/; ` +
+    `Max-Age=3500; ` +
+    `Secure; ` +
+    `HttpOnly; ` +
+    `SameSite=Lax`;
 
   const stateCookie =
     "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
@@ -151,8 +141,8 @@ export async function onRequest(context) {
     new Headers();
 
   headers.set(
-    "Location",
-    "https://dollarticks.pages.dev/"
+    "Content-Type",
+    "text/html"
   );
 
   headers.append(
@@ -170,8 +160,28 @@ export async function onRequest(context) {
     verifierCookie
   );
 
-  return new Response(null, {
-    status: 303,
-    headers
-  });
-      }
+  return new Response(
+    `<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="1;url=https://dollarticks.pages.dev/">
+<title>DollarTicks</title>
+</head>
+<body style="font-family:system-ui;background:#080b10;color:white;padding:30px">
+<h2>DollarTicks</h2>
+<p>Deriv account connected successfully.</p>
+<p>Returning to DollarTicks...</p>
+<p>
+<a href="https://dollarticks.pages.dev/" style="color:#18c6d8">
+Continue to DollarTicks
+</a>
+</p>
+</body>
+</html>`,
+    {
+      status: 200,
+      headers
+    }
+  );
+}
