@@ -70,7 +70,7 @@ export async function onRequest(context) {
       body: new URLSearchParams({
         grant_type: "authorization_code",
         client_id: clientId,
-        code: code,
+        code,
         code_verifier: codeVerifier,
         redirect_uri: redirectUri
       })
@@ -91,21 +91,39 @@ export async function onRequest(context) {
     );
   }
 
+  const headers = new Headers();
+
+  headers.set("Content-Type", "text/html");
+
+  headers.append(
+    "Set-Cookie",
+    `dt_access_token=${encodeURIComponent(tokenData.access_token)}; Path=/; Max-Age=3600; Secure; HttpOnly; SameSite=Lax`
+  );
+
+  headers.append(
+    "Set-Cookie",
+    "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax"
+  );
+
+  headers.append(
+    "Set-Cookie",
+    "dt_pkce_verifier=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax"
+  );
+
   return new Response(
     `<html>
-      <head><title>DollarTicks</title></head>
+      <head>
+        <title>DollarTicks</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+      </head>
       <body>
         <h2>DollarTicks</h2>
         <p>Deriv account connected successfully.</p>
-        <p>You can return to DollarTicks.</p>
+        <p><a href="/">Return to DollarTicks</a></p>
       </body>
     </html>`,
     {
-      headers: {
-        "Content-Type": "text/html",
-        "Set-Cookie":
-          "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax"
-      }
+      headers
     }
   );
-          }
+  }
