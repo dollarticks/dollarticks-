@@ -40,12 +40,11 @@ export async function onRequest(context) {
   const clientId =
     "347btQbpUS2La9uhcLb2X";
 
-  /*
-   * First test the authenticated
-   * Deriv Options account endpoint.
-   */
-
   try {
+    /*
+     * Get authenticated Options accounts
+     */
+
     const accountsResponse =
       await fetch(
         "https://api.derivws.com/trading/v1/options/accounts",
@@ -65,12 +64,6 @@ export async function onRequest(context) {
     const accountsData =
       await accountsResponse.json();
 
-    /*
-     * IMPORTANT:
-     * We never return the access token.
-     * Only the safe account response is returned.
-     */
-
     if (!accountsResponse.ok) {
       return json(
         {
@@ -86,11 +79,6 @@ export async function onRequest(context) {
         accountsResponse.status
       );
     }
-
-    /*
-     * Deriv normally returns the accounts
-     * inside data.
-     */
 
     let accounts = [];
 
@@ -118,10 +106,26 @@ export async function onRequest(context) {
     }
 
     /*
-     * If no account was found, return the
-     * actual safe response so we can see
-     * what Deriv is sending us.
+     * Some Deriv responses can return
+     * a single account object in data.
      */
+
+    if (
+      !accounts.length &&
+      accountsData.data &&
+      typeof accountsData.data === "object" &&
+      !Array.isArray(accountsData.data)
+    ) {
+      if (
+        accountsData.data.account_id ||
+        accountsData.data.id ||
+        accountsData.data.loginid
+      ) {
+        accounts = [
+          accountsData.data
+        ];
+      }
+    }
 
     if (!accounts.length) {
       return json(
@@ -131,16 +135,19 @@ export async function onRequest(context) {
           stage:
             "account-discovery",
           message:
-            "Deriv authentication works, but no Options account was found in the response.",
+            "Deriv authentication works, but no Options account was found.",
           deriv_response:
             accountsData
-        },
-        200
+        }
       );
     }
 
     const account =
-      accounts[0];
+      accounts.find(
+        a =>
+          a.account_type === "demo" &&
+          a.status === "active"
+      ) || accounts[0];
 
     const accountId =
       account.account_id ||
@@ -155,18 +162,20 @@ export async function onRequest(context) {
           stage:
             "account-id",
           message:
-            "An account was returned, but no account ID was found.",
+            "An Options account was returned, but no account ID was found.",
           account:
             account
-        },
-        200
+        }
       );
     }
 
     /*
-     * We found the account.
-     * Now request the authenticated
+     * Request the short-lived authenticated
      * WebSocket URL.
+     *
+     * Deriv says this OTP/WebSocket URL
+     * is valid for 120 seconds and can
+     * only be used once.
      */
 
     const otpResponse =
@@ -210,15 +219,9 @@ export async function onRequest(context) {
     }
 
     /*
-     * IMPORTANT:
-     * We have deliberately stopped here.
+     * Return ONLY the short-lived WebSocket URL.
      *
-     * No proposal is requested.
-     * No trade is purchased.
-     *
-     * We are only confirming that the
-     * authenticated Options WebSocket
-     * connection can be created.
+     * Never return the OAuth access token.
      */
 
     return json({
@@ -228,22 +231,21 @@ export async function onRequest(context) {
         "authenticated-options-account",
       account: {
         account_id:
-          account.account_id ||
-          account.id ||
-          account.loginid ||
-          null,
+          accountId,
         account_type:
           account.account_type ||
           null,
         currency:
           account.currency ||
-          null,
+          "USD",
         status:
           account.status ||
           null
       },
+      ws_url:
+        otpData.data.url,
       message:
-        "Deriv Options account found and authenticated WebSocket URL created successfully. No trade was placed."
+        "Authenticated Deriv Options WebSocket URL created successfully."
     });
 
   } catch (error) {
