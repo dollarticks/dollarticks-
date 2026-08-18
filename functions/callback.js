@@ -145,9 +145,10 @@ Return to DollarTicks
   const headers =
     new Headers();
 
+  // Return to the DollarTicks dashboard
   headers.set(
     "Location",
-    "https://dollarticks.pages.dev/trading"
+    "https://dollarticks.pages.dev/"
   );
 
   headers.append(
@@ -169,4 +170,4 @@ Return to DollarTicks
     status: 303,
     headers
   });
-      }
+}
