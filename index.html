@@ -12,109 +12,115 @@ body{
   margin:0;
   background:#080b10;
   color:#f5f7fa;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif
 }
 
 .wrap{
   max-width:760px;
   margin:auto;
-  padding:12px;
+  padding:12px
 }
 
 .top{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:12px;
+  margin-bottom:12px
 }
 
 .brand{
   font-size:25px;
-  font-weight:800;
+  font-weight:800
 }
 
-.brand span{color:#18c6d8}
+.brand span{
+  color:#18c6d8
+}
 
 .status{
   padding:7px 11px;
   border-radius:20px;
   background:#171c24;
   color:#aab4c3;
-  font-size:12px;
+  font-size:12px
 }
 
-.status.live{color:#62e6a7}
+.status.live{
+  color:#62e6a7
+}
 
 .card{
   background:#10151d;
   border:1px solid #202733;
   border-radius:16px;
   padding:14px;
-  margin-bottom:12px;
+  margin-bottom:12px
 }
 
-select,button,input{
+select,
+button,
+input{
   width:100%;
   padding:12px;
   border-radius:11px;
   border:1px solid #2b3442;
   background:#151b24;
   color:#fff;
-  font-size:15px;
+  font-size:15px
 }
 
 button{
   cursor:pointer;
-  font-weight:700;
+  font-weight:700
 }
 
 button.primary{
   background:#13aebf;
   border-color:#13aebf;
-  color:#061014;
+  color:#061014
 }
 
 button.connect{
   margin-top:10px;
   background:#18c6d8;
   border-color:#18c6d8;
-  color:#061014;
+  color:#061014
 }
 
 button.buy{
   margin-top:10px;
   background:#62e6a7;
   border-color:#62e6a7;
-  color:#061014;
+  color:#061014
 }
 
 button:disabled{
   opacity:.5;
-  cursor:not-allowed;
+  cursor:not-allowed
 }
 
 .market{
   font-size:18px;
   font-weight:800;
-  margin-top:10px;
+  margin-top:10px
 }
 
 .quote{
   color:#9da8b8;
   font-size:13px;
-  margin-top:4px;
+  margin-top:4px
 }
 
 .latestBadge{
   color:#8d98aa;
   font-size:12px;
-  margin-bottom:9px;
+  margin-bottom:9px
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:10px;
+  gap:10px
 }
 
 .digit{
@@ -126,13 +132,16 @@ button:disabled{
   display:flex;
   flex-direction:column;
   justify-content:center;
-  align-items:center;
+  align-items:center
 }
 
-.digit strong{font-size:22px}
+.digit strong{
+  font-size:22px
+}
+
 .digit small{
   color:#aeb8c7;
-  font-size:11px;
+  font-size:11px
 }
 
 .digit.most::before{
@@ -143,7 +152,7 @@ button:disabled{
   border:6px solid transparent;
   border-top-color:#39e58c;
   border-left-color:#39e58c;
-  transform:rotate(-25deg);
+  transform:rotate(-25deg)
 }
 
 .digit.least::after{
@@ -154,11 +163,11 @@ button:disabled{
   border:6px solid transparent;
   border-bottom-color:#ff4d5a;
   border-right-color:#ff4d5a;
-  transform:rotate(-25deg);
+  transform:rotate(-25deg)
 }
 
 .digit.latest{
-  box-shadow:0 0 0 3px rgba(150,100,255,.25);
+  box-shadow:0 0 0 3px rgba(150,100,255,.25)
 }
 
 .digit.latest .pointer{
@@ -171,6 +180,7 @@ button:disabled{
   border-left:8px solid transparent;
   border-right:8px solid transparent;
   border-top:15px solid #9b6cff;
+  z-index:10
 }
 
 .ticks{
@@ -178,7 +188,7 @@ button:disabled{
   flex-wrap:wrap;
   gap:6px;
   max-height:110px;
-  overflow:hidden;
+  overflow:hidden
 }
 
 .tick{
@@ -188,31 +198,35 @@ button:disabled{
   background:#171e28;
   display:grid;
   place-items:center;
-  font-weight:800;
+  font-weight:800
 }
 
-.tick.new{outline:2px solid #18c6d8}
+.tick.new{
+  outline:2px solid #18c6d8
+}
 
 .row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:10px;
+  gap:10px
 }
 
 .metric{
   background:#0d1219;
   border-radius:12px;
-  padding:12px;
+  padding:12px
 }
 
 .metric label{
   display:block;
   color:#8f9aab;
   font-size:12px;
-  margin-bottom:4px;
+  margin-bottom:4px
 }
 
-.metric b{font-size:19px}
+.metric b{
+  font-size:19px
+}
 
 .tradeStatus{
   margin-top:10px;
@@ -220,35 +234,73 @@ button:disabled{
   border-radius:11px;
   background:#0d1219;
   color:#aeb8c7;
-  font-size:13px;
+  font-size:13px
 }
 
-.success{color:#62e6a7}
-.error{color:#ff7b7b}
-.connectionOk{color:#62e6a7}
-.connectionBad{color:#ff7b7b}
+.success{
+  color:#62e6a7
+}
 
-.hidden{display:none}
+.error{
+  color:#ff7b7b
+}
+
+.connectionOk{
+  color:#62e6a7
+}
+
+.connectionBad{
+  color:#ff7b7b
+}
+
+.hidden{
+  display:none
+}
 
 .note{
   color:#8995a6;
   font-size:12px;
-  line-height:1.5;
+  line-height:1.5
 }
 
 .footer{
   text-align:center;
   color:#697486;
   font-size:11px;
-  padding:10px 0 20px;
+  padding:10px 0 20px
+}
+
+.debug{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#080b10;
+  color:#8995a6;
+  font-size:11px;
+  word-break:break-word
 }
 
 @media(max-width:430px){
-  .wrap{padding:9px}
-  .grid{gap:7px}
-  .digit{border-width:3px}
-  .digit strong{font-size:19px}
-  .digit small{font-size:10px}
+
+  .wrap{
+    padding:9px
+  }
+
+  .grid{
+    gap:7px
+  }
+
+  .digit{
+    border-width:3px
+  }
+
+  .digit strong{
+    font-size:19px
+  }
+
+  .digit small{
+    font-size:10px
+  }
 }
 </style>
 </head>
@@ -258,428 +310,545 @@ button:disabled{
 <div class="wrap">
 
 <div class="top">
-  <div class="brand">Dollar<span>Ticks</span></div>
-  <div id="status" class="status">Connecting…</div>
+
+  <div class="brand">
+    Dollar<span>Ticks</span>
+  </div>
+
+  <div id="status" class="status">
+    Connecting…
+  </div>
+
 </div>
+
 
 <!-- MARKET -->
 
 <div class="card">
 
-<select id="market">
-  <option value="1HZ100V">Volatility 100 (1s)</option>
-  <option value="1HZ75V">Volatility 75 (1s)</option>
-  <option value="1HZ50V">Volatility 50 (1s)</option>
-  <option value="1HZ25V">Volatility 25 (1s)</option>
-  <option value="1HZ10V">Volatility 10 (1s)</option>
-</select>
+  <label>Volatility Market</label>
 
-<div class="market" id="marketName">
-Volatility 100 (1s)
+  <select id="market">
+
+    <option value="1HZ100V">
+      Volatility 100 (1s)
+    </option>
+
+    <option value="1HZ75V">
+      Volatility 75 (1s)
+    </option>
+
+    <option value="1HZ50V">
+      Volatility 50 (1s)
+    </option>
+
+    <option value="1HZ25V">
+      Volatility 25 (1s)
+    </option>
+
+    <option value="1HZ10V">
+      Volatility 10 (1s)
+    </option>
+
+  </select>
+
+  <div class="market" id="marketName">
+    Volatility 100 (1s)
+  </div>
+
+  <div class="quote" id="quote">
+    Waiting for tick…
+  </div>
+
 </div>
 
-<div class="quote" id="quote">
-Waiting for tick…
-</div>
 
-</div>
-
-<!-- DIGITS -->
+<!-- FREQUENCY -->
 
 <div class="card">
 
-<div class="latestBadge">
-LAST DIGIT FREQUENCY — LAST <b>100</b> TICKS
+  <div class="latestBadge">
+    LAST DIGIT FREQUENCY —
+    LAST <b id="countLabel">100</b> TICKS
+  </div>
+
+  <div id="digits" class="grid"></div>
+
 </div>
 
-<div id="digits" class="grid"></div>
 
-</div>
+<!-- LIVE DIGITS -->
 
 <div class="card">
 
-<div class="latestBadge">
-LIVE LAST DIGITS
+  <div class="latestBadge">
+    LIVE LAST DIGITS
+  </div>
+
+  <div id="ticks" class="ticks"></div>
+
 </div>
 
-<div id="ticks" class="ticks"></div>
 
-</div>
+<!-- METRICS -->
 
 <div class="row">
 
-<div class="metric">
-<label>Most frequent</label>
-<b id="most">—</b>
+  <div class="metric">
+
+    <label>
+      Most frequent
+    </label>
+
+    <b id="most">—</b>
+
+  </div>
+
+
+  <div class="metric">
+
+    <label>
+      Least frequent
+    </label>
+
+    <b id="least">—</b>
+
+  </div>
+
 </div>
 
-<div class="metric">
-<label>Least frequent</label>
-<b id="least">—</b>
-</div>
-
-</div>
 
 <div style="height:12px"></div>
+
 
 <!-- OVER UNDER -->
 
 <div class="card">
 
-<div class="latestBadge">
-OVER / UNDER
+  <div class="latestBadge">
+    OVER / UNDER
+  </div>
+
+  <div class="row">
+
+    <div class="metric">
+
+      <label>
+        Over 5 — digits 6–9
+      </label>
+
+      <b id="over5">—</b>
+
+    </div>
+
+
+    <div class="metric">
+
+      <label>
+        Under 5 — digits 0–4
+      </label>
+
+      <b id="under5">—</b>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div class="row">
-
-<div class="metric">
-<label>Over 5 — digits 6–9</label>
-<b id="over5">—</b>
-</div>
-
-<div class="metric">
-<label>Under 5 — digits 0–4</label>
-<b id="under5">—</b>
-</div>
-
-</div>
-
-</div>
 
 <!-- TRADING -->
 
 <div class="card">
 
-<div class="latestBadge">
-TRADING
+  <div class="latestBadge">
+    TRADING
+  </div>
+
+
+  <label>
+    Contract type
+  </label>
+
+  <select id="contractType">
+
+    <option value="DIGITOVER">
+      Over
+    </option>
+
+    <option value="DIGITUNDER">
+      Under
+    </option>
+
+    <option value="DIGITMATCH">
+      Matches
+    </option>
+
+    <option value="DIGITDIFF">
+      Differs
+    </option>
+
+    <option value="DIGITEVEN">
+      Even
+    </option>
+
+    <option value="DIGITODD">
+      Odd
+    </option>
+
+  </select>
+
+
+  <div style="height:10px"></div>
+
+
+  <div id="digitControl">
+
+    <label>
+      Digit / Barrier
+    </label>
+
+    <select id="barrier">
+
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5" selected>5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+
+    </select>
+
+  </div>
+
+
+  <div style="height:10px"></div>
+
+
+  <label>
+    Stake
+  </label>
+
+  <input
+    id="stake"
+    type="number"
+    min="0.35"
+    step="0.01"
+    value="1"
+  >
+
+
+  <div style="height:10px"></div>
+
+
+  <label>
+    Duration
+  </label>
+
+  <input
+    id="duration"
+    type="number"
+    min="1"
+    max="10"
+    value="1"
+  >
+
+
+  <div style="height:10px"></div>
+
+
+  <button
+    id="getProposal"
+    class="primary"
+    type="button"
+  >
+    Get Trade Proposal
+  </button>
+
+
+  <div
+    id="proposalInfo"
+    class="tradeStatus"
+  >
+    No proposal requested yet.
+  </div>
+
+
+  <button
+    id="buyContract"
+    class="buy hidden"
+    type="button"
+  >
+    Buy DEMO Contract
+  </button>
+
+
+  <div
+    id="tradeStatus"
+    class="tradeStatus"
+  >
+    Proposal mode only — no contract will be purchased.
+  </div>
+
+
+  <div
+    id="debug"
+    class="debug hidden"
+  ></div>
+
 </div>
 
-<label>Contract type</label>
-
-<select id="contractType">
-
-<option value="DIGITOVER">Over</option>
-<option value="DIGITUNDER">Under</option>
-<option value="DIGITMATCH">Matches</option>
-<option value="DIGITDIFF">Differs</option>
-<option value="DIGITEVEN">Even</option>
-<option value="DIGITODD">Odd</option>
-
-</select>
-
-<div style="height:10px"></div>
-
-<div id="digitControl">
-
-<label>Digit / Barrier</label>
-
-<select id="barrier">
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5" selected>5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-</select>
-
-</div>
-
-<div style="height:10px"></div>
-
-<label>Stake</label>
-
-<input
-id="stake"
-type="number"
-min="0.35"
-step="0.01"
-value="1"
->
-
-<div style="height:10px"></div>
-
-<label>Duration</label>
-
-<input
-id="duration"
-type="number"
-min="1"
-max="10"
-value="1"
->
-
-<div style="height:10px"></div>
-
-<button id="getProposal" class="primary">
-Get Trade Proposal
-</button>
-
-<div id="proposalInfo" class="tradeStatus">
-No proposal requested yet.
-</div>
-
-<button id="buyContract" class="buy hidden">
-Buy DEMO Contract
-</button>
-
-<div id="tradeStatus" class="tradeStatus">
-Ready.
-</div>
-
-</div>
 
 <!-- ACCOUNT -->
 
 <div class="card">
 
-<div class="latestBadge">
-ACCOUNT CONNECTION
+  <div class="latestBadge">
+    ACCOUNT CONNECTION
+  </div>
+
+  <div class="metric">
+
+    <label>
+      Deriv account
+    </label>
+
+    <b id="accountStatus">
+      Checking…
+    </b>
+
+
+    <button
+      id="connectDeriv"
+      class="connect"
+    >
+      Connect Deriv
+    </button>
+
+  </div>
+
 </div>
 
-<div class="metric">
 
-<label>Deriv account</label>
-
-<b id="accountStatus">
-Checking…
-</b>
-
-<button id="connectDeriv" class="connect">
-Connect Deriv
-</button>
-
-</div>
-
-</div>
+<!-- NOTE -->
 
 <div class="card">
 
-<div class="note">
+  <div class="note">
 
-<b>DollarTicks</b> reads public Deriv tick data and calculates last-digit frequencies locally.
+    <b>DollarTicks</b>
+    reads public Deriv tick data and calculates
+    last-digit frequencies locally.
 
-<br><br>
+    <br><br>
 
-Percentages are based on recent ticks and are
-<b>not guaranteed predictions</b>
-of the next tick.
+    🟢 Green = most occurring digit.
 
-<br><br>
+    <br>
 
-The proposal button requests a fresh Deriv proposal.
+    🔴 Red = least occurring digit.
 
-The DEMO button requests another fresh proposal immediately before buying so an old proposal is not reused.
+    <br>
+
+    🟣 Pointer = current moving tick.
+
+    <br><br>
+
+    Percentages are based on recent ticks and are
+    <b>not guaranteed predictions</b>
+    of the next tick.
+
+    <br><br>
+
+    The proposal button requests a Deriv proposal.
+
+    <br><br>
+
+    The Buy DEMO button requests a fresh proposal
+    immediately before purchasing.
+
+  </div>
 
 </div>
 
-</div>
 
 <div class="footer">
-DollarTicks • Market data powered by Deriv
+  DollarTicks • Market data powered by Deriv
 </div>
 
 </div>
+
 
 <script>
 
+/* =====================================================
+   PUBLIC MARKET WEBSOCKET
+   ===================================================== */
+
 const WS_URL =
-"wss://api.derivws.com/trading/v1/options/ws/public";
+  "wss://api.derivws.com/trading/v1/options/ws/public";
+
 
 const MAX_TICKS = 100;
 
+
 const marketNames = {
-  "1HZ100V":"Volatility 100 (1s)",
-  "1HZ75V":"Volatility 75 (1s)",
-  "1HZ50V":"Volatility 50 (1s)",
-  "1HZ25V":"Volatility 25 (1s)",
-  "1HZ10V":"Volatility 10 (1s)"
+
+  "1HZ100V":
+    "Volatility 100 (1s)",
+
+  "1HZ75V":
+    "Volatility 75 (1s)",
+
+  "1HZ50V":
+    "Volatility 50 (1s)",
+
+  "1HZ25V":
+    "Volatility 25 (1s)",
+
+  "1HZ10V":
+    "Volatility 10 (1s)"
+
 };
 
+
 let ws = null;
+
 let history = [];
+
 let latestDigit = null;
+
+let currentProposal = null;
+
 let currentAccountType = "demo";
 
-const $ = id => document.getElementById(id);
+
+const $ =
+  id => document.getElementById(id);
 
 
-/* STATUS */
+/* =====================================================
+   STATUS
+   ===================================================== */
 
-function setStatus(text,live=false){
+function setStatus(
+  text,
+  live = false
+){
 
   $("status").textContent = text;
 
   $("status").className =
-    "status" + (live ? " live" : "");
+    "status" +
+    (live ? " live" : "");
 
 }
 
 
-/* DIGIT */
+/* =====================================================
+   GET MARKET
+   ===================================================== */
 
-function getLastDigit(quote,pipSize){
+function getSelectedMarket(){
 
-  const n = Number(quote);
+  const select =
+    $("market");
+
+  /*
+   * IMPORTANT:
+   * Always fall back to Volatility 100.
+   */
+
+  const selected =
+    select?.value;
+
+  const market =
+    selected &&
+    marketNames[selected]
+      ? selected
+      : "1HZ100V";
+
+  /*
+   * Keep selector synchronized.
+   */
+
+  if(select){
+    select.value = market;
+  }
+
+  return market;
+
+}
+
+
+/* =====================================================
+   DIGIT
+   ===================================================== */
+
+function getLastDigit(
+  quote,
+  pipSize
+){
+
+  const n =
+    Number(quote);
 
   if(!Number.isFinite(n)){
     return null;
   }
 
-  if(Number.isFinite(Number(pipSize))){
+  if(
+    Number.isFinite(
+      Number(pipSize)
+    )
+  ){
 
     const factor =
       10 ** Number(pipSize);
 
     return Math.abs(
-      Math.round(n * factor)
+      Math.round(
+        n * factor
+      )
     ) % 10;
 
   }
 
-  const text = String(quote);
+  const text =
+    String(quote);
 
   const clean =
-    text.replace(/[^0-9]/g,"");
+    text.replace(
+      /[^0-9]/g,
+      ""
+    );
 
   if(!clean){
     return null;
   }
 
   return Number(
-    clean.charAt(clean.length - 1)
+    clean.charAt(
+      clean.length - 1
+    )
   );
 
 }
 
 
-/* RENDER */
+/* =====================================================
+   ADD DIGIT
+   ===================================================== */
 
-function render(){
-
-  const counts = Array(10).fill(0);
-
-  for(const digit of history){
-    counts[digit]++;
-  }
-
-  let mostDigit = 0;
-  let leastDigit = 0;
-
-  for(let i=1;i<10;i++){
-
-    if(counts[i] > counts[mostDigit]){
-      mostDigit = i;
-    }
-
-    if(counts[i] < counts[leastDigit]){
-      leastDigit = i;
-    }
-
-  }
-
-  $("digits").innerHTML =
-    counts.map((count,digit)=>{
-
-      const percentage =
-        history.length
-        ? count / history.length * 100
-        : 0;
-
-      const isMost =
-        history.length > 0 &&
-        digit === mostDigit &&
-        counts[mostDigit] > 0;
-
-      const isLeast =
-        history.length > 0 &&
-        digit === leastDigit;
-
-      const isLatest =
-        digit === latestDigit;
-
-      return `
-        <div class="digit
-        ${isMost ? "most" : ""}
-        ${isLeast ? "least" : ""}
-        ${isLatest ? "latest" : ""}">
-
-        ${isLatest
-          ? '<div class="pointer"></div>'
-          : ""}
-
-        <strong>${digit}</strong>
-
-        <small>
-        ${count} • ${percentage.toFixed(1)}%
-        </small>
-
-        </div>
-      `;
-
-    }).join("");
-
-
-  $("ticks").innerHTML =
-    history
-    .slice()
-    .reverse()
-    .map((digit,index)=>`
-
-      <div class="tick ${index === 0 ? "new" : ""}">
-      ${digit}
-      </div>
-
-    `)
-    .join("");
-
-
-  if(history.length){
-
-    $("most").textContent =
-      `${mostDigit} (${(
-        counts[mostDigit] /
-        history.length * 100
-      ).toFixed(1)}%)`;
-
-    $("least").textContent =
-      `${leastDigit} (${(
-        counts[leastDigit] /
-        history.length * 100
-      ).toFixed(1)}%)`;
-
-    const over =
-      counts[6] +
-      counts[7] +
-      counts[8] +
-      counts[9];
-
-    const under =
-      counts[0] +
-      counts[1] +
-      counts[2] +
-      counts[3] +
-      counts[4];
-
-    $("over5").textContent =
-      (over / history.length * 100)
-      .toFixed(1) + "%";
-
-    $("under5").textContent =
-      (under / history.length * 100)
-      .toFixed(1) + "%";
-
-  }
-
-}
-
-
-/* ADD TICK */
-
-function addDigit(digit,quote,epoch){
+function addDigit(
+  digit,
+  quote,
+  epoch
+){
 
   if(
     digit === null ||
@@ -689,18 +858,25 @@ function addDigit(digit,quote,epoch){
     return;
   }
 
-  latestDigit = digit;
+  latestDigit =
+    digit;
 
-  history.push(digit);
+  history.push(
+    digit
+  );
 
-  if(history.length > MAX_TICKS){
+  if(
+    history.length >
+    MAX_TICKS
+  ){
     history.shift();
   }
 
   $("quote").textContent =
     `${quote} • ${
-      new Date(epoch * 1000)
-      .toLocaleTimeString()
+      new Date(
+        epoch * 1000
+      ).toLocaleTimeString()
     }`;
 
   render();
@@ -708,7 +884,196 @@ function addDigit(digit,quote,epoch){
 }
 
 
-/* MARKET */
+/* =====================================================
+   RENDER
+   ===================================================== */
+
+function render(){
+
+  const counts =
+    Array(10).fill(0);
+
+
+  for(
+    const digit of history
+  ){
+    counts[digit]++;
+  }
+
+
+  $("countLabel").textContent =
+    history.length;
+
+
+  let mostDigit = 0;
+
+  let leastDigit = 0;
+
+
+  for(
+    let i = 1;
+    i < 10;
+    i++
+  ){
+
+    if(
+      counts[i] >
+      counts[mostDigit]
+    ){
+      mostDigit = i;
+    }
+
+
+    if(
+      counts[i] <
+      counts[leastDigit]
+    ){
+      leastDigit = i;
+    }
+
+  }
+
+
+  $("digits").innerHTML =
+    counts.map(
+      (count,digit) => {
+
+        const percentage =
+          history.length
+            ? count /
+              history.length *
+              100
+            : 0;
+
+
+        const isMost =
+          history.length > 0 &&
+          digit === mostDigit &&
+          counts[mostDigit] > 0;
+
+
+        const isLeast =
+          history.length > 0 &&
+          digit === leastDigit;
+
+
+        const isLatest =
+          digit === latestDigit;
+
+
+        return `
+
+          <div class="digit
+            ${isMost ? "most" : ""}
+            ${isLeast ? "least" : ""}
+            ${isLatest ? "latest" : ""}
+          ">
+
+            ${
+              isLatest
+                ? '<div class="pointer"></div>'
+                : ""
+            }
+
+            <strong>
+              ${digit}
+            </strong>
+
+            <small>
+              ${count} •
+              ${percentage.toFixed(1)}%
+            </small>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  $("ticks").innerHTML =
+    history
+      .slice()
+      .reverse()
+      .map(
+        (digit,index) => `
+
+          <div class="tick ${
+            index === 0
+              ? "new"
+              : ""
+          }">
+
+            ${digit}
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  if(history.length){
+
+    $("most").textContent =
+      `${mostDigit} (${
+        (
+          counts[mostDigit] /
+          history.length *
+          100
+        ).toFixed(1)
+      }%)`;
+
+
+    $("least").textContent =
+      `${leastDigit} (${
+        (
+          counts[leastDigit] /
+          history.length *
+          100
+        ).toFixed(1)
+      }%)`;
+
+
+    const over =
+      counts[6] +
+      counts[7] +
+      counts[8] +
+      counts[9];
+
+
+    const under =
+      counts[0] +
+      counts[1] +
+      counts[2] +
+      counts[3] +
+      counts[4];
+
+
+    $("over5").textContent =
+      (
+        over /
+        history.length *
+        100
+      ).toFixed(1) + "%";
+
+
+    $("under5").textContent =
+      (
+        under /
+        history.length *
+        100
+      ).toFixed(1) + "%";
+
+  }
+
+}
+
+
+/* =====================================================
+   MARKET CONNECTION
+   ===================================================== */
 
 function connectMarket(){
 
@@ -718,188 +1083,286 @@ function connectMarket(){
       ws.close();
     }catch(e){}
 
+    ws = null;
+
   }
 
+
   history = [];
+
   latestDigit = null;
 
   render();
 
+
   const symbol =
-    $("market").value;
+    getSelectedMarket();
 
-  if(!marketNames[symbol]){
-
-    setStatus("Select a Volatility market");
-
-    return;
-
-  }
 
   $("marketName").textContent =
     marketNames[symbol];
 
-  setStatus("Connecting…");
 
-  ws = new WebSocket(WS_URL);
-
-  ws.onopen = function(){
-
-    setStatus("LIVE",true);
-
-    ws.send(JSON.stringify({
-
-      ticks_history:symbol,
-      count:MAX_TICKS,
-      end:"latest",
-      style:"ticks",
-      subscribe:1,
-      req_id:1
-
-    }));
-
-  };
+  setStatus(
+    "Connecting…"
+  );
 
 
-  ws.onmessage = function(event){
-
-    try{
-
-      const data =
-        JSON.parse(event.data);
-
-      if(data.error){
-
-        console.error(data.error);
-
-        setStatus("Market API error");
-
-        return;
-
-      }
+  ws =
+    new WebSocket(
+      WS_URL
+    );
 
 
-      if(data.msg_type === "history"){
+  ws.onopen =
+    function(){
 
-        const prices =
-          data.history?.prices || [];
+      setStatus(
+        "LIVE",
+        true
+      );
 
-        const times =
-          data.history?.times || [];
 
-        const pipSize =
-          data.pip_size;
+      ws.send(
+        JSON.stringify({
 
-        history = [];
+          ticks_history:
+            symbol,
 
-        for(let i=0;i<prices.length;i++){
+          count:
+            MAX_TICKS,
+
+          end:
+            "latest",
+
+          style:
+            "ticks",
+
+          subscribe:
+            1,
+
+          req_id:
+            1
+
+        })
+      );
+
+    };
+
+
+  ws.onmessage =
+    function(event){
+
+      try{
+
+        const data =
+          JSON.parse(
+            event.data
+          );
+
+
+        if(data.error){
+
+          console.error(
+            data.error
+          );
+
+          setStatus(
+            "API error"
+          );
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "history"
+        ){
+
+          const prices =
+            data.history?.prices ||
+            [];
+
+
+          const times =
+            data.history?.times ||
+            [];
+
+
+          const pipSize =
+            data.pip_size;
+
+
+          history = [];
+
+
+          for(
+            let i = 0;
+            i < prices.length;
+            i++
+          ){
+
+            const digit =
+              getLastDigit(
+                prices[i],
+                pipSize
+              );
+
+
+            if(
+              digit !== null
+            ){
+
+              history.push(
+                digit
+              );
+
+            }
+
+          }
+
+
+          if(
+            history.length >
+            MAX_TICKS
+          ){
+
+            history =
+              history.slice(
+                -MAX_TICKS
+              );
+
+          }
+
+
+          if(history.length){
+
+            latestDigit =
+              history[
+                history.length - 1
+              ];
+
+          }
+
+
+          if(prices.length){
+
+            const lastPrice =
+              prices[
+                prices.length - 1
+              ];
+
+
+            const lastTime =
+              times[
+                times.length - 1
+              ];
+
+
+            $("quote").textContent =
+              `${lastPrice} • ${
+                new Date(
+                  lastTime * 1000
+                ).toLocaleTimeString()
+              }`;
+
+          }
+
+
+          render();
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "tick"
+        ){
+
+          if(!data.tick){
+            return;
+          }
+
+
+          const tick =
+            data.tick;
+
 
           const digit =
             getLastDigit(
-              prices[i],
-              pipSize
+              tick.quote,
+              tick.pip_size
             );
 
-          if(digit !== null){
-            history.push(digit);
-          }
 
-        }
-
-        if(history.length > MAX_TICKS){
-          history =
-            history.slice(-MAX_TICKS);
-        }
-
-        if(history.length){
-          latestDigit =
-            history[history.length - 1];
-        }
-
-        if(prices.length){
-
-          const lastPrice =
-            prices[prices.length - 1];
-
-          const lastTime =
-            times[times.length - 1];
-
-          $("quote").textContent =
-            `${lastPrice} • ${
-              new Date(lastTime * 1000)
-              .toLocaleTimeString()
-            }`;
-
-        }
-
-        render();
-
-        return;
-
-      }
-
-
-      if(data.msg_type === "tick"){
-
-        if(!data.tick){
-          return;
-        }
-
-        const tick = data.tick;
-
-        const digit =
-          getLastDigit(
+          addDigit(
+            digit,
             tick.quote,
-            tick.pip_size
+            tick.epoch
           );
 
-        addDigit(
-          digit,
-          tick.quote,
-          tick.epoch
+        }
+
+      }catch(error){
+
+        console.error(
+          "Tick error:",
+          error
         );
 
       }
 
-    }catch(error){
+    };
 
-      console.error(
-        "Tick error:",
-        error
+
+  ws.onerror =
+    function(){
+
+      setStatus(
+        "Connection error"
       );
 
-    }
-
-  };
+    };
 
 
-  ws.onerror = function(){
+  ws.onclose =
+    function(){
 
-    setStatus("Connection error");
+      setStatus(
+        "Disconnected"
+      );
 
-  };
+      setTimeout(
+        connectMarket,
+        3000
+      );
 
-
-  ws.onclose = function(){
-
-    setStatus("Disconnected");
-
-  };
+    };
 
 }
 
 
-/* IMPORTANT:
-   Make sure the market is always valid.
-*/
+/* =====================================================
+   MARKET CHANGE
+   ===================================================== */
 
 $("market").addEventListener(
   "change",
-  connectMarket
+  function(){
+
+    connectMarket();
+
+  }
 );
 
 
-/* ACCOUNT */
+/* =====================================================
+   ACCOUNT
+   ===================================================== */
 
 async function checkAccount(){
 
@@ -909,19 +1372,30 @@ async function checkAccount(){
       await fetch(
         "/trading",
         {
-          method:"GET",
-          credentials:"same-origin",
-          cache:"no-store"
+          method:
+            "GET",
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store"
         }
       );
+
 
     const data =
       await response.json();
 
-    if(data.ok && data.connected){
+
+    if(
+      data.ok &&
+      data.connected
+    ){
 
       const account =
         data.selected_account;
+
 
       currentAccountType =
         String(
@@ -929,183 +1403,268 @@ async function checkAccount(){
           "demo"
         ).toLowerCase();
 
+
       $("accountStatus").textContent =
         `${currentAccountType.toUpperCase()} Connected ✓`;
+
 
       $("accountStatus").className =
         "connectionOk";
 
+
       $("connectDeriv").textContent =
         "Deriv Connected ✓";
 
-      $("connectDeriv").disabled = true;
+
+      $("connectDeriv").disabled =
+        true;
 
     }else{
 
       $("accountStatus").textContent =
         "Not connected";
 
+
       $("accountStatus").className =
         "connectionBad";
 
-      $("connectDeriv").disabled = false;
+
+      $("connectDeriv").textContent =
+        "Connect Deriv";
+
+
+      $("connectDeriv").disabled =
+        false;
 
     }
 
   }catch(error){
 
+    console.error(
+      error
+    );
+
+
     $("accountStatus").textContent =
       "Not connected";
+
 
     $("accountStatus").className =
       "connectionBad";
 
-    $("connectDeriv").disabled = false;
+
+    $("connectDeriv").disabled =
+      false;
 
   }
 
 }
 
 
+/* =====================================================
+   CONNECT DERIV
+   ===================================================== */
+
 $("connectDeriv").addEventListener(
   "click",
   function(){
 
-    window.location.href = "/auth";
+    window.location.href =
+      "/auth";
 
   }
 );
 
 
-/* CONTRACT UI */
+/* =====================================================
+   CONTRACT UI
+   ===================================================== */
 
 function updateContractUI(){
 
   const type =
     $("contractType").value;
 
+
   const digitContracts = [
+
     "DIGITOVER",
     "DIGITUNDER",
     "DIGITMATCH",
-    "DIGITDIFF",
-    "DIGITEVEN",
-    "DIGITODD"
+    "DIGITDIFF"
+
   ];
 
+
   $("digitControl")
-    .classList
-    .toggle(
+    .classList.toggle(
       "hidden",
       !digitContracts.includes(type)
     );
 
 }
 
+
 $("contractType").addEventListener(
   "change",
   updateContractUI
 );
 
+
 updateContractUI();
 
 
-/*
-==================================================
-BUILD TRADE PAYLOAD
-==================================================
-*/
+/* =====================================================
+   BUILD TRADE PAYLOAD
+   ===================================================== */
 
 function buildTradePayload(){
 
+  /*
+   * THIS IS THE IMPORTANT PART.
+   *
+   * We NEVER allow market to be empty.
+   */
+
   const market =
-    String(
-      $("market").value || ""
-    ).trim();
+    getSelectedMarket();
 
-  if(!market){
 
-    throw new Error(
-      "Please select a Volatility market first."
-    );
+  const contractType =
+    $("contractType").value;
 
-  }
 
-  return {
+  const payload = {
 
-    action:"proposal",
+    account_type:
+      "demo",
 
-    account_type:"demo",
+    market:
+      market,
 
-    /*
-     * Send BOTH names.
-     * The backend can use either.
-     */
+    symbol:
+      market,
 
-    market:market,
-
-    underlying_symbol:market,
+    underlying_symbol:
+      market,
 
     contract_type:
-      $("contractType").value,
+      contractType,
 
     barrier:
       $("barrier").value,
 
     stake:
-      Number($("stake").value),
+      Number(
+        $("stake").value
+      ),
 
     duration:
-      Number($("duration").value),
+      Number(
+        $("duration").value
+      ),
 
-    duration_unit:"t"
+    duration_unit:
+      "t"
 
   };
+
+
+  console.log(
+    "DollarTicks trade payload:",
+    payload
+  );
+
+
+  return payload;
 
 }
 
 
-/*
-==================================================
-REQUEST PROPOSAL
-==================================================
-*/
+/* =====================================================
+   REQUEST PROPOSAL
+   ===================================================== */
 
 async function requestFreshProposal(){
 
-  const payload =
-    buildTradePayload();
+  const payload = {
+
+    action:
+      "proposal",
+
+    ...buildTradePayload()
+
+  };
+
+
+  /*
+   * Final safety check.
+   */
+
+  if(
+    !payload.market
+  ){
+
+    throw new Error(
+      "No market selected. Please select a Volatility market."
+    );
+
+  }
+
 
   console.log(
-    "DollarTicks proposal payload:",
+    "Sending proposal:",
     payload
   );
+
 
   const response =
     await fetch(
       "/trading",
       {
-        method:"POST",
 
-        headers:{
+        method:
+          "POST",
+
+        headers: {
+
           "Content-Type":
-            "application/json"
+            "application/json",
+
+          "Cache-Control":
+            "no-cache"
+
         },
 
-        credentials:"same-origin",
+        credentials:
+          "same-origin",
 
-        cache:"no-store",
+        cache:
+          "no-store",
 
         body:
-          JSON.stringify(payload)
+          JSON.stringify(
+            payload
+          )
 
       }
     );
 
+
   const data =
     await response.json();
 
-  if(!response.ok || !data.ok){
+
+  console.log(
+    "Proposal response:",
+    data
+  );
+
+
+  if(
+    !response.ok ||
+    !data.ok
+  ){
 
     throw new Error(
       data.error ||
@@ -1113,6 +1672,7 @@ async function requestFreshProposal(){
     );
 
   }
+
 
   if(
     !data.proposal ||
@@ -1125,16 +1685,15 @@ async function requestFreshProposal(){
 
   }
 
+
   return data.proposal;
 
 }
 
 
-/*
-==================================================
-GET PROPOSAL
-==================================================
-*/
+/* =====================================================
+   GET PROPOSAL BUTTON
+   ===================================================== */
 
 $("getProposal").addEventListener(
   "click",
@@ -1149,58 +1708,120 @@ $("getProposal").addEventListener(
     const info =
       $("proposalInfo");
 
-    button.disabled = true;
+    const debug =
+      $("debug");
+
+
+    button.disabled =
+      true;
+
 
     $("buyContract")
-      .classList
-      .add("hidden");
+      .classList.add(
+        "hidden"
+      );
+
+
+    currentProposal =
+      null;
+
+
+    debug.classList.add(
+      "hidden"
+    );
+
 
     status.className =
       "tradeStatus";
 
+
     status.textContent =
       "Requesting fresh proposal…";
 
+
     info.textContent =
       "Waiting for Deriv…";
+
 
     try{
 
       const proposal =
         await requestFreshProposal();
 
-      info.innerHTML =
-        `Proposal ID: <b>${proposal.id}</b><br>
-         Ask price: <b>${proposal.ask_price ?? "—"}</b><br>
-         Payout: <b>${proposal.payout ?? "—"}</b><br>
-         Spot: <b>${proposal.spot ?? "—"}</b>`;
+
+      currentProposal =
+        proposal;
+
+
+      info.innerHTML = `
+
+        Proposal ID:
+        <b>${proposal.id}</b>
+
+        <br>
+
+        Ask price:
+        <b>${proposal.ask_price ?? "—"}</b>
+
+        <br>
+
+        Payout:
+        <b>${proposal.payout ?? "—"}</b>
+
+        <br>
+
+        Spot:
+        <b>${proposal.spot ?? "—"}</b>
+
+      `;
+
 
       status.className =
         "tradeStatus success";
 
+
       status.textContent =
         "✓ Fresh proposal received.";
 
+      
       $("buyContract")
-        .classList
-        .remove("hidden");
+        .classList.remove(
+          "hidden"
+        );
+
 
     }catch(error){
 
-      console.error(error);
+      console.error(
+        error
+      );
+
 
       status.className =
         "tradeStatus error";
 
+
       status.textContent =
         error.message;
+
 
       info.textContent =
         "No valid proposal.";
 
+
+      debug.textContent =
+        "Market sent: " +
+        getSelectedMarket();
+
+
+      debug.classList.remove(
+        "hidden"
+      );
+
     }finally{
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
     }
 
@@ -1208,11 +1829,9 @@ $("getProposal").addEventListener(
 );
 
 
-/*
-==================================================
-BUY DEMO
-==================================================
-*/
+/* =====================================================
+   BUY DEMO
+   ===================================================== */
 
 $("buyContract").addEventListener(
   "click",
@@ -1224,72 +1843,131 @@ $("buyContract").addEventListener(
     const status =
       $("tradeStatus");
 
-    if(currentAccountType !== "demo"){
+
+    if(
+      currentAccountType !==
+      "demo"
+    ){
 
       status.className =
         "tradeStatus error";
 
+
       status.textContent =
-        "Please connect the DEMO account first.";
+        "Please connect the DEMO Deriv account first.";
+
 
       return;
 
     }
 
-    button.disabled = true;
 
-    $("getProposal").disabled = true;
+    button.disabled =
+      true;
+
+
+    $("getProposal").disabled =
+      true;
+
 
     status.className =
       "tradeStatus";
 
+
     status.textContent =
-      "Getting a fresh proposal and buying immediately…";
+      "Getting fresh proposal and purchasing…";
+
 
     try{
 
       /*
-       * Fresh proposal immediately before buy.
+       * Get a completely fresh proposal.
        */
 
-      const proposal =
+      const freshProposal =
         await requestFreshProposal();
+
+
+      currentProposal =
+        freshProposal;
+
+
+      /*
+       * Buy immediately.
+       */
+
+      const buyPayload = {
+
+        action:
+          "buy",
+
+        account_type:
+          "demo",
+
+        market:
+          getSelectedMarket(),
+
+        proposal_id:
+          String(
+            freshProposal.id
+          ),
+
+        price:
+          Number(
+            freshProposal.ask_price
+          )
+
+      };
+
+
+      console.log(
+        "Sending buy:",
+        buyPayload
+      );
+
 
       const buyResponse =
         await fetch(
           "/trading",
           {
-            method:"POST",
 
-            headers:{
+            method:
+              "POST",
+
+            headers: {
+
               "Content-Type":
-                "application/json"
+                "application/json",
+
+              "Cache-Control":
+                "no-cache"
+
             },
 
-            credentials:"same-origin",
+            credentials:
+              "same-origin",
 
-            cache:"no-store",
+            cache:
+              "no-store",
 
             body:
-              JSON.stringify({
-
-                action:"buy",
-
-                account_type:"demo",
-
-                proposal_id:
-                  String(proposal.id),
-
-                price:
-                  Number(proposal.ask_price)
-
-              })
+              JSON.stringify(
+                buyPayload
+              )
 
           }
         );
 
+
       const data =
         await buyResponse.json();
+
+
+      console.log(
+        "Buy response:",
+        data
+      );
+
 
       if(
         !buyResponse.ok ||
@@ -1303,46 +1981,74 @@ $("buyContract").addEventListener(
 
       }
 
+
       status.className =
         "tradeStatus success";
 
-      status.textContent =
-        `✓ DEMO contract purchased successfully. Contract ID: ${
-          data.contract?.contract_id || "—"
-        }`;
 
-      $("proposalInfo").innerHTML =
-        `Proposal ID: <b>${proposal.id}</b><br>
-         Purchase Price: <b>${
-           data.contract?.buy_price ??
-           proposal.ask_price ??
+      status.textContent =
+        `✓ DEMO contract purchased successfully.
+         Contract ID: ${
+           data.contract?.contract_id ||
            "—"
-         }</b><br>
-         Payout: <b>${
-           data.contract?.payout ??
-           proposal.payout ??
-           "—"
-         }</b>`;
+         }`;
+
+
+      $("proposalInfo").innerHTML = `
+
+        Proposal ID:
+        <b>${freshProposal.id}</b>
+
+        <br>
+
+        Purchase Price:
+        <b>${
+          data.contract?.buy_price ??
+          freshProposal.ask_price
+        }</b>
+
+        <br>
+
+        Payout:
+        <b>${
+          data.contract?.payout ??
+          freshProposal.payout ??
+          "—"
+        }</b>
+
+      `;
+
+
+      currentProposal =
+        null;
+
 
       $("buyContract")
-        .classList
-        .add("hidden");
+        .classList.add(
+          "hidden"
+        );
 
     }catch(error){
 
-      console.error(error);
+      console.error(
+        error
+      );
+
 
       status.className =
         "tradeStatus error";
+
 
       status.textContent =
         error.message;
 
     }finally{
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
-      $("getProposal").disabled = false;
+      $("getProposal").disabled =
+        false;
 
     }
 
@@ -1350,9 +2056,13 @@ $("buyContract").addEventListener(
 );
 
 
-/* START */
+/* =====================================================
+   START
+   ===================================================== */
 
 render();
+
+getSelectedMarket();
 
 connectMarket();
 
