@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>DollarTicks — Live Digit Dashboard</title>
+<title>DollarTicks — Moving Tick Validator</title>
 
 <style>
 *{box-sizing:border-box}
@@ -34,9 +34,7 @@ body{
   font-weight:800;
 }
 
-.brand span{
-  color:#18c6d8;
-}
+.brand span{color:#18c6d8}
 
 .status{
   padding:7px 11px;
@@ -46,9 +44,7 @@ body{
   font-size:12px;
 }
 
-.status.live{
-  color:#62e6a7;
-}
+.status.live{color:#62e6a7}
 
 .card{
   background:#10151d;
@@ -58,9 +54,7 @@ body{
   margin-bottom:12px;
 }
 
-select,
-button,
-input{
+select,button,input{
   width:100%;
   padding:12px;
   border-radius:11px;
@@ -166,6 +160,79 @@ button:disabled{
   outline:2px solid #18c6d8;
 }
 
+.movingTick{
+  text-align:center;
+  padding:20px 10px;
+  background:#0d1219;
+  border-radius:14px;
+}
+
+.movingDigit{
+  font-size:55px;
+  font-weight:900;
+  line-height:1;
+}
+
+.movingQuote{
+  margin-top:8px;
+  color:#9da8b8;
+  font-size:13px;
+}
+
+.sequence{
+  display:flex;
+  gap:6px;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.sequence span{
+  min-width:34px;
+  height:34px;
+  border-radius:8px;
+  background:#171e28;
+  display:grid;
+  place-items:center;
+  font-weight:800;
+}
+
+.sequence span.latest{
+  outline:2px solid #18c6d8;
+}
+
+.validation{
+  text-align:center;
+  padding:16px;
+  border-radius:14px;
+  background:#0d1219;
+}
+
+.validationTitle{
+  font-size:12px;
+  color:#8f9aab;
+  margin-bottom:7px;
+}
+
+.validationSignal{
+  font-size:24px;
+  font-weight:900;
+}
+
+.validationInfo{
+  margin-top:7px;
+  font-size:12px;
+  color:#9da8b8;
+  line-height:1.5;
+}
+
+.wait{
+  color:#f0c674;
+}
+
+.watch{
+  color:#18c6d8;
+}
+
 .row{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -198,25 +265,10 @@ button:disabled{
   font-size:13px;
 }
 
-.success{
-  color:#62e6a7;
-}
-
-.error{
-  color:#ff7b7b;
-}
-
-.connectionOk{
-  color:#62e6a7;
-}
-
-.connectionBad{
-  color:#ff7b7b;
-}
-
-.hidden{
-  display:none;
-}
+.success{color:#62e6a7}
+.error{color:#ff7b7b}
+.connectionOk{color:#62e6a7}
+.connectionBad{color:#ff7b7b}
 
 .note{
   color:#8995a6;
@@ -232,10 +284,16 @@ button:disabled{
 }
 
 @media(max-width:430px){
+
   .wrap{padding:9px}
+
   .grid{gap:6px}
+
   .digit{border-width:3px}
+
   .digit strong{font-size:19px}
+
+  .movingDigit{font-size:48px}
 }
 </style>
 </head>
@@ -245,13 +303,15 @@ button:disabled{
 <div class="wrap">
 
 <div class="top">
-  <div class="brand">
-    Dollar<span>Ticks</span>
-  </div>
 
-  <div id="status" class="status">
-    Connecting…
-  </div>
+<div class="brand">
+Dollar<span>Ticks</span>
+</div>
+
+<div id="status" class="status">
+Connecting…
+</div>
+
 </div>
 
 
@@ -261,25 +321,11 @@ button:disabled{
 
 <select id="market">
 
-<option value="1HZ100V">
-Volatility 100 (1s)
-</option>
-
-<option value="1HZ75V">
-Volatility 75 (1s)
-</option>
-
-<option value="1HZ50V">
-Volatility 50 (1s)
-</option>
-
-<option value="1HZ25V">
-Volatility 25 (1s)
-</option>
-
-<option value="1HZ10V">
-Volatility 10 (1s)
-</option>
+<option value="1HZ100V">Volatility 100 (1s)</option>
+<option value="1HZ75V">Volatility 75 (1s)</option>
+<option value="1HZ50V">Volatility 50 (1s)</option>
+<option value="1HZ25V">Volatility 25 (1s)</option>
+<option value="1HZ10V">Volatility 10 (1s)</option>
 
 </select>
 
@@ -294,7 +340,74 @@ Waiting for tick…
 </div>
 
 
-<!-- DIGITS -->
+<!-- MOVING TICK -->
+
+<div class="card">
+
+<div class="latestBadge">
+LIVE MOVING TICK
+</div>
+
+<div class="movingTick">
+
+<div
+id="movingDigit"
+class="movingDigit"
+>
+—
+</div>
+
+<div
+id="movingQuote"
+class="movingQuote"
+>
+Waiting for live tick…
+</div>
+
+</div>
+
+<div
+id="sequence"
+class="sequence"
+></div>
+
+</div>
+
+
+<!-- VALIDATION -->
+
+<div class="card">
+
+<div class="latestBadge">
+MOVING-TICK VALIDATION
+</div>
+
+<div class="validation">
+
+<div class="validationTitle">
+CURRENT STATUS
+</div>
+
+<div
+id="validationSignal"
+class="validationSignal wait"
+>
+WAITING
+</div>
+
+<div
+id="validationInfo"
+class="validationInfo"
+>
+Waiting for enough live ticks to validate the setup.
+</div>
+
+</div>
+
+</div>
+
+
+<!-- DIGIT FREQUENCY -->
 
 <div class="card">
 
@@ -309,7 +422,7 @@ TICKS
 </div>
 
 
-<!-- LIVE TICKS -->
+<!-- LIVE DIGITS -->
 
 <div class="card">
 
@@ -328,20 +441,15 @@ LIVE LAST DIGITS
 
 <div class="metric">
 
-<label>
-Most frequent
-</label>
+<label>Most frequent</label>
 
 <b id="most">—</b>
 
 </div>
 
-
 <div class="metric">
 
-<label>
-Least frequent
-</label>
+<label>Least frequent</label>
 
 <b id="least">—</b>
 
@@ -373,7 +481,6 @@ Over 5 — digits 6–9
 
 </div>
 
-
 <div class="metric">
 
 <label>
@@ -389,12 +496,12 @@ Under 5 — digits 0–4
 </div>
 
 
-<!-- TRADING -->
+<!-- PROPOSAL -->
 
 <div class="card">
 
 <div class="latestBadge">
-TRADING
+TRADING — PROPOSAL ONLY
 </div>
 
 <label>Contract type</label>
@@ -422,7 +529,6 @@ TRADING
 <option>1</option>
 <option>2</option>
 <option>3</option>
-<option>4</option>
 <option selected>5</option>
 <option>6</option>
 <option>7</option>
@@ -487,9 +593,7 @@ ACCOUNT CONNECTION
 
 <div class="metric">
 
-<label>
-Deriv account
-</label>
+<label>Deriv account</label>
 
 <b id="accountStatus">
 Checking…
@@ -513,15 +617,19 @@ Connect Deriv
 
 <div class="note">
 
-<b>DollarTicks</b> reads public Deriv tick data and calculates the last-digit frequencies locally.
+<b>DollarTicks</b> reads public Deriv tick data and calculates recent digit frequencies.
 
 <br><br>
 
-The percentages are based on the recent ticks shown above. They are <b>not guaranteed predictions</b> of the next tick.
+The moving tick shows the latest live digit as it arrives.
 
 <br><br>
 
-Trading remains in proposal mode. Pressing "Get Trade Proposal" does not purchase a contract.
+The validation panel is a monitoring tool. It does <b>not</b> guarantee the next digit and does not automatically place trades.
+
+<br><br>
+
+Trading remains in proposal mode.
 
 </div>
 
@@ -537,14 +645,12 @@ DollarTicks • Market data powered by Deriv
 
 <script>
 
-/* =====================================================
-   CONFIG
-===================================================== */
-
 const WS_URL =
 "wss://api.derivws.com/trading/v1/options/ws/public";
 
 const MAX_TICKS = 100;
+
+const SEQUENCE_LENGTH = 20;
 
 const marketNames = {
 
@@ -557,14 +663,15 @@ const marketNames = {
 };
 
 let ws = null;
+
 let history = [];
+
 let latestDigit = null;
+
+let latestQuote = null;
+
 let reconnectTimer = null;
 
-
-/* =====================================================
-   ELEMENT HELPER
-===================================================== */
 
 const $ = id =>
 document.getElementById(id);
@@ -574,7 +681,10 @@ document.getElementById(id);
    STATUS
 ===================================================== */
 
-function setStatus(text,live=false){
+function setStatus(
+text,
+live=false
+){
 
 $("status").textContent = text;
 
@@ -586,46 +696,247 @@ $("status").className =
 
 
 /* =====================================================
-   LAST DIGIT CALCULATION
+   LAST DIGIT
 ===================================================== */
 
-function getLastDigit(quote,pipSize){
+function getLastDigit(
+quote,
+pipSize
+){
 
-const n = Number(quote);
+const n =
+Number(quote);
 
 if(!Number.isFinite(n)){
 return null;
 }
 
-if(Number.isFinite(Number(pipSize))){
+if(
+Number.isFinite(
+Number(pipSize)
+)
+){
 
 const factor =
 10 ** Number(pipSize);
 
 return Math.abs(
-Math.round(n * factor)
+Math.round(
+n * factor
+)
 ) % 10;
 
 }
-
-/*
-Fallback:
-Use the final decimal digit.
-*/
 
 const text =
 String(quote);
 
 const clean =
-text.replace(/[^0-9]/g,"");
+text.replace(
+/[^0-9]/g,
+""
+);
 
 if(!clean){
 return null;
 }
 
 return Number(
-clean.charAt(clean.length - 1)
+clean.charAt(
+clean.length - 1
+)
 );
+
+}
+
+
+/* =====================================================
+   MOVING TICK
+===================================================== */
+
+function updateMovingTick(
+digit,
+quote
+){
+
+if(
+digit === null
+){
+return;
+}
+
+$("movingDigit")
+.textContent =
+digit;
+
+$("movingQuote")
+.textContent =
+`Current quote: ${quote}`;
+
+renderSequence();
+
+}
+
+
+/* =====================================================
+   SEQUENCE
+===================================================== */
+
+function renderSequence(){
+
+const sequence =
+history
+.slice(-SEQUENCE_LENGTH)
+.reverse();
+
+$("sequence").innerHTML =
+sequence.map(
+(digit,index)=>`
+
+<span
+class="${index === 0 ? "latest" : ""}"
+>
+${digit}
+</span>
+
+`
+).join("");
+
+}
+
+
+/* =====================================================
+   VALIDATION
+===================================================== */
+
+function validateMovingTick(){
+
+if(
+history.length < 10
+){
+
+$("validationSignal")
+.textContent =
+"WAITING";
+
+$("validationSignal")
+.className =
+"validationSignal wait";
+
+$("validationInfo")
+.textContent =
+"Collecting live ticks…";
+
+return;
+
+}
+
+const recent =
+history.slice(-10);
+
+const over =
+recent.filter(
+d => d >= 6
+).length;
+
+const under =
+recent.filter(
+d => d <= 4
+).length;
+
+const even =
+recent.filter(
+d => d % 2 === 0
+).length;
+
+const odd =
+recent.filter(
+d => d % 2 !== 0
+).length;
+
+const latest =
+recent[recent.length - 1];
+
+
+/*
+This is deliberately NOT
+a prediction engine.
+
+It simply describes the
+current recent sequence.
+*/
+
+if(over >= 7){
+
+$("validationSignal")
+.textContent =
+"OVER 5 DOMINANT";
+
+$("validationSignal")
+.className =
+"validationSignal watch";
+
+$("validationInfo")
+.textContent =
+`Recent 10 ticks: ${over}/10 were digits 6–9. Latest digit: ${latest}. This is historical validation only — not a guaranteed next-tick prediction.`;
+
+}else if(under >= 7){
+
+$("validationSignal")
+.textContent =
+"UNDER 5 DOMINANT";
+
+$("validationSignal")
+.className =
+"validationSignal watch";
+
+$("validationInfo")
+.textContent =
+`Recent 10 ticks: ${under}/10 were digits 0–4. Latest digit: ${latest}. This is historical validation only — not a guaranteed next-tick prediction.`;
+
+}else if(even >= 8){
+
+$("validationSignal")
+.textContent =
+"EVEN DOMINANT";
+
+$("validationSignal")
+.className =
+"validationSignal watch";
+
+$("validationInfo")
+.textContent =
+`Recent 10 ticks: ${even}/10 were even. Latest digit: ${latest}.`;
+
+}else if(odd >= 8){
+
+$("validationSignal")
+.textContent =
+"ODD DOMINANT";
+
+$("validationSignal")
+.className =
+"validationSignal watch";
+
+$("validationInfo")
+.textContent =
+`Recent 10 ticks: ${odd}/10 were odd. Latest digit: ${latest}.`;
+
+}else{
+
+$("validationSignal")
+.textContent =
+"WAIT";
+
+$("validationSignal")
+.className =
+"validationSignal wait";
+
+$("validationInfo")
+.textContent =
+`No strong recent pattern detected. Latest digit: ${latest}. Continue observing.`;
+
+}
 
 }
 
@@ -648,18 +959,38 @@ digit > 9
 return;
 }
 
-latestDigit = digit;
+latestDigit =
+digit;
 
-history.push(digit);
+latestQuote =
+quote;
 
-if(history.length > MAX_TICKS){
+history.push(
+digit
+);
+
+if(
+history.length >
+MAX_TICKS
+){
+
 history.shift();
+
 }
 
 $("quote").textContent =
-`${quote} • ${new Date(epoch * 1000).toLocaleTimeString()}`;
+`${quote} • ${new Date(
+epoch * 1000
+).toLocaleTimeString()}`;
+
+updateMovingTick(
+digit,
+quote
+);
 
 render();
+
+validateMovingTick();
 
 }
 
@@ -673,23 +1004,21 @@ function render(){
 const counts =
 Array(10).fill(0);
 
-for(const digit of history){
+for(
+const digit of history
+){
+
 counts[digit]++;
+
 }
 
-$("countLabel").textContent =
+$("countLabel")
+.textContent =
 history.length;
 
 
 let maxCount =
 Math.max(...counts);
-
-let minCount =
-Math.min(
-...counts.filter(
-count => count >= 0
-)
-);
 
 
 $("digits").innerHTML =
@@ -699,7 +1028,9 @@ counts.map(
 const percentage =
 history.length
 ?
-(count / history.length * 100)
+count /
+history.length *
+100
 :
 0;
 
@@ -717,10 +1048,13 @@ ${hot ? "hot" : ""}
 ${latest ? "latest" : ""}
 ">
 
-<strong>${digit}</strong>
+<strong>
+${digit}
+</strong>
 
 <small>
-${count} • ${percentage.toFixed(1)}%
+${count} •
+${percentage.toFixed(1)}%
 </small>
 
 </div>
@@ -754,37 +1088,57 @@ if(history.length){
 let mostDigit = 0;
 let leastDigit = 0;
 
-for(let i=1;i<10;i++){
+for(
+let i=1;
+i<10;
+i++
+){
 
-if(counts[i] > counts[mostDigit]){
+if(
+counts[i] >
+counts[mostDigit]
+){
+
 mostDigit = i;
+
 }
 
-if(counts[i] < counts[leastDigit]){
+if(
+counts[i] <
+counts[leastDigit]
+){
+
 leastDigit = i;
+
 }
 
 }
 
 $("most").textContent =
-`${mostDigit} (${(
+`${mostDigit} (${
+(
 counts[mostDigit] /
 history.length *
 100
-).toFixed(1)}%)`;
+).toFixed(1)
+}%)`;
 
 $("least").textContent =
-`${leastDigit} (${(
+`${leastDigit} (${
+(
 counts[leastDigit] /
 history.length *
 100
-).toFixed(1)}%)`;
+).toFixed(1)
+}%)`;
+
 
 const over =
 counts[6] +
 counts[7] +
 counts[8] +
 counts[9];
+
 
 const under =
 counts[0] +
@@ -793,26 +1147,37 @@ counts[2] +
 counts[3] +
 counts[4];
 
+
 $("over5").textContent =
 (
 over /
 history.length *
 100
-).toFixed(1) + "%";
+).toFixed(1)
++ "%";
+
 
 $("under5").textContent =
 (
 under /
 history.length *
 100
-).toFixed(1) + "%";
+).toFixed(1)
++ "%";
 
 }else{
 
-$("most").textContent = "—";
-$("least").textContent = "—";
-$("over5").textContent = "—";
-$("under5").textContent = "—";
+$("most").textContent =
+"—";
+
+$("least").textContent =
+"—";
+
+$("over5").textContent =
+"—";
+
+$("under5").textContent =
+"—";
 
 }
 
@@ -835,49 +1200,90 @@ ws = null;
 
 }
 
-clearTimeout(reconnectTimer);
+clearTimeout(
+reconnectTimer
+);
 
 history = [];
+
 latestDigit = null;
 
 render();
 
+$("movingDigit")
+.textContent =
+"—";
+
+$("movingQuote")
+.textContent =
+"Waiting for live tick…";
+
+$("sequence")
+.innerHTML = "";
+
+$("validationSignal")
+.textContent =
+"WAITING";
+
+$("validationSignal")
+.className =
+"validationSignal wait";
+
+$("validationInfo")
+.textContent =
+"Waiting for enough live ticks to validate the setup.";
+
+
 const symbol =
 $("market").value;
 
-$("marketName").textContent =
-marketNames[symbol] || symbol;
 
-setStatus("Connecting…");
+$("marketName")
+.textContent =
+marketNames[symbol] ||
+symbol;
+
+
+setStatus(
+"Connecting…"
+);
 
 
 ws =
-new WebSocket(WS_URL);
+new WebSocket(
+WS_URL
+);
 
 
-ws.onopen = function(){
+ws.onopen =
+function(){
 
-setStatus("LIVE",true);
+setStatus(
+"LIVE",
+true
+);
 
-
-/*
-Get last 100 ticks first.
-*/
 
 ws.send(
 JSON.stringify({
 
-ticks_history:symbol,
+ticks_history:
+symbol,
 
-count:MAX_TICKS,
+count:
+MAX_TICKS,
 
-end:"latest",
+end:
+"latest",
 
-style:"ticks",
+style:
+"ticks",
 
-subscribe:1,
+subscribe:
+1,
 
-req_id:1
+req_id:
+1
 
 })
 );
@@ -885,21 +1291,16 @@ req_id:1
 };
 
 
-/* =====================================================
-   MESSAGE
-===================================================== */
-
-ws.onmessage = function(event){
+ws.onmessage =
+function(event){
 
 try{
 
 const data =
-JSON.parse(event.data);
+JSON.parse(
+event.data
+);
 
-
-/*
-API error
-*/
 
 if(data.error){
 
@@ -908,7 +1309,9 @@ console.error(
 data.error
 );
 
-setStatus("API error");
+setStatus(
+"API error"
+);
 
 return;
 
@@ -916,10 +1319,13 @@ return;
 
 
 /*
-Historical ticks
+Historical data
 */
 
-if(data.msg_type === "history"){
+if(
+data.msg_type ===
+"history"
+){
 
 const prices =
 data.history &&
@@ -941,19 +1347,14 @@ const pipSize =
 data.pip_size;
 
 
-/*
-Reset history
-*/
-
 history = [];
 
 
-/*
-Convert every historical quote
-to its last digit.
-*/
-
-for(let i=0;i<prices.length;i++){
+for(
+let i=0;
+i<prices.length;
+i++
+){
 
 const digit =
 getLastDigit(
@@ -961,58 +1362,80 @@ prices[i],
 pipSize
 );
 
-if(digit !== null){
+if(
+digit !== null
+){
 
-history.push(digit);
+history.push(
+digit
+);
 
 }
 
 }
 
 
-/*
-Keep only last 100.
-*/
-
-if(history.length > MAX_TICKS){
+if(
+history.length >
+MAX_TICKS
+){
 
 history =
-history.slice(-MAX_TICKS);
+history.slice(
+-MAX_TICKS
+);
 
 }
 
-
-/*
-Latest digit
-*/
 
 if(history.length){
 
 latestDigit =
-history[history.length - 1];
+history[
+history.length - 1
+];
+
+latestQuote =
+prices[
+prices.length - 1
+];
+
+$("movingDigit")
+.textContent =
+latestDigit;
+
+$("movingQuote")
+.textContent =
+`Current quote: ${latestQuote}`;
 
 }
 
 
-/*
-Latest quote
-*/
-
 if(prices.length){
 
 const lastPrice =
-prices[prices.length - 1];
+prices[
+prices.length - 1
+];
 
 const lastTime =
-times[times.length - 1];
+times[
+times.length - 1
+];
 
 $("quote").textContent =
-`${lastPrice} • ${new Date(lastTime * 1000).toLocaleTimeString()}`;
+`${lastPrice} • ${new Date(
+lastTime * 1000
+).toLocaleTimeString()}`;
 
 }
 
 
 render();
+
+renderSequence();
+
+validateMovingTick();
 
 return;
 
@@ -1023,7 +1446,10 @@ return;
 Live tick
 */
 
-if(data.msg_type === "tick"){
+if(
+data.msg_type ===
+"tick"
+){
 
 if(!data.tick){
 return;
@@ -1032,11 +1458,13 @@ return;
 const tick =
 data.tick;
 
+
 const digit =
 getLastDigit(
 tick.quote,
 tick.pip_size
 );
+
 
 addDigit(
 digit,
@@ -1058,31 +1486,26 @@ error
 };
 
 
-/* =====================================================
-   ERROR
-===================================================== */
+ws.onerror =
+function(){
 
-ws.onerror = function(error){
-
-console.error(
-"WebSocket error:",
-error
+setStatus(
+"Connection error"
 );
-
-setStatus("Connection error");
 
 };
 
 
-/* =====================================================
-   CLOSE
-===================================================== */
+ws.onclose =
+function(){
 
-ws.onclose = function(){
+setStatus(
+"Disconnected"
+);
 
-setStatus("Disconnected");
-
-clearTimeout(reconnectTimer);
+clearTimeout(
+reconnectTimer
+);
 
 reconnectTimer =
 setTimeout(
@@ -1099,7 +1522,8 @@ connectMarket,
    MARKET CHANGE
 ===================================================== */
 
-$("market").addEventListener(
+$("market")
+.addEventListener(
 "change",
 connectMarket
 );
@@ -1132,30 +1556,38 @@ data.ok &&
 data.connected
 ){
 
-$("accountStatus").textContent =
+$("accountStatus")
+.textContent =
 "Connected ✓";
 
-$("accountStatus").className =
+$("accountStatus")
+.className =
 "connectionOk";
 
-$("connectDeriv").textContent =
+$("connectDeriv")
+.textContent =
 "Deriv Connected ✓";
 
-$("connectDeriv").disabled =
+$("connectDeriv")
+.disabled =
 true;
 
 }else{
 
-$("accountStatus").textContent =
+$("accountStatus")
+.textContent =
 "Not connected";
 
-$("accountStatus").className =
+$("accountStatus")
+.className =
 "connectionBad";
 
-$("connectDeriv").textContent =
+$("connectDeriv")
+.textContent =
 "Connect Deriv";
 
-$("connectDeriv").disabled =
+$("connectDeriv")
+.disabled =
 false;
 
 }
@@ -1164,13 +1596,16 @@ false;
 
 console.error(error);
 
-$("accountStatus").textContent =
+$("accountStatus")
+.textContent =
 "Not connected";
 
-$("accountStatus").className =
+$("accountStatus")
+.className =
 "connectionBad";
 
-$("connectDeriv").disabled =
+$("connectDeriv")
+.disabled =
 false;
 
 }
@@ -1182,18 +1617,20 @@ false;
    CONNECT DERIV
 ===================================================== */
 
-$("connectDeriv").addEventListener(
+$("connectDeriv")
+.addEventListener(
 "click",
 function(){
 
-window.location.href = "/auth";
+window.location.href =
+"/auth";
 
 }
 );
 
 
 /* =====================================================
-   CONTRACT TYPE
+   CONTRACT UI
 ===================================================== */
 
 function updateContractUI(){
@@ -1212,14 +1649,18 @@ const digitContracts = [
 
 ];
 
-$("digitControl").classList.toggle(
-"hidden",
-!digitContracts.includes(type)
-);
+$("digitControl")
+.style.display =
+digitContracts.includes(type)
+?
+"block"
+:
+"none";
 
 }
 
-$("contractType").addEventListener(
+$("contractType")
+.addEventListener(
 "change",
 updateContractUI
 );
@@ -1231,7 +1672,8 @@ updateContractUI();
    GET PROPOSAL
 ===================================================== */
 
-$("getProposal").addEventListener(
+$("getProposal")
+.addEventListener(
 "click",
 async function(){
 
@@ -1241,7 +1683,8 @@ $("getProposal");
 const status =
 $("tradeStatus");
 
-button.disabled = true;
+button.disabled =
+true;
 
 status.className =
 "tradeStatus";
@@ -1252,9 +1695,11 @@ status.textContent =
 
 const payload = {
 
-action:"proposal",
+action:
+"proposal",
 
-market:$("market").value,
+market:
+$("market").value,
 
 contract_type:
 $("contractType").value,
@@ -1263,12 +1708,17 @@ barrier:
 $("barrier").value,
 
 stake:
-Number($("stake").value),
+Number(
+$("stake").value
+),
 
 duration:
-Number($("duration").value),
+Number(
+$("duration").value
+),
 
-duration_unit:"t"
+duration_unit:
+"t"
 
 };
 
@@ -1291,7 +1741,9 @@ credentials:
 "same-origin",
 
 body:
-JSON.stringify(payload)
+JSON.stringify(
+payload
+)
 
 }
 );
@@ -1301,7 +1753,10 @@ const data =
 await response.json();
 
 
-if(!response.ok || !data.ok){
+if(
+!response.ok ||
+!data.ok
+){
 
 throw new Error(
 data.error ||
@@ -1320,7 +1775,9 @@ status.textContent =
 
 }catch(error){
 
-console.error(error);
+console.error(
+error
+);
 
 status.className =
 "tradeStatus error";
@@ -1330,7 +1787,8 @@ error.message;
 
 }finally{
 
-button.disabled = false;
+button.disabled =
+false;
 
 }
 
