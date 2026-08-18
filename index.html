@@ -519,9 +519,9 @@ of the next tick.
 
 The proposal button requests a real Deriv proposal.
 
-It does <b>not</b> purchase a contract.
+<br><br>
 
-The Buy button is available only after a successful proposal.
+The Buy DEMO button gets a <b>fresh proposal immediately before purchasing</b> so an expired proposal is not reused.
 
 </div>
 
@@ -951,8 +951,10 @@ async function checkAccount(){
         data.selected_account;
 
       currentAccountType=
-        account?.account_type ||
-        "demo";
+        String(
+          account?.account_type ||
+          "demo"
+        ).toLowerCase();
 
       $("accountStatus").textContent=
         `${currentAccountType.toUpperCase()} Connected ✓`;
@@ -1033,7 +1035,104 @@ $("contractType").addEventListener(
 updateContractUI();
 
 
-/* PROPOSAL */
+/*
+=====================================================
+BUILD TRADE PAYLOAD
+=====================================================
+*/
+
+function buildTradePayload(){
+
+  return {
+
+    account_type:"demo",
+
+    market:
+      $("market").value,
+
+    contract_type:
+      $("contractType").value,
+
+    barrier:
+      $("barrier").value,
+
+    stake:
+      Number($("stake").value),
+
+    duration:
+      Number($("duration").value),
+
+    duration_unit:"t"
+
+  };
+
+}
+
+
+/*
+=====================================================
+GET PROPOSAL
+=====================================================
+*/
+
+async function requestFreshProposal(){
+
+  const payload={
+    action:"proposal",
+    ...buildTradePayload()
+  };
+
+  const response=
+    await fetch(
+      "/trading",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        credentials:"same-origin",
+
+        cache:"no-store",
+
+        body:
+          JSON.stringify(payload)
+
+      }
+    );
+
+  const data=
+    await response.json();
+
+  if(!response.ok || !data.ok){
+
+    throw new Error(
+      data.error ||
+      "Proposal request failed."
+    );
+
+  }
+
+  if(
+    !data.proposal ||
+    !data.proposal.id ||
+    !Number.isFinite(
+      Number(data.proposal.ask_price)
+    )
+  ){
+
+    throw new Error(
+      "Deriv returned an incomplete proposal."
+    );
+
+  }
+
+  return data.proposal;
+
+}
+
 
 $("getProposal").addEventListener(
   "click",
@@ -1054,96 +1153,37 @@ $("getProposal").addEventListener(
     status.className="tradeStatus";
 
     status.textContent=
-      "Requesting proposal from Deriv…";
+      "Requesting fresh proposal from Deriv…";
 
     proposalInfo.textContent=
       "Waiting for Deriv…";
 
-    const payload={
-
-      action:"proposal",
-
-      account_type:
-        currentAccountType,
-
-      market:
-        $("market").value,
-
-      contract_type:
-        $("contractType").value,
-
-      barrier:
-        $("barrier").value,
-
-      stake:
-        Number($("stake").value),
-
-      duration:
-        Number($("duration").value),
-
-      duration_unit:"t"
-
-    };
-
     try{
 
-      const response=
-        await fetch(
-          "/trading",
-          {
-            method:"POST",
+      const proposal=
+        await requestFreshProposal();
 
-            headers:{
-              "Content-Type":
-                "application/json"
-            },
-
-            credentials:"same-origin",
-
-            body:
-              JSON.stringify(payload)
-
-          }
-        );
-
-      const data=
-        await response.json();
-
-      if(!response.ok || !data.ok){
-
-        throw new Error(
-          data.error ||
-          "Proposal request failed."
-        );
-
-      }
-
-      currentProposal=data.proposal;
+      currentProposal=proposal;
 
       proposalInfo.innerHTML=
         `Proposal ID: <b>${
-          data.proposal.id||"—"
+          proposal.id
         }</b><br>
         Ask price: <b>${
-          data.proposal.ask_price??"—"
+          proposal.ask_price
         }</b><br>
         Payout: <b>${
-          data.proposal.payout??"—"
+          proposal.payout??"—"
         }</b><br>
         Spot: <b>${
-          data.proposal.spot??"—"
+          proposal.spot??"—"
         }</b>`;
 
       status.className=
         "tradeStatus success";
 
       status.textContent=
-        "✓ Real Deriv proposal received. No contract was purchased.";
-
-      /*
-       * Buy button only appears
-       * after a successful proposal.
-       */
+        "✓ Fresh proposal received. Buy it promptly.";
 
       $("buyContract").classList.remove(
         "hidden"
@@ -1172,56 +1212,68 @@ $("getProposal").addEventListener(
 );
 
 
-/* BUY DEMO CONTRACT */
+/*
+=====================================================
+BUY DEMO CONTRACT
+
+IMPORTANT:
+A completely NEW proposal is requested immediately
+before the purchase. This prevents an expired proposal
+from being sent to Deriv.
+=====================================================
+*/
 
 $("buyContract").addEventListener(
   "click",
   async function(){
 
-    if(!currentProposal){
-
-      $("tradeStatus").className=
-        "tradeStatus error";
-
-      $("tradeStatus").textContent=
-        "Get a proposal first.";
-
-      return;
-
-    }
-
-    /*
-     * Safety:
-     * This button is disabled for
-     * real accounts.
-     */
-
-    if(currentAccountType==="real"){
-
-      $("tradeStatus").className=
-        "tradeStatus error";
-
-      $("tradeStatus").textContent=
-        "Real account buying is disabled here. Use a demo account first.";
-
-      return;
-
-    }
-
     const button=
       $("buyContract");
 
+    const status=
+      $("tradeStatus");
+
+    if(currentAccountType!=="demo"){
+
+      status.className=
+        "tradeStatus error";
+
+      status.textContent=
+        "Please connect/select the DEMO Deriv account first.";
+
+      return;
+
+    }
+
     button.disabled=true;
 
-    $("tradeStatus").className=
+    $("getProposal").disabled=true;
+
+    status.className=
       "tradeStatus";
 
-    $("tradeStatus").textContent=
-      "Purchasing DEMO contract…";
+    status.textContent=
+      "Getting a fresh proposal and purchasing immediately…";
 
     try{
 
-      const response=
+      /*
+       * STEP 1:
+       * Get a brand-new proposal.
+       */
+
+      const freshProposal=
+        await requestFreshProposal();
+
+      currentProposal=
+        freshProposal;
+
+      /*
+       * STEP 2:
+       * Immediately buy the fresh proposal.
+       */
+
+      const buyResponse=
         await fetch(
           "/trading",
           {
@@ -1235,6 +1287,8 @@ $("buyContract").addEventListener(
 
             credentials:"same-origin",
 
+            cache:"no-store",
+
             body:
               JSON.stringify({
 
@@ -1243,11 +1297,13 @@ $("buyContract").addEventListener(
                 account_type:"demo",
 
                 proposal_id:
-                  currentProposal.id,
+                  String(
+                    freshProposal.id
+                  ),
 
                 price:
                   Number(
-                    currentProposal.ask_price
+                    freshProposal.ask_price
                   )
 
               })
@@ -1256,9 +1312,12 @@ $("buyContract").addEventListener(
         );
 
       const data=
-        await response.json();
+        await buyResponse.json();
 
-      if(!response.ok || !data.ok){
+      if(
+        !buyResponse.ok ||
+        !data.ok
+      ){
 
         throw new Error(
           data.error ||
@@ -1267,13 +1326,27 @@ $("buyContract").addEventListener(
 
       }
 
-      $("tradeStatus").className=
+      status.className=
         "tradeStatus success";
 
-      $("tradeStatus").textContent=
+      status.textContent=
         `✓ DEMO contract purchased successfully. Contract ID: ${
           data.contract?.contract_id||"—"
         }`;
+
+      $("proposalInfo").innerHTML=
+        `Fresh Proposal ID: <b>${
+          freshProposal.id
+        }</b><br>
+        Purchase Price: <b>${
+          data.contract?.buy_price ??
+          freshProposal.ask_price
+        }</b><br>
+        Payout: <b>${
+          data.contract?.payout ??
+          freshProposal.payout ??
+          "—"
+        }</b>`;
 
       currentProposal=null;
 
@@ -1285,15 +1358,17 @@ $("buyContract").addEventListener(
 
       console.error(error);
 
-      $("tradeStatus").className=
+      status.className=
         "tradeStatus error";
 
-      $("tradeStatus").textContent=
+      status.textContent=
         error.message;
 
     }finally{
 
       button.disabled=false;
+
+      $("getProposal").disabled=false;
 
     }
 
@@ -1312,4 +1387,4 @@ checkAccount();
 </script>
 
 </body>
-  </html>
+</html>
