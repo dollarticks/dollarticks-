@@ -303,10 +303,12 @@ button:disabled{
   <div id="status" class="status">Connecting…</div>
 </div>
 
+<!-- MARKET -->
+
 <div class="card">
 
 <select id="market">
-<option value="1HZ100V">Volatility 100 (1s)</option>
+<option value="1HZ100V" selected>Volatility 100 (1s)</option>
 <option value="1HZ75V">Volatility 75 (1s)</option>
 <option value="1HZ50V">Volatility 50 (1s)</option>
 <option value="1HZ25V">Volatility 25 (1s)</option>
@@ -323,6 +325,8 @@ Waiting for tick…
 
 </div>
 
+<!-- DIGITS -->
+
 <div class="card">
 
 <div class="latestBadge">
@@ -332,6 +336,8 @@ LAST DIGIT FREQUENCY — LAST <b id="countLabel">100</b> TICKS
 <div id="digits" class="grid"></div>
 
 </div>
+
+<!-- LIVE TICKS -->
 
 <div class="card">
 
@@ -358,6 +364,8 @@ LIVE LAST DIGITS
 </div>
 
 <div style="height:12px"></div>
+
+<!-- OVER UNDER -->
 
 <div class="card">
 
@@ -389,17 +397,27 @@ OVER / UNDER
 TRADING
 </div>
 
+<label>Market</label>
+
+<select id="tradeMarket">
+<option value="1HZ100V" selected>Volatility 100 (1s)</option>
+<option value="1HZ75V">Volatility 75 (1s)</option>
+<option value="1HZ50V">Volatility 50 (1s)</option>
+<option value="1HZ25V">Volatility 25 (1s)</option>
+<option value="1HZ10V">Volatility 10 (1s)</option>
+</select>
+
+<div style="height:10px"></div>
+
 <label>Contract type</label>
 
 <select id="contractType">
-
 <option value="DIGITOVER">Over</option>
 <option value="DIGITUNDER">Under</option>
 <option value="DIGITMATCH">Matches</option>
 <option value="DIGITDIFF">Differs</option>
 <option value="DIGITEVEN">Even</option>
 <option value="DIGITODD">Odd</option>
-
 </select>
 
 <div style="height:10px"></div>
@@ -409,16 +427,16 @@ TRADING
 <label>Digit / Barrier</label>
 
 <select id="barrier">
-<option>0</option>
-<option>1</option>
-<option>2</option>
-<option>3</option>
-<option>4</option>
-<option selected>5</option>
-<option>6</option>
-<option>7</option>
-<option>8</option>
-<option>9</option>
+<option value="0">0</option>
+<option value="1">1</option>
+<option value="2">2</option>
+<option value="3">3</option>
+<option value="4">4</option>
+<option value="5" selected>5</option>
+<option value="6">6</option>
+<option value="7">7</option>
+<option value="8">8</option>
+<option value="9">9</option>
 </select>
 
 </div>
@@ -512,16 +530,15 @@ Connect Deriv
 <br><br>
 
 Percentages are based on recent ticks and are
-<b>not guaranteed predictions</b>
-of the next tick.
+<b>not guaranteed predictions</b> of the next tick.
 
 <br><br>
 
-The proposal button requests a real Deriv proposal.
+The proposal request uses the selected Volatility market.
 
 <br><br>
 
-The Buy DEMO button gets a <b>fresh proposal immediately before purchasing</b> so an expired proposal is not reused.
+The Buy DEMO button requests a <b>fresh proposal immediately before purchasing</b> so an expired proposal is not reused.
 
 </div>
 
@@ -541,11 +558,11 @@ const WS_URL =
 const MAX_TICKS = 100;
 
 const marketNames = {
-"1HZ100V":"Volatility 100 (1s)",
-"1HZ75V":"Volatility 75 (1s)",
-"1HZ50V":"Volatility 50 (1s)",
-"1HZ25V":"Volatility 25 (1s)",
-"1HZ10V":"Volatility 10 (1s)"
+  "1HZ100V":"Volatility 100 (1s)",
+  "1HZ75V":"Volatility 75 (1s)",
+  "1HZ50V":"Volatility 50 (1s)",
+  "1HZ25V":"Volatility 25 (1s)",
+  "1HZ10V":"Volatility 10 (1s)"
 };
 
 let ws = null;
@@ -557,14 +574,24 @@ let currentAccountType = "demo";
 
 const $ = id => document.getElementById(id);
 
+
+/* STATUS */
+
 function setStatus(text,live=false){
-  $("status").textContent=text;
-  $("status").className="status"+(live?" live":"");
+
+  $("status").textContent = text;
+
+  $("status").className =
+    "status" + (live ? " live" : "");
+
 }
+
+
+/* LAST DIGIT */
 
 function getLastDigit(quote,pipSize){
 
-  const n=Number(quote);
+  const n = Number(quote);
 
   if(!Number.isFinite(n)){
     return null;
@@ -572,77 +599,98 @@ function getLastDigit(quote,pipSize){
 
   if(Number.isFinite(Number(pipSize))){
 
-    const factor=10**Number(pipSize);
+    const factor =
+      10 ** Number(pipSize);
 
     return Math.abs(
-      Math.round(n*factor)
-    )%10;
+      Math.round(n * factor)
+    ) % 10;
 
   }
 
-  const text=String(quote);
+  const text = String(quote);
 
-  const clean=text.replace(/[^0-9]/g,"");
+  const clean =
+    text.replace(/[^0-9]/g,"");
 
   if(!clean){
     return null;
   }
 
   return Number(
-    clean.charAt(clean.length-1)
+    clean.charAt(clean.length - 1)
   );
+
 }
+
+
+/* ADD DIGIT */
 
 function addDigit(digit,quote,epoch){
 
   if(
-    digit===null ||
-    digit<0 ||
-    digit>9
+    digit === null ||
+    digit < 0 ||
+    digit > 9
   ){
     return;
   }
 
-  latestDigit=digit;
+  latestDigit = digit;
 
   history.push(digit);
 
-  if(history.length>MAX_TICKS){
+  if(history.length > MAX_TICKS){
     history.shift();
   }
 
   $("quote").textContent =
-    `${quote} • ${new Date(epoch*1000).toLocaleTimeString()}`;
+    `${quote} • ${
+      new Date(epoch * 1000)
+      .toLocaleTimeString()
+    }`;
 
   render();
+
 }
+
+
+/* RENDER */
 
 function render(){
 
-  const counts=Array(10).fill(0);
+  const counts =
+    Array(10).fill(0);
 
   for(const digit of history){
     counts[digit]++;
   }
 
-  $("countLabel").textContent=history.length;
+  $("countLabel").textContent =
+    history.length;
 
-  let mostDigit=0;
+  let mostDigit = 0;
 
   for(let i=1;i<10;i++){
 
-    if(counts[i]>counts[mostDigit]){
-      mostDigit=i;
+    if(
+      counts[i] >
+      counts[mostDigit]
+    ){
+      mostDigit = i;
     }
 
   }
 
-  let leastDigit=0;
+  let leastDigit = 0;
 
   for(let i=1;i<10;i++){
 
-    if(counts[i]<counts[leastDigit]){
-      leastDigit=i;
+    if(
+      counts[i] <
+      counts[leastDigit]
+    ){
+      leastDigit = i;
     }
 
   }
@@ -650,38 +698,42 @@ function render(){
   $("digits").innerHTML =
     counts.map((count,digit)=>{
 
-      const percentage=
+      const percentage =
         history.length
-        ? count/history.length*100
+        ? count / history.length * 100
         : 0;
 
-      const isMost=
-        history.length>0 &&
-        digit===mostDigit &&
-        counts[mostDigit]>0;
+      const isMost =
+        history.length > 0 &&
+        digit === mostDigit &&
+        counts[mostDigit] > 0;
 
-      const isLeast=
-        history.length>0 &&
-        digit===leastDigit;
+      const isLeast =
+        history.length > 0 &&
+        digit === leastDigit;
 
-      const isLatest=
-        digit===latestDigit;
+      const isLatest =
+        digit === latestDigit;
 
       return `
-      <div class="digit
-      ${isMost?"most":""}
-      ${isLeast?"least":""}
-      ${isLatest?"latest":""}">
+        <div class="digit
+        ${isMost ? "most" : ""}
+        ${isLeast ? "least" : ""}
+        ${isLatest ? "latest" : ""}">
 
-      ${isLatest?'<div class="pointer"></div>':""}
+        ${
+          isLatest
+          ? '<div class="pointer"></div>'
+          : ""
+        }
 
-      <strong>${digit}</strong>
+        <strong>${digit}</strong>
 
-      <small>
-      ${count} • ${percentage.toFixed(1)}%
-      </small>
+        <small>
+        ${count} • ${percentage.toFixed(1)}%
+        </small>
 
-      </div>
+        </div>
       `;
 
     }).join("");
@@ -692,8 +744,10 @@ function render(){
     .reverse()
     .map((digit,index)=>`
 
-      <div class="tick ${index===0?"new":""}">
-      ${digit}
+      <div class="tick ${
+        index === 0 ? "new" : ""
+      }">
+        ${digit}
       </div>
 
     `)
@@ -702,44 +756,63 @@ function render(){
   if(history.length){
 
     $("most").textContent =
-      `${mostDigit} (${(
-        counts[mostDigit]/history.length*100
-      ).toFixed(1)}%)`;
+      `${mostDigit} (${
+        (
+          counts[mostDigit] /
+          history.length *
+          100
+        ).toFixed(1)
+      }%)`;
 
     $("least").textContent =
-      `${leastDigit} (${(
-        counts[leastDigit]/history.length*100
-      ).toFixed(1)}%)`;
+      `${leastDigit} (${
+        (
+          counts[leastDigit] /
+          history.length *
+          100
+        ).toFixed(1)
+      }%)`;
 
-    const over=
-      counts[6]+
-      counts[7]+
-      counts[8]+
+    const over =
+      counts[6] +
+      counts[7] +
+      counts[8] +
       counts[9];
 
-    const under=
-      counts[0]+
-      counts[1]+
-      counts[2]+
-      counts[3]+
+    const under =
+      counts[0] +
+      counts[1] +
+      counts[2] +
+      counts[3] +
       counts[4];
 
-    $("over5").textContent=
-      (over/history.length*100).toFixed(1)+"%";
+    $("over5").textContent =
+      (
+        over /
+        history.length *
+        100
+      ).toFixed(1) + "%";
 
-    $("under5").textContent=
-      (under/history.length*100).toFixed(1)+"%";
+    $("under5").textContent =
+      (
+        under /
+        history.length *
+        100
+      ).toFixed(1) + "%";
 
   }else{
 
-    $("most").textContent="—";
-    $("least").textContent="—";
-    $("over5").textContent="—";
-    $("under5").textContent="—";
+    $("most").textContent = "—";
+    $("least").textContent = "—";
+    $("over5").textContent = "—";
+    $("under5").textContent = "—";
 
   }
 
 }
+
+
+/* MARKET DATA */
 
 function connectMarket(){
 
@@ -749,24 +822,28 @@ function connectMarket(){
       ws.close();
     }catch(e){}
 
-    ws=null;
+    ws = null;
   }
 
-  history=[];
-  latestDigit=null;
+  history = [];
+  latestDigit = null;
 
   render();
 
-  const symbol=$("market").value;
+  const symbol =
+    $("market").value ||
+    "1HZ100V";
 
-  $("marketName").textContent=
-    marketNames[symbol]||symbol;
+  $("market").value = symbol;
+
+  $("marketName").textContent =
+    marketNames[symbol] || symbol;
 
   setStatus("Connecting…");
 
-  ws=new WebSocket(WS_URL);
+  ws = new WebSocket(WS_URL);
 
-  ws.onopen=function(){
+  ws.onopen = function(){
 
     setStatus("LIVE",true);
 
@@ -788,11 +865,12 @@ function connectMarket(){
 
   };
 
-  ws.onmessage=function(event){
+  ws.onmessage = function(event){
 
     try{
 
-      const data=JSON.parse(event.data);
+      const data =
+        JSON.parse(event.data);
 
       if(data.error){
 
@@ -803,23 +881,24 @@ function connectMarket(){
         return;
       }
 
-      if(data.msg_type==="history"){
+      if(data.msg_type === "history"){
 
-        const prices=
+        const prices =
           data.history &&
           data.history.prices
-          ?data.history.prices
-          :[];
+          ? data.history.prices
+          : [];
 
-        const times=
+        const times =
           data.history &&
           data.history.times
-          ?data.history.times
-          :[];
+          ? data.history.times
+          : [];
 
-        const pipSize=data.pip_size;
+        const pipSize =
+          data.pip_size;
 
-        history=[];
+        history = [];
 
         for(
           let i=0;
@@ -827,40 +906,40 @@ function connectMarket(){
           i++
         ){
 
-          const digit=
+          const digit =
             getLastDigit(
               prices[i],
               pipSize
             );
 
-          if(digit!==null){
+          if(digit !== null){
             history.push(digit);
           }
 
         }
 
-        if(history.length>MAX_TICKS){
-          history=history.slice(-MAX_TICKS);
+        if(history.length > MAX_TICKS){
+          history =
+            history.slice(-MAX_TICKS);
         }
 
         if(history.length){
-          latestDigit=
-            history[history.length-1];
+          latestDigit =
+            history[history.length - 1];
         }
 
         if(prices.length){
 
-          const lastPrice=
-            prices[prices.length-1];
+          const lastPrice =
+            prices[prices.length - 1];
 
-          const lastTime=
-            times[times.length-1];
+          const lastTime =
+            times[times.length - 1];
 
-          $("quote").textContent=
+          $("quote").textContent =
             `${lastPrice} • ${
-              new Date(
-                lastTime*1000
-              ).toLocaleTimeString()
+              new Date(lastTime * 1000)
+              .toLocaleTimeString()
             }`;
 
         }
@@ -870,15 +949,15 @@ function connectMarket(){
         return;
       }
 
-      if(data.msg_type==="tick"){
+      if(data.msg_type === "tick"){
 
         if(!data.tick){
           return;
         }
 
-        const tick=data.tick;
+        const tick = data.tick;
 
-        const digit=
+        const digit =
           getLastDigit(
             tick.quote,
             tick.pip_size
@@ -903,11 +982,11 @@ function connectMarket(){
 
   };
 
-  ws.onerror=function(){
+  ws.onerror = function(){
     setStatus("Connection error");
   };
 
-  ws.onclose=function(){
+  ws.onclose = function(){
 
     setStatus("Disconnected");
 
@@ -926,13 +1005,38 @@ $("market").addEventListener(
 );
 
 
+/* KEEP TRADE MARKET IN SYNC */
+
+$("market").addEventListener(
+  "change",
+  function(){
+
+    $("tradeMarket").value =
+      $("market").value;
+
+  }
+);
+
+$("tradeMarket").addEventListener(
+  "change",
+  function(){
+
+    $("market").value =
+      $("tradeMarket").value;
+
+    connectMarket();
+
+  }
+);
+
+
 /* ACCOUNT */
 
 async function checkAccount(){
 
   try{
 
-    const response=
+    const response =
       await fetch(
         "/trading",
         {
@@ -942,55 +1046,60 @@ async function checkAccount(){
         }
       );
 
-    const data=
+    const data =
       await response.json();
 
-    if(data.ok && data.connected){
+    if(
+      data.ok &&
+      data.connected
+    ){
 
-      const account=
+      const account =
         data.selected_account;
 
-      currentAccountType=
+      currentAccountType =
         String(
           account?.account_type ||
           "demo"
         ).toLowerCase();
 
-      $("accountStatus").textContent=
+      $("accountStatus").textContent =
         `${currentAccountType.toUpperCase()} Connected ✓`;
 
-      $("accountStatus").className=
+      $("accountStatus").className =
         "connectionOk";
 
-      $("connectDeriv").textContent=
+      $("connectDeriv").textContent =
         "Deriv Connected ✓";
 
-      $("connectDeriv").disabled=true;
+      $("connectDeriv").disabled = true;
 
     }else{
 
-      $("accountStatus").textContent=
+      $("accountStatus").textContent =
         "Not connected";
 
-      $("accountStatus").className=
+      $("accountStatus").className =
         "connectionBad";
 
-      $("connectDeriv").textContent=
+      $("connectDeriv").textContent =
         "Connect Deriv";
 
-      $("connectDeriv").disabled=false;
+      $("connectDeriv").disabled = false;
 
     }
 
   }catch(error){
 
-    $("accountStatus").textContent=
+    console.error(error);
+
+    $("accountStatus").textContent =
       "Not connected";
 
-    $("accountStatus").className=
+    $("accountStatus").className =
       "connectionBad";
 
-    $("connectDeriv").disabled=false;
+    $("connectDeriv").disabled = false;
 
   }
 
@@ -999,7 +1108,10 @@ async function checkAccount(){
 $("connectDeriv").addEventListener(
   "click",
   function(){
-    window.location.href="/auth";
+
+    window.location.href =
+      "/auth";
+
   }
 );
 
@@ -1008,10 +1120,10 @@ $("connectDeriv").addEventListener(
 
 function updateContractUI(){
 
-  const type=
+  const type =
     $("contractType").value;
 
-  const digitContracts=[
+  const digitContracts = [
     "DIGITOVER",
     "DIGITUNDER",
     "DIGITMATCH",
@@ -1036,19 +1148,45 @@ updateContractUI();
 
 
 /*
-=====================================================
+====================================================
 BUILD TRADE PAYLOAD
-=====================================================
+====================================================
 */
 
 function buildTradePayload(){
 
-  return {
+  /*
+   * IMPORTANT:
+   * Always take the market directly from
+   * the trade market selector.
+   */
+
+  const marketElement =
+    $("tradeMarket");
+
+  const market =
+    marketElement
+      ? String(
+          marketElement.value ||
+          "1HZ100V"
+        ).trim()
+      : "1HZ100V";
+
+  if(!market){
+
+    throw new Error(
+      "Market is required. Select a Volatility market first."
+    );
+
+  }
+
+  const payload = {
+
+    action:"proposal",
 
     account_type:"demo",
 
-    market:
-      $("market").value,
+    market:market,
 
     contract_type:
       $("contractType").value,
@@ -1066,23 +1204,28 @@ function buildTradePayload(){
 
   };
 
+  console.log(
+    "DollarTicks proposal payload:",
+    payload
+  );
+
+  return payload;
+
 }
 
 
 /*
-=====================================================
-GET PROPOSAL
-=====================================================
+====================================================
+REQUEST FRESH PROPOSAL
+====================================================
 */
 
 async function requestFreshProposal(){
 
-  const payload={
-    action:"proposal",
-    ...buildTradePayload()
-  };
+  const payload =
+    buildTradePayload();
 
-  const response=
+  const response =
     await fetch(
       "/trading",
       {
@@ -1103,10 +1246,13 @@ async function requestFreshProposal(){
       }
     );
 
-  const data=
+  const data =
     await response.json();
 
-  if(!response.ok || !data.ok){
+  if(
+    !response.ok ||
+    !data.ok
+  ){
 
     throw new Error(
       data.error ||
@@ -1119,7 +1265,9 @@ async function requestFreshProposal(){
     !data.proposal ||
     !data.proposal.id ||
     !Number.isFinite(
-      Number(data.proposal.ask_price)
+      Number(
+        data.proposal.ask_price
+      )
     )
   ){
 
@@ -1134,38 +1282,50 @@ async function requestFreshProposal(){
 }
 
 
+/*
+====================================================
+GET PROPOSAL
+====================================================
+*/
+
 $("getProposal").addEventListener(
   "click",
   async function(){
 
-    const button=$("getProposal");
+    const button =
+      $("getProposal");
 
-    const status=$("tradeStatus");
+    const status =
+      $("tradeStatus");
 
-    const proposalInfo=$("proposalInfo");
+    const proposalInfo =
+      $("proposalInfo");
 
-    button.disabled=true;
+    button.disabled = true;
 
-    $("buyContract").classList.add("hidden");
+    $("buyContract")
+      .classList.add("hidden");
 
-    currentProposal=null;
+    currentProposal = null;
 
-    status.className="tradeStatus";
+    status.className =
+      "tradeStatus";
 
-    status.textContent=
+    status.textContent =
       "Requesting fresh proposal from Deriv…";
 
-    proposalInfo.textContent=
+    proposalInfo.textContent =
       "Waiting for Deriv…";
 
     try{
 
-      const proposal=
+      const proposal =
         await requestFreshProposal();
 
-      currentProposal=proposal;
+      currentProposal =
+        proposal;
 
-      proposalInfo.innerHTML=
+      proposalInfo.innerHTML =
         `Proposal ID: <b>${
           proposal.id
         }</b><br>
@@ -1173,38 +1333,37 @@ $("getProposal").addEventListener(
           proposal.ask_price
         }</b><br>
         Payout: <b>${
-          proposal.payout??"—"
+          proposal.payout ?? "—"
         }</b><br>
         Spot: <b>${
-          proposal.spot??"—"
+          proposal.spot ?? "—"
         }</b>`;
 
-      status.className=
+      status.className =
         "tradeStatus success";
 
-      status.textContent=
+      status.textContent =
         "✓ Fresh proposal received. Buy it promptly.";
 
-      $("buyContract").classList.remove(
-        "hidden"
-      );
+      $("buyContract")
+        .classList.remove("hidden");
 
     }catch(error){
 
       console.error(error);
 
-      status.className=
+      status.className =
         "tradeStatus error";
 
-      status.textContent=
+      status.textContent =
         error.message;
 
-      proposalInfo.textContent=
+      proposalInfo.textContent =
         "No valid proposal.";
 
     }finally{
 
-      button.disabled=false;
+      button.disabled = false;
 
     }
 
@@ -1213,71 +1372,68 @@ $("getProposal").addEventListener(
 
 
 /*
-=====================================================
+====================================================
 BUY DEMO CONTRACT
-
-IMPORTANT:
-A completely NEW proposal is requested immediately
-before the purchase. This prevents an expired proposal
-from being sent to Deriv.
-=====================================================
+====================================================
 */
 
 $("buyContract").addEventListener(
   "click",
   async function(){
 
-    const button=
+    const button =
       $("buyContract");
 
-    const status=
+    const status =
       $("tradeStatus");
 
-    if(currentAccountType!=="demo"){
+    if(
+      currentAccountType !== "demo"
+    ){
 
-      status.className=
+      status.className =
         "tradeStatus error";
 
-      status.textContent=
+      status.textContent =
         "Please connect/select the DEMO Deriv account first.";
 
       return;
 
     }
 
-    button.disabled=true;
+    button.disabled = true;
 
-    $("getProposal").disabled=true;
+    $("getProposal").disabled = true;
 
-    status.className=
+    status.className =
       "tradeStatus";
 
-    status.textContent=
+    status.textContent =
       "Getting a fresh proposal and purchasing immediately…";
 
     try{
 
       /*
-       * STEP 1:
-       * Get a brand-new proposal.
+       * FIRST:
+       * Request a brand-new proposal.
        */
 
-      const freshProposal=
+      const freshProposal =
         await requestFreshProposal();
 
-      currentProposal=
+      currentProposal =
         freshProposal;
 
       /*
-       * STEP 2:
-       * Immediately buy the fresh proposal.
+       * SECOND:
+       * Immediately send that proposal
+       * to the backend for purchase.
        */
 
-      const buyResponse=
+      const buyResponse =
         await fetch(
           "/trading",
           {
-
             method:"POST",
 
             headers:{
@@ -1311,7 +1467,7 @@ $("buyContract").addEventListener(
           }
         );
 
-      const data=
+      const data =
         await buyResponse.json();
 
       if(
@@ -1326,15 +1482,16 @@ $("buyContract").addEventListener(
 
       }
 
-      status.className=
+      status.className =
         "tradeStatus success";
 
-      status.textContent=
+      status.textContent =
         `✓ DEMO contract purchased successfully. Contract ID: ${
-          data.contract?.contract_id||"—"
+          data.contract?.contract_id ||
+          "—"
         }`;
 
-      $("proposalInfo").innerHTML=
+      $("proposalInfo").innerHTML =
         `Fresh Proposal ID: <b>${
           freshProposal.id
         }</b><br>
@@ -1348,27 +1505,26 @@ $("buyContract").addEventListener(
           "—"
         }</b>`;
 
-      currentProposal=null;
+      currentProposal = null;
 
-      $("buyContract").classList.add(
-        "hidden"
-      );
+      $("buyContract")
+        .classList.add("hidden");
 
     }catch(error){
 
       console.error(error);
 
-      status.className=
+      status.className =
         "tradeStatus error";
 
-      status.textContent=
+      status.textContent =
         error.message;
 
     }finally{
 
-      button.disabled=false;
+      button.disabled = false;
 
-      $("getProposal").disabled=false;
+      $("getProposal").disabled = false;
 
     }
 
