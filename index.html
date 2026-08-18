@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>DollarTicks — Moving Tick Validator</title>
+<title>DollarTicks — Live Digit Dashboard</title>
 
 <style>
 *{box-sizing:border-box}
@@ -34,7 +33,9 @@ body{
   font-weight:800;
 }
 
-.brand span{color:#18c6d8}
+.brand span{
+  color:#18c6d8;
+}
 
 .status{
   padding:7px 11px;
@@ -44,7 +45,9 @@ body{
   font-size:12px;
 }
 
-.status.live{color:#62e6a7}
+.status.live{
+  color:#62e6a7;
+}
 
 .card{
   background:#10151d;
@@ -54,7 +57,9 @@ body{
   margin-bottom:12px;
 }
 
-select,button,input{
+select,
+button,
+input{
   width:100%;
   padding:12px;
   border-radius:11px;
@@ -107,10 +112,15 @@ button:disabled{
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:9px;
+  gap:10px;
 }
 
+/* =========================
+   DIGIT
+========================= */
+
 .digit{
+  position:relative;
   aspect-ratio:1;
   border-radius:50%;
   background:#0d1219;
@@ -119,23 +129,96 @@ button:disabled{
   flex-direction:column;
   justify-content:center;
   align-items:center;
+  overflow:visible;
 }
 
 .digit strong{
   font-size:22px;
+  position:relative;
+  z-index:3;
 }
 
 .digit small{
   color:#aeb8c7;
   font-size:11px;
+  position:relative;
+  z-index:3;
 }
 
-.digit.hot{
-  border-color:#18c6d8;
+/* =========================
+   MOST OCCURRING
+   GREEN HALF CIRCLE
+========================= */
+
+.digit.most::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:6px solid transparent;
+  border-top-color:#39e58c;
+  border-left-color:#39e58c;
+  transform:rotate(-25deg);
+  pointer-events:none;
 }
+
+/* =========================
+   LEAST OCCURRING
+   RED HALF CIRCLE
+========================= */
+
+.digit.least::after{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:50%;
+  border:6px solid transparent;
+  border-bottom-color:#ff4d5a;
+  border-right-color:#ff4d5a;
+  transform:rotate(-25deg);
+  pointer-events:none;
+}
+
+/* =========================
+   MOVING TICK POINTER
+========================= */
 
 .digit.latest{
-  box-shadow:0 0 0 3px rgba(116,124,255,.28);
+  box-shadow:
+    0 0 0 3px rgba(150,100,255,.25);
+}
+
+/*
+  Pointer above the current digit
+*/
+
+.digit.latest .pointer{
+  position:absolute;
+  top:-24px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:15px solid #9b6cff;
+  filter:drop-shadow(0 0 5px rgba(155,108,255,.7));
+  z-index:10;
+}
+
+/*
+  Small pointer stem
+*/
+
+.digit.latest .pointer::after{
+  content:"";
+  position:absolute;
+  left:-2px;
+  top:-17px;
+  width:4px;
+  height:9px;
+  background:#9b6cff;
+  border-radius:3px;
 }
 
 .ticks{
@@ -158,79 +241,6 @@ button:disabled{
 
 .tick.new{
   outline:2px solid #18c6d8;
-}
-
-.movingTick{
-  text-align:center;
-  padding:20px 10px;
-  background:#0d1219;
-  border-radius:14px;
-}
-
-.movingDigit{
-  font-size:55px;
-  font-weight:900;
-  line-height:1;
-}
-
-.movingQuote{
-  margin-top:8px;
-  color:#9da8b8;
-  font-size:13px;
-}
-
-.sequence{
-  display:flex;
-  gap:6px;
-  overflow:hidden;
-  margin-top:12px;
-}
-
-.sequence span{
-  min-width:34px;
-  height:34px;
-  border-radius:8px;
-  background:#171e28;
-  display:grid;
-  place-items:center;
-  font-weight:800;
-}
-
-.sequence span.latest{
-  outline:2px solid #18c6d8;
-}
-
-.validation{
-  text-align:center;
-  padding:16px;
-  border-radius:14px;
-  background:#0d1219;
-}
-
-.validationTitle{
-  font-size:12px;
-  color:#8f9aab;
-  margin-bottom:7px;
-}
-
-.validationSignal{
-  font-size:24px;
-  font-weight:900;
-}
-
-.validationInfo{
-  margin-top:7px;
-  font-size:12px;
-  color:#9da8b8;
-  line-height:1.5;
-}
-
-.wait{
-  color:#f0c674;
-}
-
-.watch{
-  color:#18c6d8;
 }
 
 .row{
@@ -265,10 +275,25 @@ button:disabled{
   font-size:13px;
 }
 
-.success{color:#62e6a7}
-.error{color:#ff7b7b}
-.connectionOk{color:#62e6a7}
-.connectionBad{color:#ff7b7b}
+.success{
+  color:#62e6a7;
+}
+
+.error{
+  color:#ff7b7b;
+}
+
+.connectionOk{
+  color:#62e6a7;
+}
+
+.connectionBad{
+  color:#ff7b7b;
+}
+
+.hidden{
+  display:none;
+}
 
 .note{
   color:#8995a6;
@@ -285,22 +310,42 @@ button:disabled{
 
 @media(max-width:430px){
 
-  .wrap{padding:9px}
+  .wrap{
+    padding:9px;
+  }
 
-  .grid{gap:6px}
+  .grid{
+    gap:7px;
+  }
 
-  .digit{border-width:3px}
+  .digit{
+    border-width:3px;
+  }
 
-  .digit strong{font-size:19px}
+  .digit strong{
+    font-size:19px;
+  }
 
-  .movingDigit{font-size:48px}
+  .digit small{
+    font-size:10px;
+  }
+
+  .digit.most::before,
+  .digit.least::after{
+    inset:-5px;
+    border-width:5px;
+  }
+
 }
+
 </style>
 </head>
 
 <body>
 
 <div class="wrap">
+
+<!-- HEADER -->
 
 <div class="top">
 
@@ -321,11 +366,25 @@ Connecting…
 
 <select id="market">
 
-<option value="1HZ100V">Volatility 100 (1s)</option>
-<option value="1HZ75V">Volatility 75 (1s)</option>
-<option value="1HZ50V">Volatility 50 (1s)</option>
-<option value="1HZ25V">Volatility 25 (1s)</option>
-<option value="1HZ10V">Volatility 10 (1s)</option>
+<option value="1HZ100V">
+Volatility 100 (1s)
+</option>
+
+<option value="1HZ75V">
+Volatility 75 (1s)
+</option>
+
+<option value="1HZ50V">
+Volatility 50 (1s)
+</option>
+
+<option value="1HZ25V">
+Volatility 25 (1s)
+</option>
+
+<option value="1HZ10V">
+Volatility 10 (1s)
+</option>
 
 </select>
 
@@ -340,74 +399,7 @@ Waiting for tick…
 </div>
 
 
-<!-- MOVING TICK -->
-
-<div class="card">
-
-<div class="latestBadge">
-LIVE MOVING TICK
-</div>
-
-<div class="movingTick">
-
-<div
-id="movingDigit"
-class="movingDigit"
->
-—
-</div>
-
-<div
-id="movingQuote"
-class="movingQuote"
->
-Waiting for live tick…
-</div>
-
-</div>
-
-<div
-id="sequence"
-class="sequence"
-></div>
-
-</div>
-
-
-<!-- VALIDATION -->
-
-<div class="card">
-
-<div class="latestBadge">
-MOVING-TICK VALIDATION
-</div>
-
-<div class="validation">
-
-<div class="validationTitle">
-CURRENT STATUS
-</div>
-
-<div
-id="validationSignal"
-class="validationSignal wait"
->
-WAITING
-</div>
-
-<div
-id="validationInfo"
-class="validationInfo"
->
-Waiting for enough live ticks to validate the setup.
-</div>
-
-</div>
-
-</div>
-
-
-<!-- DIGIT FREQUENCY -->
+<!-- DIGITS -->
 
 <div class="card">
 
@@ -422,7 +414,7 @@ TICKS
 </div>
 
 
-<!-- LIVE DIGITS -->
+<!-- LIVE TICKS -->
 
 <div class="card">
 
@@ -441,7 +433,9 @@ LIVE LAST DIGITS
 
 <div class="metric">
 
-<label>Most frequent</label>
+<label>
+Most frequent
+</label>
 
 <b id="most">—</b>
 
@@ -449,7 +443,9 @@ LIVE LAST DIGITS
 
 <div class="metric">
 
-<label>Least frequent</label>
+<label>
+Least frequent
+</label>
 
 <b id="least">—</b>
 
@@ -496,24 +492,43 @@ Under 5 — digits 0–4
 </div>
 
 
-<!-- PROPOSAL -->
+<!-- TRADING -->
 
 <div class="card">
 
 <div class="latestBadge">
-TRADING — PROPOSAL ONLY
+TRADING
 </div>
 
-<label>Contract type</label>
+<label>
+Contract type
+</label>
 
 <select id="contractType">
 
-<option value="DIGITOVER">Over</option>
-<option value="DIGITUNDER">Under</option>
-<option value="DIGITMATCH">Matches</option>
-<option value="DIGITDIFF">Differs</option>
-<option value="DIGITEVEN">Even</option>
-<option value="DIGITODD">Odd</option>
+<option value="DIGITOVER">
+Over
+</option>
+
+<option value="DIGITUNDER">
+Under
+</option>
+
+<option value="DIGITMATCH">
+Matches
+</option>
+
+<option value="DIGITDIFF">
+Differs
+</option>
+
+<option value="DIGITEVEN">
+Even
+</option>
+
+<option value="DIGITODD">
+Odd
+</option>
 
 </select>
 
@@ -521,7 +536,9 @@ TRADING — PROPOSAL ONLY
 
 <div id="digitControl">
 
-<label>Digit / Barrier</label>
+<label>
+Digit / Barrier
+</label>
 
 <select id="barrier">
 
@@ -529,6 +546,7 @@ TRADING — PROPOSAL ONLY
 <option>1</option>
 <option>2</option>
 <option>3</option>
+<option>4</option>
 <option selected>5</option>
 <option>6</option>
 <option>7</option>
@@ -541,7 +559,9 @@ TRADING — PROPOSAL ONLY
 
 <div style="height:10px"></div>
 
-<label>Stake</label>
+<label>
+Stake
+</label>
 
 <input
 id="stake"
@@ -553,7 +573,9 @@ value="1"
 
 <div style="height:10px"></div>
 
-<label>Duration</label>
+<label>
+Duration
+</label>
 
 <input
 id="duration"
@@ -593,7 +615,9 @@ ACCOUNT CONNECTION
 
 <div class="metric">
 
-<label>Deriv account</label>
+<label>
+Deriv account
+</label>
 
 <b id="accountStatus">
 Checking…
@@ -617,19 +641,30 @@ Connect Deriv
 
 <div class="note">
 
-<b>DollarTicks</b> reads public Deriv tick data and calculates recent digit frequencies.
+<b>DollarTicks</b> reads public Deriv tick data and calculates the last-digit frequencies locally.
 
 <br><br>
 
-The moving tick shows the latest live digit as it arrives.
+🟢 Green half-circle = most occurring digit.
+
+<br>
+
+🔴 Red half-circle = least occurring digit.
+
+<br>
+
+🟣 Pointer = current moving tick.
 
 <br><br>
 
-The validation panel is a monitoring tool. It does <b>not</b> guarantee the next digit and does not automatically place trades.
+The percentages are based on recent ticks. They are
+<b>not guaranteed predictions</b>
+of the next tick.
 
 <br><br>
 
-Trading remains in proposal mode.
+Trading remains in proposal mode. Pressing
+"Get Trade Proposal" does not purchase a contract.
 
 </div>
 
@@ -645,12 +680,14 @@ DollarTicks • Market data powered by Deriv
 
 <script>
 
+/* =====================================================
+   CONFIG
+===================================================== */
+
 const WS_URL =
 "wss://api.derivws.com/trading/v1/options/ws/public";
 
 const MAX_TICKS = 100;
-
-const SEQUENCE_LENGTH = 20;
 
 const marketNames = {
 
@@ -668,10 +705,12 @@ let history = [];
 
 let latestDigit = null;
 
-let latestQuote = null;
-
 let reconnectTimer = null;
 
+
+/* =====================================================
+   ELEMENT HELPER
+===================================================== */
 
 const $ = id =>
 document.getElementById(id);
@@ -686,7 +725,8 @@ text,
 live=false
 ){
 
-$("status").textContent = text;
+$("status").textContent =
+text;
 
 $("status").className =
 "status" +
@@ -711,11 +751,9 @@ if(!Number.isFinite(n)){
 return null;
 }
 
-if(
-Number.isFinite(
+if(Number.isFinite(
 Number(pipSize)
-)
-){
+)){
 
 const factor =
 10 ** Number(pipSize);
@@ -751,197 +789,6 @@ clean.length - 1
 
 
 /* =====================================================
-   MOVING TICK
-===================================================== */
-
-function updateMovingTick(
-digit,
-quote
-){
-
-if(
-digit === null
-){
-return;
-}
-
-$("movingDigit")
-.textContent =
-digit;
-
-$("movingQuote")
-.textContent =
-`Current quote: ${quote}`;
-
-renderSequence();
-
-}
-
-
-/* =====================================================
-   SEQUENCE
-===================================================== */
-
-function renderSequence(){
-
-const sequence =
-history
-.slice(-SEQUENCE_LENGTH)
-.reverse();
-
-$("sequence").innerHTML =
-sequence.map(
-(digit,index)=>`
-
-<span
-class="${index === 0 ? "latest" : ""}"
->
-${digit}
-</span>
-
-`
-).join("");
-
-}
-
-
-/* =====================================================
-   VALIDATION
-===================================================== */
-
-function validateMovingTick(){
-
-if(
-history.length < 10
-){
-
-$("validationSignal")
-.textContent =
-"WAITING";
-
-$("validationSignal")
-.className =
-"validationSignal wait";
-
-$("validationInfo")
-.textContent =
-"Collecting live ticks…";
-
-return;
-
-}
-
-const recent =
-history.slice(-10);
-
-const over =
-recent.filter(
-d => d >= 6
-).length;
-
-const under =
-recent.filter(
-d => d <= 4
-).length;
-
-const even =
-recent.filter(
-d => d % 2 === 0
-).length;
-
-const odd =
-recent.filter(
-d => d % 2 !== 0
-).length;
-
-const latest =
-recent[recent.length - 1];
-
-
-/*
-This is deliberately NOT
-a prediction engine.
-
-It simply describes the
-current recent sequence.
-*/
-
-if(over >= 7){
-
-$("validationSignal")
-.textContent =
-"OVER 5 DOMINANT";
-
-$("validationSignal")
-.className =
-"validationSignal watch";
-
-$("validationInfo")
-.textContent =
-`Recent 10 ticks: ${over}/10 were digits 6–9. Latest digit: ${latest}. This is historical validation only — not a guaranteed next-tick prediction.`;
-
-}else if(under >= 7){
-
-$("validationSignal")
-.textContent =
-"UNDER 5 DOMINANT";
-
-$("validationSignal")
-.className =
-"validationSignal watch";
-
-$("validationInfo")
-.textContent =
-`Recent 10 ticks: ${under}/10 were digits 0–4. Latest digit: ${latest}. This is historical validation only — not a guaranteed next-tick prediction.`;
-
-}else if(even >= 8){
-
-$("validationSignal")
-.textContent =
-"EVEN DOMINANT";
-
-$("validationSignal")
-.className =
-"validationSignal watch";
-
-$("validationInfo")
-.textContent =
-`Recent 10 ticks: ${even}/10 were even. Latest digit: ${latest}.`;
-
-}else if(odd >= 8){
-
-$("validationSignal")
-.textContent =
-"ODD DOMINANT";
-
-$("validationSignal")
-.className =
-"validationSignal watch";
-
-$("validationInfo")
-.textContent =
-`Recent 10 ticks: ${odd}/10 were odd. Latest digit: ${latest}.`;
-
-}else{
-
-$("validationSignal")
-.textContent =
-"WAIT";
-
-$("validationSignal")
-.className =
-"validationSignal wait";
-
-$("validationInfo")
-.textContent =
-`No strong recent pattern detected. Latest digit: ${latest}. Continue observing.`;
-
-}
-
-}
-
-
-/* =====================================================
    ADD DIGIT
 ===================================================== */
 
@@ -962,9 +809,6 @@ return;
 latestDigit =
 digit;
 
-latestQuote =
-quote;
-
 history.push(
 digit
 );
@@ -979,18 +823,13 @@ history.shift();
 }
 
 $("quote").textContent =
-`${quote} • ${new Date(
+`${quote} • ${
+new Date(
 epoch * 1000
-).toLocaleTimeString()}`;
-
-updateMovingTick(
-digit,
-quote
-);
+).toLocaleTimeString()
+}`;
 
 render();
-
-validateMovingTick();
 
 }
 
@@ -1012,14 +851,67 @@ counts[digit]++;
 
 }
 
-$("countLabel")
-.textContent =
+
+$("countLabel").textContent =
 history.length;
 
 
-let maxCount =
-Math.max(...counts);
+/*
+Find most occurring
+*/
 
+let mostDigit = 0;
+
+for(
+let i=1;
+i<10;
+i++
+){
+
+if(
+counts[i] >
+counts[mostDigit]
+){
+
+mostDigit = i;
+
+}
+
+}
+
+
+/*
+Find least occurring.
+
+We include zero-count
+digits so a digit that has
+not appeared is considered
+least frequent.
+*/
+
+let leastDigit = 0;
+
+for(
+let i=1;
+i<10;
+i++
+){
+
+if(
+counts[i] <
+counts[leastDigit]
+){
+
+leastDigit = i;
+
+}
+
+}
+
+
+/*
+DIGIT CIRCLES
+*/
 
 $("digits").innerHTML =
 counts.map(
@@ -1028,33 +920,48 @@ counts.map(
 const percentage =
 history.length
 ?
+(
 count /
 history.length *
 100
+)
 :
 0;
 
-const hot =
-count === maxCount &&
-count > 0;
+const isMost =
+history.length > 0 &&
+digit === mostDigit &&
+counts[mostDigit] > 0;
 
-const latest =
+const isLeast =
+history.length > 0 &&
+digit === leastDigit;
+
+const isLatest =
 digit === latestDigit;
 
 return `
 
 <div class="digit
-${hot ? "hot" : ""}
-${latest ? "latest" : ""}
+${isMost ? "most" : ""}
+${isLeast ? "least" : ""}
+${isLatest ? "latest" : ""}
 ">
+
+${
+isLatest
+?
+'<div class="pointer"></div>'
+:
+''
+}
 
 <strong>
 ${digit}
 </strong>
 
 <small>
-${count} •
-${percentage.toFixed(1)}%
+${count} • ${percentage.toFixed(1)}%
 </small>
 
 </div>
@@ -1064,6 +971,10 @@ ${percentage.toFixed(1)}%
 }
 ).join("");
 
+
+/*
+LIVE DIGITS
+*/
 
 $("ticks").innerHTML =
 history
@@ -1083,36 +994,11 @@ ${digit}
 .join("");
 
 
+/*
+MOST / LEAST TEXT
+*/
+
 if(history.length){
-
-let mostDigit = 0;
-let leastDigit = 0;
-
-for(
-let i=1;
-i<10;
-i++
-){
-
-if(
-counts[i] >
-counts[mostDigit]
-){
-
-mostDigit = i;
-
-}
-
-if(
-counts[i] <
-counts[leastDigit]
-){
-
-leastDigit = i;
-
-}
-
-}
 
 $("most").textContent =
 `${mostDigit} (${
@@ -1133,12 +1019,20 @@ history.length *
 }%)`;
 
 
+/*
+OVER
+*/
+
 const over =
 counts[6] +
 counts[7] +
 counts[8] +
 counts[9];
 
+
+/*
+UNDER
+*/
 
 const under =
 counts[0] +
@@ -1154,7 +1048,8 @@ over /
 history.length *
 100
 ).toFixed(1)
-+ "%";
++
+"%";
 
 
 $("under5").textContent =
@@ -1163,7 +1058,8 @@ under /
 history.length *
 100
 ).toFixed(1)
-+ "%";
++
+"%";
 
 }else{
 
@@ -1210,39 +1106,12 @@ latestDigit = null;
 
 render();
 
-$("movingDigit")
-.textContent =
-"—";
-
-$("movingQuote")
-.textContent =
-"Waiting for live tick…";
-
-$("sequence")
-.innerHTML = "";
-
-$("validationSignal")
-.textContent =
-"WAITING";
-
-$("validationSignal")
-.className =
-"validationSignal wait";
-
-$("validationInfo")
-.textContent =
-"Waiting for enough live ticks to validate the setup.";
-
-
 const symbol =
 $("market").value;
 
-
-$("marketName")
-.textContent =
+$("marketName").textContent =
 marketNames[symbol] ||
 symbol;
-
 
 setStatus(
 "Connecting…"
@@ -1262,7 +1131,6 @@ setStatus(
 "LIVE",
 true
 );
-
 
 ws.send(
 JSON.stringify({
@@ -1302,6 +1170,10 @@ event.data
 );
 
 
+/*
+API ERROR
+*/
+
 if(data.error){
 
 console.error(
@@ -1319,7 +1191,7 @@ return;
 
 
 /*
-Historical data
+HISTORY
 */
 
 if(
@@ -1395,19 +1267,6 @@ history[
 history.length - 1
 ];
 
-latestQuote =
-prices[
-prices.length - 1
-];
-
-$("movingDigit")
-.textContent =
-latestDigit;
-
-$("movingQuote")
-.textContent =
-`Current quote: ${latestQuote}`;
-
 }
 
 
@@ -1424,18 +1283,16 @@ times.length - 1
 ];
 
 $("quote").textContent =
-`${lastPrice} • ${new Date(
+`${lastPrice} • ${
+new Date(
 lastTime * 1000
-).toLocaleTimeString()}`;
+).toLocaleTimeString()
+}`;
 
 }
 
 
 render();
-
-renderSequence();
-
-validateMovingTick();
 
 return;
 
@@ -1443,7 +1300,7 @@ return;
 
 
 /*
-Live tick
+LIVE TICK
 */
 
 if(
@@ -1458,13 +1315,11 @@ return;
 const tick =
 data.tick;
 
-
 const digit =
 getLastDigit(
 tick.quote,
 tick.pip_size
 );
-
 
 addDigit(
 digit,
@@ -1594,8 +1449,6 @@ false;
 
 }catch(error){
 
-console.error(error);
-
 $("accountStatus")
 .textContent =
 "Not connected";
@@ -1630,7 +1483,7 @@ window.location.href =
 
 
 /* =====================================================
-   CONTRACT UI
+   CONTRACT TYPE
 ===================================================== */
 
 function updateContractUI(){
@@ -1650,12 +1503,10 @@ const digitContracts = [
 ];
 
 $("digitControl")
-.style.display =
-digitContracts.includes(type)
-?
-"block"
-:
-"none";
+.classList.toggle(
+"hidden",
+!digitContracts.includes(type)
+);
 
 }
 
@@ -1775,9 +1626,7 @@ status.textContent =
 
 }catch(error){
 
-console.error(
-error
-);
+console.error(error);
 
 status.className =
 "tradeStatus error";
