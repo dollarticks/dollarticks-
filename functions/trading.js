@@ -10,7 +10,12 @@ export async function onRequest(context) {
       }
     });
 
-  const cookies = request.headers.get("Cookie") || "";
+  /* =========================================
+     COOKIE / ACCESS TOKEN
+     ========================================= */
+
+  const cookies =
+    request.headers.get("Cookie") || "";
 
   function getCookie(name) {
     const match = cookies.match(
@@ -37,66 +42,88 @@ export async function onRequest(context) {
     );
   }
 
+  /* =========================================
+     DERIV CONFIG
+     ========================================= */
+
   const clientId =
     "347btQbpUS2La9uhcLb2X";
 
   const DERIV_API =
     "https://api.derivws.com";
 
-  /* ================================
+
+  /* =========================================
      GET OPTIONS ACCOUNTS
-     ================================ */
+     ========================================= */
 
   async function getAccounts() {
-    const response = await fetch(
-      `${DERIV_API}/trading/v1/options/accounts`,
-      {
-        method: "GET",
-        headers: {
-          Authorization:
-            `Bearer ${accessToken}`,
 
-          "Deriv-App-ID":
-            clientId,
+    const response =
+      await fetch(
+        `${DERIV_API}/trading/v1/options/accounts`,
+        {
+          method: "GET",
 
-          Accept:
-            "application/json"
+          headers: {
+            Authorization:
+              `Bearer ${accessToken}`,
+
+            "Deriv-App-ID":
+              clientId,
+
+            Accept:
+              "application/json"
+          }
         }
-      }
-    );
+      );
 
     const data =
       await response.json();
 
+    console.log(
+      "DOLLARTICKS ACCOUNTS RESPONSE:",
+      JSON.stringify(data)
+    );
+
     if (!response.ok) {
+
       throw new Error(
         data.errors?.[0]?.message ||
         data.error?.message ||
-        "Deriv rejected the account request."
+        `Deriv account request failed (${response.status}).`
       );
     }
 
     return data;
   }
 
-  /* ================================
-     FIND ACCOUNTS
-     ================================ */
+
+  /* =========================================
+     EXTRACT ACCOUNTS
+     ========================================= */
 
   function extractAccounts(data) {
+
     const found = [];
 
     function scan(value) {
+
       if (!value) return;
 
       if (Array.isArray(value)) {
+
         for (const item of value) {
           scan(item);
         }
+
         return;
       }
 
-      if (typeof value !== "object") {
+      if (
+        typeof value !==
+        "object"
+      ) {
         return;
       }
 
@@ -108,12 +135,15 @@ export async function onRequest(context) {
         found.push(value);
       }
 
-      for (const value2 of Object.values(value)) {
+      for (
+        const child of Object.values(value)
+      ) {
+
         if (
-          value2 &&
-          typeof value2 === "object"
+          child &&
+          typeof child === "object"
         ) {
-          scan(value2);
+          scan(child);
         }
       }
     }
@@ -147,7 +177,13 @@ export async function onRequest(context) {
     });
   }
 
+
+  /* =========================================
+     ACCOUNT ID
+     ========================================= */
+
   function accountId(account) {
+
     return (
       account.account_id ||
       account.loginid ||
@@ -156,7 +192,13 @@ export async function onRequest(context) {
     );
   }
 
+
+  /* =========================================
+     FIND DEMO ACCOUNT
+     ========================================= */
+
   function findDemo(accounts) {
+
     return accounts.find(account => {
 
       const type =
@@ -176,9 +218,10 @@ export async function onRequest(context) {
     });
   }
 
-  /* ================================
-     AUTHENTICATED WEBSOCKET
-     ================================ */
+
+  /* =========================================
+     CREATE AUTHENTICATED WEBSOCKET
+     ========================================= */
 
   async function createWebSocket(account) {
 
@@ -186,10 +229,16 @@ export async function onRequest(context) {
       accountId(account);
 
     if (!id) {
+
       throw new Error(
         "Deriv account ID is missing."
       );
     }
+
+    console.log(
+      "DOLLARTICKS REQUESTING OTP FOR:",
+      id
+    );
 
     const response =
       await fetch(
@@ -204,7 +253,7 @@ export async function onRequest(context) {
             "Deriv-App-ID":
               clientId,
 
-            "Content-Type":
+            Accept:
               "application/json"
           }
         }
@@ -213,25 +262,52 @@ export async function onRequest(context) {
     const data =
       await response.json();
 
-    if (
-      !response.ok ||
-      !data.data?.url
-    ) {
+    console.log(
+      "DOLLARTICKS OTP RESPONSE:",
+      JSON.stringify(data)
+    );
+
+    if (!response.ok) {
+
       throw new Error(
         data.errors?.[0]?.message ||
         data.error?.message ||
-        "Could not create authenticated Deriv WebSocket."
+        `OTP request failed with HTTP ${response.status}.`
       );
     }
 
+    if (
+      !data.data ||
+      !data.data.url
+    ) {
+
+      throw new Error(
+        "Deriv did not return an authenticated WebSocket URL."
+      );
+    }
+
+    const wsUrl =
+      data.data.url;
+
+    console.log(
+      "DOLLARTICKS: AUTHENTICATED WS URL RECEIVED"
+    );
+
+    /*
+     * IMPORTANT:
+     * Connect directly to the URL returned
+     * by Deriv's OTP endpoint.
+     */
+
     return new WebSocket(
-      data.data.url
+      wsUrl
     );
   }
 
-  /* ================================
+
+  /* =========================================
      WEBSOCKET REQUEST
-     ================================ */
+     ========================================= */
 
   function wsRequest(
     ws,
@@ -242,22 +318,30 @@ export async function onRequest(context) {
     return new Promise(
       (resolve, reject) => {
 
-        let finished = false;
+        let finished =
+          false;
+
+        let opened =
+          false;
 
         const timeout =
           setTimeout(() => {
 
-            if (finished) return;
+            if (finished) {
+              return;
+            }
 
-            finished = true;
+            finished =
+              true;
 
             reject(
               new Error(
-                "Deriv request timed out."
+                `Deriv request timed out waiting for ${expectedMessage}.`
               )
             );
 
           }, 15000);
+
 
         function finish(
           callback,
@@ -268,12 +352,65 @@ export async function onRequest(context) {
             return;
           }
 
-          finished = true;
+          finished =
+            true;
 
-          clearTimeout(timeout);
+          clearTimeout(
+            timeout
+          );
 
-          callback(value);
+          callback(
+            value
+          );
         }
+
+
+        /*
+         * OPEN
+         */
+
+        ws.addEventListener(
+          "open",
+          () => {
+
+            opened =
+              true;
+
+            console.log(
+              "DOLLARTICKS: AUTHENTICATED WEBSOCKET OPEN"
+            );
+
+            try {
+
+              ws.send(
+                JSON.stringify(
+                  payload
+                )
+              );
+
+              console.log(
+                "DOLLARTICKS SENT REQUEST:",
+                JSON.stringify(
+                  payload
+                )
+              );
+
+            } catch (error) {
+
+              finish(
+                reject,
+                error
+              );
+            }
+
+          },
+          { once: true }
+        );
+
+
+        /*
+         * MESSAGE
+         */
 
         ws.addEventListener(
           "message",
@@ -286,20 +423,27 @@ export async function onRequest(context) {
                   event.data
                 );
 
+              console.log(
+                "DOLLARTICKS DERIV MESSAGE:",
+                JSON.stringify(
+                  data
+                )
+              );
+
+
               /*
-               * IMPORTANT:
-               * Return the REAL Deriv error.
+               * DERIV ERROR
                */
 
               if (data.error) {
 
+                const code =
+                  data.error.code ||
+                  "DERIV_ERROR";
+
                 const message =
                   data.error.message ||
                   "Deriv rejected the request.";
-
-                const code =
-                  data.error.code ||
-                  "UNKNOWN_ERROR";
 
                 finish(
                   reject,
@@ -310,6 +454,11 @@ export async function onRequest(context) {
 
                 return;
               }
+
+
+              /*
+               * EXPECTED RESPONSE
+               */
 
               if (
                 data.msg_type ===
@@ -333,67 +482,121 @@ export async function onRequest(context) {
           }
         );
 
+
+        /*
+         * ERROR
+         */
+
         ws.addEventListener(
           "error",
-          () => {
+          event => {
+
+            console.error(
+              "DOLLARTICKS WEBSOCKET ERROR:",
+              event
+            );
+
+            if (!opened) {
+
+              finish(
+                reject,
+                new Error(
+                  "Deriv authenticated WebSocket failed before opening."
+                )
+              );
+
+            } else {
+
+              finish(
+                reject,
+                new Error(
+                  "Deriv authenticated WebSocket encountered a connection error."
+                )
+              );
+            }
+
+          }
+        );
+
+
+        /*
+         * CLOSE
+         */
+
+        ws.addEventListener(
+          "close",
+          event => {
+
+            console.error(
+              "DOLLARTICKS WEBSOCKET CLOSED:",
+              {
+                code:
+                  event.code,
+
+                reason:
+                  event.reason,
+
+                wasClean:
+                  event.wasClean
+              }
+            );
+
+
+            if (finished) {
+              return;
+            }
+
+
+            let message =
+              "Deriv authenticated WebSocket closed.";
+
+
+            if (event.code) {
+
+              message +=
+                ` Close code: ${event.code}.`;
+            }
+
+
+            if (event.reason) {
+
+              message +=
+                ` Reason: ${event.reason}.`;
+            }
+
+
+            if (!opened) {
+
+              message +=
+                " The connection closed before it opened.";
+            }
+
 
             finish(
               reject,
               new Error(
-                "Authenticated Deriv WebSocket connection failed."
+                message
               )
             );
 
           }
         );
 
-        const send =
-          () => {
-
-            try {
-
-              ws.send(
-                JSON.stringify(
-                  payload
-                )
-              );
-
-            } catch (error) {
-
-              finish(
-                reject,
-                error
-              );
-            }
-
-          };
-
-        if (
-          ws.readyState ===
-          WebSocket.OPEN
-        ) {
-
-          send();
-
-        } else {
-
-          ws.addEventListener(
-            "open",
-            send,
-            { once: true }
-          );
-
-        }
-
       }
     );
   }
 
+
+  /* =========================================
+     MAIN REQUEST HANDLER
+     ========================================= */
+
   try {
 
-    /* =================================
+
+    /* =======================================
        GET
-       ================================= */
+       ======================================= */
 
     if (
       request.method ===
@@ -404,12 +607,17 @@ export async function onRequest(context) {
         await getAccounts();
 
       const accounts =
-        extractAccounts(data);
+        extractAccounts(
+          data
+        );
 
-      if (!accounts.length) {
+      if (
+        !accounts.length
+      ) {
 
         return json({
           ok: false,
+
           connected: true,
 
           error:
@@ -421,7 +629,9 @@ export async function onRequest(context) {
       }
 
       const demo =
-        findDemo(accounts);
+        findDemo(
+          accounts
+        );
 
       return json({
 
@@ -432,8 +642,11 @@ export async function onRequest(context) {
         selected_account:
           demo
             ? {
+
                 account_id:
-                  accountId(demo),
+                  accountId(
+                    demo
+                  ),
 
                 loginid:
                   demo.loginid ||
@@ -453,14 +666,19 @@ export async function onRequest(context) {
                 balance:
                   demo.balance ??
                   null
+
               }
             : null,
+
 
         accounts:
           accounts.map(
             account => ({
+
               account_id:
-                accountId(account),
+                accountId(
+                  account
+                ),
 
               loginid:
                 account.loginid ||
@@ -477,14 +695,17 @@ export async function onRequest(context) {
               status:
                 account.status ||
                 "active"
+
             })
           )
+
       });
     }
 
-    /* =================================
-       POST ONLY
-       ================================= */
+
+    /* =======================================
+       ONLY GET AND POST ALLOWED
+       ======================================= */
 
     if (
       request.method !==
@@ -494,6 +715,7 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
+
           error:
             "Method not allowed."
         },
@@ -501,12 +723,26 @@ export async function onRequest(context) {
       );
     }
 
+
+    /* =======================================
+       READ BODY
+       ======================================= */
+
     const body =
       await request.json();
 
-    /* =================================
+
+    console.log(
+      "DOLLARTICKS POST BODY:",
+      JSON.stringify(
+        body
+      )
+    );
+
+
+    /* =======================================
        MARKET
-       ================================= */
+       ======================================= */
 
     const market =
       String(
@@ -515,6 +751,7 @@ export async function onRequest(context) {
         body.underlying_symbol ||
         ""
       ).trim();
+
 
     if (!market) {
 
@@ -534,13 +771,21 @@ export async function onRequest(context) {
       );
     }
 
+
     const validMarkets = [
+
       "1HZ100V",
+
       "1HZ75V",
+
       "1HZ50V",
+
       "1HZ25V",
+
       "1HZ10V"
+
     ];
+
 
     if (
       !validMarkets.includes(
@@ -555,7 +800,7 @@ export async function onRequest(context) {
           connected: true,
 
           error:
-            `Invalid market: ${market}`,
+            `Invalid market: ${market}.`,
 
           received_market:
             market,
@@ -567,9 +812,10 @@ export async function onRequest(context) {
       );
     }
 
-    /* =================================
+
+    /* =======================================
        ACCOUNT
-       ================================= */
+       ======================================= */
 
     const accountData =
       await getAccounts();
@@ -580,7 +826,10 @@ export async function onRequest(context) {
       );
 
     const account =
-      findDemo(accounts);
+      findDemo(
+        accounts
+      );
+
 
     if (!account) {
 
@@ -595,21 +844,23 @@ export async function onRequest(context) {
 
           accounts:
             accounts.map(
-              account => ({
+              a => ({
+
                 account_id:
-                  accountId(account),
+                  accountId(a),
 
                 loginid:
-                  account.loginid ||
+                  a.loginid ||
                   null,
 
                 account_type:
-                  account.account_type ||
+                  a.account_type ||
                   null,
 
                 currency:
-                  account.currency ||
+                  a.currency ||
                   "USD"
+
               })
             )
         },
@@ -617,32 +868,45 @@ export async function onRequest(context) {
       );
     }
 
-    const id =
-      accountId(account);
 
-    /* =================================
+    const id =
+      accountId(
+        account
+      );
+
+
+    /* =======================================
        PROPOSAL
-       ================================= */
+       ======================================= */
 
     if (
       body.action ===
       "proposal"
     ) {
 
-      let contractType =
+      const contractType =
         String(
           body.contract_type ||
           "DIGITOVER"
         ).toUpperCase().trim();
 
+
       const allowedContracts = [
+
         "DIGITOVER",
+
         "DIGITUNDER",
+
         "DIGITMATCH",
+
         "DIGITDIFF",
+
         "DIGITEVEN",
+
         "DIGITODD"
+
       ];
+
 
       if (
         !allowedContracts.includes(
@@ -657,7 +921,7 @@ export async function onRequest(context) {
             connected: true,
 
             error:
-              `Invalid digit contract type: ${contractType}`,
+              `Invalid contract type: ${contractType}`,
 
             allowed_contracts:
               allowedContracts
@@ -666,24 +930,30 @@ export async function onRequest(context) {
         );
       }
 
+
       const stake =
         Number(
           body.stake
         );
+
 
       const duration =
         Number(
           body.duration
         );
 
+
       if (
-        !Number.isFinite(stake) ||
+        !Number.isFinite(
+          stake
+        ) ||
         stake <= 0
       ) {
 
         return json(
           {
             ok: false,
+
             error:
               "Enter a valid stake."
           },
@@ -691,14 +961,18 @@ export async function onRequest(context) {
         );
       }
 
+
       if (
-        !Number.isFinite(duration) ||
+        !Number.isFinite(
+          duration
+        ) ||
         duration < 1
       ) {
 
         return json(
           {
             ok: false,
+
             error:
               "Enter a valid duration."
           },
@@ -706,10 +980,23 @@ export async function onRequest(context) {
         );
       }
 
+
       /*
-       * DIGITOVER and DIGITUNDER need
-       * a barrier.
+       * DIGIT CONTRACT BARRIER
        */
+
+      const digitContracts = [
+
+        "DIGITOVER",
+
+        "DIGITUNDER",
+
+        "DIGITMATCH",
+
+        "DIGITDIFF"
+
+      ];
+
 
       let barrier =
         String(
@@ -717,15 +1004,11 @@ export async function onRequest(context) {
           "5"
         ).trim();
 
+
       if (
-        contractType ===
-          "DIGITOVER" ||
-        contractType ===
-          "DIGITUNDER" ||
-        contractType ===
-          "DIGITMATCH" ||
-        contractType ===
-          "DIGITDIFF"
+        digitContracts.includes(
+          contractType
+        )
       ) {
 
         if (
@@ -737,28 +1020,37 @@ export async function onRequest(context) {
           return json(
             {
               ok: false,
+
               error:
-                "Digit barrier must be a number from 0 to 9."
+                "Digit barrier must be from 0 to 9."
             },
             400
           );
         }
       }
 
+
+      /* =====================================
+         OPEN AUTHENTICATED WS
+         ===================================== */
+
       const ws =
         await createWebSocket(
           account
         );
 
+
       try {
 
+
         /*
-         * CURRENT DERIV PROPOSAL FORMAT
+         * PROPOSAL REQUEST
          */
 
         const proposalRequest = {
 
-          proposal: 1,
+          proposal:
+            1,
 
           amount:
             stake,
@@ -782,32 +1074,26 @@ export async function onRequest(context) {
           underlying_symbol:
             market,
 
-          subscribe:
-            1,
-
           req_id:
             Date.now()
+
         };
 
+
         /*
-         * Barrier is required for
-         * digit contracts.
+         * ADD BARRIER ONLY WHERE REQUIRED
          */
 
         if (
-          contractType ===
-            "DIGITOVER" ||
-          contractType ===
-            "DIGITUNDER" ||
-          contractType ===
-            "DIGITMATCH" ||
-          contractType ===
-            "DIGITDIFF"
+          digitContracts.includes(
+            contractType
+          )
         ) {
 
           proposalRequest.barrier =
             barrier;
         }
+
 
         console.log(
           "DOLLARTICKS PROPOSAL REQUEST:",
@@ -816,12 +1102,20 @@ export async function onRequest(context) {
           )
         );
 
+
         const result =
           await wsRequest(
             ws,
+
             proposalRequest,
+
             "proposal"
           );
+
+
+        /*
+         * VALIDATE RESPONSE
+         */
 
         if (
           !result.proposal ||
@@ -835,7 +1129,7 @@ export async function onRequest(context) {
               connected: true,
 
               error:
-                "Deriv returned a proposal response without a proposal ID.",
+                "Deriv returned a proposal without a proposal ID.",
 
               deriv_response:
                 result
@@ -843,6 +1137,7 @@ export async function onRequest(context) {
             502
           );
         }
+
 
         return json({
 
@@ -857,7 +1152,12 @@ export async function onRequest(context) {
             contractType,
 
           barrier:
-            barrier,
+            digitContracts.includes(
+              contractType
+            )
+              ? barrier
+              : null,
+
 
           account: {
 
@@ -872,6 +1172,7 @@ export async function onRequest(context) {
               "USD"
 
           },
+
 
           proposal: {
 
@@ -892,10 +1193,12 @@ export async function onRequest(context) {
 
           },
 
+
           message:
             "Fresh Deriv proposal received."
 
         });
+
 
       } finally {
 
@@ -904,16 +1207,19 @@ export async function onRequest(context) {
         } catch {}
 
       }
+
     }
 
-    /* =================================
+
+    /* =======================================
        BUY
-       ================================= */
+       ======================================= */
 
     if (
       body.action ===
       "buy"
     ) {
+
 
       if (
         !body.proposal_id
@@ -932,13 +1238,17 @@ export async function onRequest(context) {
         );
       }
 
+
       const price =
         Number(
           body.price
         );
 
+
       if (
-        !Number.isFinite(price) ||
+        !Number.isFinite(
+          price
+        ) ||
         price <= 0
       ) {
 
@@ -955,12 +1265,15 @@ export async function onRequest(context) {
         );
       }
 
+
       const ws =
         await createWebSocket(
           account
         );
 
+
       try {
+
 
         const buyRequest = {
 
@@ -977,6 +1290,7 @@ export async function onRequest(context) {
 
         };
 
+
         console.log(
           "DOLLARTICKS BUY REQUEST:",
           JSON.stringify(
@@ -984,12 +1298,16 @@ export async function onRequest(context) {
           )
         );
 
+
         const result =
           await wsRequest(
             ws,
+
             buyRequest,
+
             "buy"
           );
+
 
         if (
           !result.buy
@@ -1011,6 +1329,7 @@ export async function onRequest(context) {
           );
         }
 
+
         return json({
 
           ok: true,
@@ -1018,6 +1337,7 @@ export async function onRequest(context) {
           connected: true,
 
           purchased: true,
+
 
           account: {
 
@@ -1032,6 +1352,7 @@ export async function onRequest(context) {
               "USD"
 
           },
+
 
           contract: {
 
@@ -1069,10 +1390,12 @@ export async function onRequest(context) {
 
           },
 
+
           message:
             "DEMO contract purchased successfully."
 
         });
+
 
       } finally {
 
@@ -1081,7 +1404,13 @@ export async function onRequest(context) {
         } catch {}
 
       }
+
     }
+
+
+    /* =======================================
+       UNKNOWN ACTION
+       ======================================= */
 
     return json(
       {
@@ -1095,12 +1424,15 @@ export async function onRequest(context) {
       400
     );
 
+
   } catch (error) {
 
+
     console.error(
-      "DollarTicks trading error:",
+      "DOLLARTICKS TRADING ERROR:",
       error
     );
+
 
     return json(
       {
@@ -1115,4 +1447,4 @@ export async function onRequest(context) {
       500
     );
   }
-          }
+              }
