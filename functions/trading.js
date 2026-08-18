@@ -11,20 +11,31 @@ export async function onRequest(context) {
     });
 
   // =====================================================
-  // GET ACCESS TOKEN
+  // CONFIG
   // =====================================================
 
-  const cookies = request.headers.get("Cookie") || "";
+  const clientId = "347btQbpUS2La9uhcLb2X";
+  const DERIV_API = "https://api.derivws.com";
+
+  // =====================================================
+  // COOKIE
+  // =====================================================
+
+  const cookies =
+    request.headers.get("Cookie") || "";
 
   function getCookie(name) {
     const match = cookies.match(
       new RegExp("(^|;\\s*)" + name + "=([^;]*)")
     );
 
-    return match ? decodeURIComponent(match[2]) : null;
+    return match
+      ? decodeURIComponent(match[2])
+      : null;
   }
 
-  const accessToken = getCookie("dt_access_token");
+  const accessToken =
+    getCookie("dt_access_token");
 
   if (!accessToken) {
     return json(
@@ -39,14 +50,7 @@ export async function onRequest(context) {
   }
 
   // =====================================================
-  // CONFIG
-  // =====================================================
-
-  const clientId = "347btQbpUS2La9uhcLb2X";
-  const DERIV_API = "https://api.derivws.com";
-
-  // =====================================================
-  // ACCOUNT HELPERS
+  // ACCOUNT ID
   // =====================================================
 
   function getAccountId(account) {
@@ -58,6 +62,10 @@ export async function onRequest(context) {
     );
   }
 
+  // =====================================================
+  // FIND ACCOUNTS
+  // =====================================================
+
   function findAccounts(data) {
     const found = [];
 
@@ -65,9 +73,7 @@ export async function onRequest(context) {
       if (!value) return;
 
       if (Array.isArray(value)) {
-        for (const item of value) {
-          scan(item);
-        }
+        value.forEach(scan);
         return;
       }
 
@@ -90,16 +96,14 @@ export async function onRequest(context) {
         found.push(value);
       }
 
-      for (const key of Object.keys(value)) {
-        const child = value[key];
-
+      Object.values(value).forEach(child => {
         if (
           child &&
           typeof child === "object"
         ) {
           scan(child);
         }
-      }
+      });
     }
 
     scan(data);
@@ -121,56 +125,76 @@ export async function onRequest(context) {
     return unique;
   }
 
+  // =====================================================
+  // GET ACCOUNTS
+  // =====================================================
+
   async function getAccounts() {
     const response = await fetch(
-      DERIV_API + "/trading/v1/options/accounts",
+      DERIV_API +
+        "/trading/v1/options/accounts",
       {
         method: "GET",
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Deriv-App-ID": clientId,
-          "Accept": "application/json"
+          "Authorization":
+            `Bearer ${accessToken}`,
+
+          "Deriv-App-ID":
+            clientId,
+
+          "Accept":
+            "application/json"
         }
       }
     );
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
     return {
       response,
       data,
-      accounts: findAccounts(data)
+      accounts:
+        findAccounts(data)
     };
   }
+
+  // =====================================================
+  // SELECT ACCOUNT
+  // =====================================================
 
   function selectAccount(
     accounts,
     requestedType = "demo",
     requestedId = null
   ) {
-    // Exact account ID first
+    // Exact ID first
     if (requestedId) {
-      const exact = accounts.find(
-        account =>
-          String(getAccountId(account)) ===
-          String(requestedId)
-      );
+      const exact =
+        accounts.find(
+          account =>
+            String(
+              getAccountId(account)
+            ) === String(requestedId)
+        );
 
       if (exact) {
         return exact;
       }
     }
 
-    const type = String(
-      requestedType || "demo"
-    ).toLowerCase();
+    const type =
+      String(
+        requestedType
+      ).toLowerCase();
 
-    const matching = accounts.filter(
-      account =>
-        String(
-          account.account_type || ""
-        ).toLowerCase() === type
-    );
+    const matching =
+      accounts.filter(
+        account =>
+          String(
+            account.account_type || ""
+          ).toLowerCase() === type
+      );
 
     return (
       matching.find(
@@ -184,208 +208,230 @@ export async function onRequest(context) {
     );
   }
 
-  async function getSelectedAccount(
-    requestedType,
-    requestedId
+  // =====================================================
+  // AUTHENTICATED WEBSOCKET
+  // =====================================================
+
+  async function createAuthenticatedWS(
+    accountId
   ) {
-    const result = await getAccounts();
+    const response =
+      await fetch(
+        DERIV_API +
+          `/trading/v1/options/accounts/${encodeURIComponent(
+            accountId
+          )}/otp`,
+        {
+          method: "POST",
 
-    if (!result.response.ok) {
-      throw new Error(
-        result.data?.errors?.[0]?.message ||
-        "Could not retrieve Deriv accounts."
-      );
-    }
+          headers: {
+            "Authorization":
+              `Bearer ${accessToken}`,
 
-    if (!result.accounts.length) {
-      throw new Error(
-        "No Deriv Options accounts were returned."
-      );
-    }
+            "Deriv-App-ID":
+              clientId,
 
-    const account = selectAccount(
-      result.accounts,
-      requestedType,
-      requestedId
-    );
-
-    if (!account) {
-      throw new Error(
-        `No ${requestedType || "demo"} Deriv Options account was found.`
-      );
-    }
-
-    return account;
-  }
-
-  // =====================================================
-  // CREATE AUTHENTICATED DERIV WEBSOCKET
-  // =====================================================
-
-  async function createAuthenticatedWS(accountId) {
-    const otpResponse = await fetch(
-      DERIV_API +
-        `/trading/v1/options/accounts/${encodeURIComponent(
-          accountId
-        )}/otp`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-          "Deriv-App-ID": clientId,
-          "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
+          }
         }
-      }
-    );
+      );
 
-    const otpData = await otpResponse.json();
+    const data =
+      await response.json();
 
     if (
-      !otpResponse.ok ||
-      !otpData?.data?.url
+      !response.ok ||
+      !data?.data?.url
     ) {
       throw new Error(
-        otpData?.errors?.[0]?.message ||
-        otpData?.error?.message ||
+        data?.errors?.[0]?.message ||
+        data?.error?.message ||
         "Could not create authenticated Deriv WebSocket."
       );
     }
 
-    // Deriv gives us a ready-to-use authenticated URL.
     return new WebSocket(
-      otpData.data.url
+      data.data.url
     );
   }
 
   // =====================================================
-  // WEBSOCKET REQUEST
+  // WEBSOCKET SEND
   // =====================================================
 
-  function wsRequest(
+  function wsSend(
     ws,
     payload,
-    expectedMessage,
-    timeoutMs = 15000
+    expected,
+    timeout = 15000
   ) {
-    return new Promise((resolve, reject) => {
-      let finished = false;
-      let timeout;
+    return new Promise(
+      (resolve, reject) => {
 
-      const finish = (callback, value) => {
-        if (finished) return;
+        let done = false;
 
-        finished = true;
+        const finish = (
+          fn,
+          value
+        ) => {
+          if (done) return;
 
-        if (timeout) {
-          clearTimeout(timeout);
-        }
+          done = true;
 
-        callback(value);
-      };
+          clearTimeout(timer);
 
-      const onMessage = event => {
-        try {
-          const data = JSON.parse(event.data);
+          fn(value);
+        };
 
-          if (data.error) {
+        const timer =
+          setTimeout(
+            () => {
+              finish(
+                reject,
+                new Error(
+                  "Deriv request timed out."
+                )
+              );
+            },
+            timeout
+          );
+
+        const messageHandler =
+          event => {
+            try {
+              const data =
+                JSON.parse(
+                  event.data
+                );
+
+              if (data.error) {
+                finish(
+                  reject,
+                  new Error(
+                    data.error.message ||
+                    "Deriv rejected the request."
+                  )
+                );
+
+                return;
+              }
+
+              if (
+                data.msg_type ===
+                expected
+              ) {
+                finish(
+                  resolve,
+                  data
+                );
+              }
+
+            } catch (error) {
+              finish(
+                reject,
+                error
+              );
+            }
+          };
+
+        ws.addEventListener(
+          "message",
+          messageHandler
+        );
+
+        ws.addEventListener(
+          "error",
+          () => {
             finish(
               reject,
               new Error(
-                data.error.message ||
-                "Deriv rejected the request."
+                "Deriv WebSocket connection failed."
               )
             );
-            return;
-          }
-
-          if (
-            data.msg_type === expectedMessage
-          ) {
-            finish(resolve, data);
-          }
-
-        } catch (error) {
-          finish(reject, error);
-        }
-      };
-
-      const onError = () => {
-        finish(
-          reject,
-          new Error(
-            "Authenticated Deriv WebSocket connection failed."
-          )
-        );
-      };
-
-      ws.addEventListener(
-        "message",
-        onMessage
-      );
-
-      ws.addEventListener(
-        "error",
-        onError,
-        { once: true }
-      );
-
-      timeout = setTimeout(() => {
-        finish(
-          reject,
-          new Error(
-            "Deriv WebSocket request timed out."
-          )
-        );
-      }, timeoutMs);
-
-      const sendRequest = () => {
-        try {
-          ws.send(
-            JSON.stringify(payload)
-          );
-        } catch (error) {
-          finish(reject, error);
-        }
-      };
-
-      if (
-        ws.readyState === WebSocket.OPEN
-      ) {
-        sendRequest();
-      } else {
-        ws.addEventListener(
-          "open",
-          sendRequest,
+          },
           { once: true }
         );
+
+        const send = () => {
+          try {
+            ws.send(
+              JSON.stringify(
+                payload
+              )
+            );
+          } catch (error) {
+            finish(
+              reject,
+              error
+            );
+          }
+        };
+
+        if (
+          ws.readyState ===
+          WebSocket.OPEN
+        ) {
+          send();
+        } else {
+          ws.addEventListener(
+            "open",
+            send,
+            { once: true }
+          );
+        }
       }
-    });
+    );
   }
 
   // =====================================================
-  // NORMALIZE MARKET SYMBOL
+  // MARKET NORMALIZATION
   // =====================================================
 
-  function normalizeMarket(market) {
-    const value = String(
-      market || ""
-    ).trim();
+  function normalizeMarket(
+    market
+  ) {
+    const value =
+      String(
+        market || ""
+      ).trim();
 
-    const map = {
-      "Volatility 10": "1HZ10V",
-      "Volatility 25": "1HZ25V",
-      "Volatility 50": "1HZ50V",
-      "Volatility 75": "1HZ75V",
-      "Volatility 100": "1HZ100V",
+    const markets = {
+      "Volatility 10":
+        "1HZ10V",
 
-      "Volatility 10 (1s)": "1HZ10V",
-      "Volatility 25 (1s)": "1HZ25V",
-      "Volatility 50 (1s)": "1HZ50V",
-      "Volatility 75 (1s)": "1HZ75V",
-      "Volatility 100 (1s)": "1HZ100V"
+      "Volatility 25":
+        "1HZ25V",
+
+      "Volatility 50":
+        "1HZ50V",
+
+      "Volatility 75":
+        "1HZ75V",
+
+      "Volatility 100":
+        "1HZ100V",
+
+      "Volatility 10 (1s)":
+        "1HZ10V",
+
+      "Volatility 25 (1s)":
+        "1HZ25V",
+
+      "Volatility 50 (1s)":
+        "1HZ50V",
+
+      "Volatility 75 (1s)":
+        "1HZ75V",
+
+      "Volatility 100 (1s)":
+        "1HZ100V"
     };
 
-    return map[value] || value;
+    return (
+      markets[value] ||
+      value
+    );
   }
 
   // =====================================================
@@ -398,50 +444,71 @@ export async function onRequest(context) {
     // GET
     // ===================================================
 
-    if (request.method === "GET") {
+    if (
+      request.method === "GET"
+    ) {
 
-      const result = await getAccounts();
+      const result =
+        await getAccounts();
 
-      if (!result.response.ok) {
+      if (
+        !result.response.ok
+      ) {
         return json(
           {
             ok: false,
             connected: false,
+
             error:
               "Deriv rejected the account request.",
-            deriv_response: result.data
+
+            deriv_response:
+              result.data
           },
           result.response.status
         );
       }
 
-      if (!result.accounts.length) {
+      if (
+        !result.accounts.length
+      ) {
         return json({
           ok: false,
           connected: true,
+
           error:
-            "Deriv login succeeded, but no Options account was returned.",
-          deriv_response: result.data
+            "No Deriv Options account was found.",
+
+          deriv_response:
+            result.data
         });
       }
 
       const accounts =
-        result.accounts.map(account => ({
-          account_id:
-            getAccountId(account),
+        result.accounts.map(
+          account => ({
+            account_id:
+              getAccountId(
+                account
+              ),
 
-          account_type:
-            account.account_type || null,
+            account_type:
+              account.account_type ||
+              null,
 
-          currency:
-            account.currency || "USD",
+            currency:
+              account.currency ||
+              "USD",
 
-          status:
-            account.status || "active",
+            status:
+              account.status ||
+              "active",
 
-          balance:
-            account.balance ?? null
-        }));
+            balance:
+              account.balance ??
+              null
+          })
+        );
 
       const selected =
         selectAccount(
@@ -457,19 +524,25 @@ export async function onRequest(context) {
           selected
             ? {
                 account_id:
-                  getAccountId(selected),
+                  getAccountId(
+                    selected
+                  ),
 
                 account_type:
-                  selected.account_type || null,
+                  selected.account_type ||
+                  null,
 
                 currency:
-                  selected.currency || "USD",
+                  selected.currency ||
+                  "USD",
 
                 status:
-                  selected.status || "active",
+                  selected.status ||
+                  "active",
 
                 balance:
-                  selected.balance ?? null
+                  selected.balance ??
+                  null
               }
             : null,
 
@@ -481,14 +554,17 @@ export async function onRequest(context) {
     }
 
     // ===================================================
-    // ONLY POST AFTER THIS POINT
+    // POST ONLY
     // ===================================================
 
-    if (request.method !== "POST") {
+    if (
+      request.method !== "POST"
+    ) {
       return json(
         {
           ok: false,
-          error: "Method not allowed."
+          error:
+            "Method not allowed."
         },
         405
       );
@@ -499,7 +575,8 @@ export async function onRequest(context) {
 
     const requestedType =
       String(
-        body.account_type || "demo"
+        body.account_type ||
+        "demo"
       ).toLowerCase();
 
     if (
@@ -516,11 +593,67 @@ export async function onRequest(context) {
       );
     }
 
+    // ===================================================
+    // GET ACCOUNT
+    // ===================================================
+
+    const result =
+      await getAccounts();
+
+    if (
+      !result.response.ok
+    ) {
+      return json(
+        {
+          ok: false,
+          connected: false,
+
+          error:
+            result.data?.errors?.[0]?.message ||
+            "Could not retrieve Deriv accounts.",
+
+          deriv_response:
+            result.data
+        },
+        result.response.status
+      );
+    }
+
     const account =
-      await getSelectedAccount(
+      selectAccount(
+        result.accounts,
         requestedType,
         body.account_id
       );
+
+    if (!account) {
+      return json(
+        {
+          ok: false,
+          connected: true,
+
+          error:
+            `No ${requestedType} Deriv Options account was found.`,
+
+          available_accounts:
+            result.accounts.map(
+              a => ({
+                account_id:
+                  getAccountId(a),
+
+                account_type:
+                  a.account_type ||
+                  null,
+
+                status:
+                  a.status ||
+                  null
+              })
+            )
+        },
+        404
+      );
+    }
 
     const accountId =
       getAccountId(account);
@@ -529,118 +662,53 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
+          connected: true,
+
           error:
-            "No account ID was returned by Deriv."
+            "Deriv returned an account without an account ID."
         },
         400
       );
     }
 
-    const accountType =
-      String(
-        account.account_type || ""
-      ).toLowerCase();
-
     const isReal =
-      accountType === "real";
+      String(
+        account.account_type ||
+        ""
+      ).toLowerCase() ===
+      "real";
 
     // ===================================================
     // ACCOUNT
     // ===================================================
 
-    if (body.action === "account") {
+    if (
+      body.action === "account"
+    ) {
       return json({
         ok: true,
         connected: true,
 
         account: {
-          account_id: accountId,
+          account_id:
+            accountId,
 
           account_type:
-            account.account_type || null,
+            account.account_type ||
+            null,
 
           currency:
-            account.currency || "USD",
+            account.currency ||
+            "USD",
 
           status:
-            account.status || "active",
+            account.status ||
+            "active",
 
           balance:
-            account.balance ?? null
+            account.balance ??
+            null
         }
-      });
-    }
-
-    // ===================================================
-    // RESET DEMO BALANCE
-    // ===================================================
-
-    if (
-      body.action ===
-      "reset_demo_balance"
-    ) {
-
-      if (isReal) {
-        return json(
-          {
-            ok: false,
-            connected: true,
-            error:
-              "Real account balances cannot be reset."
-          },
-          400
-        );
-      }
-
-      const resetResponse =
-        await fetch(
-          DERIV_API +
-            `/trading/v1/options/accounts/${encodeURIComponent(
-              accountId
-            )}/reset-demo-balance`,
-          {
-            method: "POST",
-            headers: {
-              "Authorization":
-                `Bearer ${accessToken}`,
-
-              "Deriv-App-ID":
-                clientId,
-
-              "Content-Type":
-                "application/json"
-            }
-          }
-        );
-
-      const resetData =
-        await resetResponse.json()
-          .catch(() => ({}));
-
-      if (!resetResponse.ok) {
-        return json(
-          {
-            ok: false,
-            connected: true,
-
-            error:
-              resetData?.errors?.[0]?.message ||
-              "Could not reset demo balance.",
-
-            deriv_response:
-              resetData
-          },
-          resetResponse.status
-        );
-      }
-
-      return json({
-        ok: true,
-        connected: true,
-        account_type: "demo",
-
-        message:
-          "Demo balance reset successfully."
       });
     }
 
@@ -648,17 +716,21 @@ export async function onRequest(context) {
     // PROPOSAL
     // ===================================================
 
-    if (body.action === "proposal") {
+    if (
+      body.action === "proposal"
+    ) {
 
       const market =
-        normalizeMarket(body.market);
+        normalizeMarket(
+          body.market
+        );
 
       if (!market) {
         return json(
           {
             ok: false,
             error:
-              "A market symbol is required."
+              "Market is required."
           },
           400
         );
@@ -666,19 +738,9 @@ export async function onRequest(context) {
 
       const contractType =
         String(
-          body.contract_type || ""
+          body.contract_type ||
+          "DIGITOVER"
         ).toUpperCase();
-
-      if (!contractType) {
-        return json(
-          {
-            ok: false,
-            error:
-              "A contract type is required."
-          },
-          400
-        );
-      }
 
       const digitContracts = [
         "DIGITOVER",
@@ -693,29 +755,36 @@ export async function onRequest(context) {
         proposal: 1,
 
         amount:
-          Number(body.stake) || 1,
+          Number(
+            body.stake
+          ) || 1,
 
-        basis: "stake",
+        basis:
+          "stake",
 
         contract_type:
           contractType,
 
         currency:
-          account.currency || "USD",
+          account.currency ||
+          "USD",
 
         duration:
-          Number(body.duration) || 1,
+          Number(
+            body.duration
+          ) || 1,
 
         duration_unit:
-          body.duration_unit || "t",
+          body.duration_unit ||
+          "t",
 
         underlying_symbol:
           market,
 
-        req_id: 1001
+        req_id:
+          Date.now()
       };
 
-      // Digit contracts need a barrier.
       if (
         digitContracts.includes(
           contractType
@@ -723,7 +792,8 @@ export async function onRequest(context) {
       ) {
         proposalRequest.barrier =
           String(
-            body.barrier ?? 5
+            body.barrier ??
+            5
           );
       }
 
@@ -735,15 +805,15 @@ export async function onRequest(context) {
       try {
 
         const data =
-          await wsRequest(
+          await wsSend(
             ws,
             proposalRequest,
-            "proposal",
-            15000
+            "proposal"
           );
 
         const proposal =
-          data.proposal || {};
+          data.proposal ||
+          {};
 
         if (!proposal.id) {
           return json(
@@ -752,7 +822,7 @@ export async function onRequest(context) {
               connected: true,
 
               error:
-                "Deriv returned a proposal response without a proposal ID.",
+                "Deriv returned a proposal without a proposal ID.",
 
               deriv_response:
                 data
@@ -770,10 +840,12 @@ export async function onRequest(context) {
               accountId,
 
             account_type:
-              account.account_type || null,
+              account.account_type ||
+              null,
 
             currency:
-              account.currency || "USD"
+              account.currency ||
+              "USD"
           },
 
           proposal: {
@@ -781,31 +853,16 @@ export async function onRequest(context) {
               proposal.id,
 
             ask_price:
-              proposal.ask_price ?? null,
+              proposal.ask_price ??
+              null,
 
             payout:
-              proposal.payout ?? null,
+              proposal.payout ??
+              null,
 
             spot:
-              proposal.spot ?? null
-          },
-
-          request: {
-            market,
-            contract_type:
-              contractType,
-
-            stake:
-              Number(body.stake) || 1,
-
-            duration:
-              Number(body.duration) || 1,
-
-            duration_unit:
-              body.duration_unit || "t",
-
-            barrier:
-              body.barrier ?? null
+              proposal.spot ??
+              null
           },
 
           message:
@@ -825,15 +882,20 @@ export async function onRequest(context) {
     // BUY
     // ===================================================
 
-    if (body.action === "buy") {
+    if (
+      body.action === "buy"
+    ) {
 
       const proposalId =
         String(
-          body.proposal_id || ""
+          body.proposal_id ||
+          ""
         ).trim();
 
       const price =
-        Number(body.price);
+        Number(
+          body.price
+        );
 
       if (!proposalId) {
         return json(
@@ -842,7 +904,7 @@ export async function onRequest(context) {
             connected: true,
 
             error:
-              "A proposal ID is required. Get a new proposal before buying."
+              "Proposal ID is required."
           },
           400
         );
@@ -864,7 +926,6 @@ export async function onRequest(context) {
         );
       }
 
-      // Safety check for real account.
       if (
         isReal &&
         body.confirm_real !== true
@@ -880,7 +941,7 @@ export async function onRequest(context) {
               true,
 
             error:
-              "Real account selected. Explicit confirmation is required before purchasing."
+              "Real account selected. Confirmation is required."
           },
           400
         );
@@ -893,18 +954,23 @@ export async function onRequest(context) {
 
       try {
 
+        // IMPORTANT:
+        // Buy the proposal immediately
+        // on the authenticated socket.
+
         const buyRequest = {
-          buy: proposalId,
+          buy:
+            proposalId,
 
-          price: price,
+          price:
+            price,
 
-          subscribe: 1,
-
-          req_id: 2001
+          req_id:
+            Date.now()
         };
 
         const data =
-          await wsRequest(
+          await wsSend(
             ws,
             buyRequest,
             "buy",
@@ -912,7 +978,8 @@ export async function onRequest(context) {
           );
 
         const buy =
-          data.buy || null;
+          data.buy ||
+          null;
 
         if (!buy) {
           return json(
@@ -932,6 +999,7 @@ export async function onRequest(context) {
 
         return json({
           ok: true,
+
           connected: true,
 
           purchased: true,
@@ -944,36 +1012,46 @@ export async function onRequest(context) {
               accountId,
 
             account_type:
-              account.account_type || null,
+              account.account_type ||
+              null,
 
             currency:
-              account.currency || "USD"
+              account.currency ||
+              "USD"
           },
 
           contract: {
             contract_id:
-              buy.contract_id ?? null,
+              buy.contract_id ??
+              null,
 
             buy_price:
-              buy.buy_price ?? null,
+              buy.buy_price ??
+              null,
 
             payout:
-              buy.payout ?? null,
+              buy.payout ??
+              null,
 
             balance_after:
-              buy.balance_after ?? null,
+              buy.balance_after ??
+              null,
 
             transaction_id:
-              buy.transaction_id ?? null,
+              buy.transaction_id ??
+              null,
 
             purchase_time:
-              buy.purchase_time ?? null,
+              buy.purchase_time ??
+              null,
 
             start_time:
-              buy.start_time ?? null,
+              buy.start_time ??
+              null,
 
             longcode:
-              buy.longcode ?? null
+              buy.longcode ??
+              null
           },
 
           message:
@@ -984,34 +1062,17 @@ export async function onRequest(context) {
 
       } catch (error) {
 
-        const message =
-          String(
-            error?.message || ""
-          );
+        return json(
+          {
+            ok: false,
+            connected: true,
 
-        // Give a useful message instead of
-        // the confusing raw error.
-        if (
-          message
-            .toLowerCase()
-            .includes("unknown") &&
-          message
-            .toLowerCase()
-            .includes("proposal")
-        ) {
-          return json(
-            {
-              ok: false,
-              connected: true,
-
-              error:
-                "This proposal is no longer valid. Get a fresh proposal and buy it immediately."
-            },
-            400
-          );
-        }
-
-        throw error;
+            error:
+              error?.message ||
+              "Deriv rejected the purchase."
+          },
+          400
+        );
 
       } finally {
 
@@ -1047,6 +1108,7 @@ export async function onRequest(context) {
     return json(
       {
         ok: false,
+
         connected: true,
 
         error:
@@ -1056,4 +1118,4 @@ export async function onRequest(context) {
       500
     );
   }
-          }
+  }
