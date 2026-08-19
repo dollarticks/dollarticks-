@@ -2,7 +2,7 @@ const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const DERIV_API = "https://api.derivws.com";
 
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
+  return new Response(JSON.stringify(data, null, 2), {
     status,
     headers: {
       "Content-Type": "application/json",
@@ -94,6 +94,7 @@ async function getAccounts(token) {
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts`,
     {
+      method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,
         "Deriv-App-ID": CLIENT_ID,
@@ -155,23 +156,24 @@ function websocketRequest(
   expectedType
 ) {
   return new Promise((resolve, reject) => {
+
     let ws;
     let finished = false;
 
-    const timeout =
-      setTimeout(() => {
-        finish(
-          reject,
-          new Error(
-            "Deriv request timed out."
-          )
-        );
-      }, 15000);
+    const timeout = setTimeout(() => {
+      finish(
+        reject,
+        new Error(
+          "Deriv request timed out."
+        )
+      );
+    }, 15000);
 
     function finish(callback, value) {
       if (finished) return;
 
       finished = true;
+
       clearTimeout(timeout);
 
       try {
@@ -189,27 +191,32 @@ function websocketRequest(
     }
 
     ws.onopen = () => {
+
       console.log(
-        "Sending diagnostic request:",
+        "DollarTicks diagnostic request:",
         request
       );
 
       ws.send(
         JSON.stringify(request)
       );
+
     };
 
     ws.onmessage = event => {
+
       try {
+
         const data =
           JSON.parse(event.data);
 
         console.log(
-          "Deriv response:",
+          "DollarTicks Deriv response:",
           data
         );
 
         if (data.error) {
+
           finish(
             reject,
             new Error(
@@ -225,36 +232,51 @@ function websocketRequest(
           data.msg_type ===
           expectedType
         ) {
+
           finish(
             resolve,
             data
           );
+
         }
 
       } catch (error) {
-        finish(reject, error);
+
+        finish(
+          reject,
+          error
+        );
+
       }
+
     };
 
     ws.onerror = () => {
+
       finish(
         reject,
         new Error(
           "Trading WebSocket connection failed."
         )
       );
+
     };
 
     ws.onclose = () => {
+
       if (!finished) {
+
         finish(
           reject,
           new Error(
             "Trading WebSocket closed unexpectedly."
           )
         );
+
       }
+
     };
+
   });
 }
 
@@ -263,6 +285,9 @@ export async function onRequest(context) {
   const request =
     context.request;
 
+  const url =
+    new URL(request.url);
+
   const token =
     getCookie(
       request,
@@ -270,6 +295,7 @@ export async function onRequest(context) {
     );
 
   if (!token) {
+
     return json(
       {
         ok: false,
@@ -279,31 +305,39 @@ export async function onRequest(context) {
       },
       401
     );
+
   }
 
   let accounts;
 
   try {
+
     accounts =
       await getAccounts(token);
+
   } catch (error) {
+
     return json(
       {
         ok: false,
         connected: false,
-        error: error.message
+        error:
+          error.message
       },
       401
     );
+
   }
 
   if (!accounts.length) {
+
     return json({
       ok: false,
       connected: false,
       error:
         "No Options account found."
     });
+
   }
 
   const selected =
@@ -312,14 +346,17 @@ export async function onRequest(context) {
         account.account_type || ""
       ).toLowerCase() === "demo"
     ) ||
+
     accounts.find(account =>
       String(
         account.account_id ||
         account.id ||
         ""
-      ).toUpperCase()
-      .startsWith("DOT")
+      )
+        .toUpperCase()
+        .startsWith("DOT")
     ) ||
+
     accounts[0];
 
   const accountId =
@@ -327,116 +364,196 @@ export async function onRequest(context) {
     selected.id ||
     selected.loginid;
 
-  if (request.method === "GET") {
+  /*
+   * ==========================================
+   * NORMAL ACCOUNT CHECK
+   * ==========================================
+   */
+
+  const diagnostic =
+    url.searchParams.get(
+      "diagnostic"
+    );
+
+  if (
+    request.method === "GET" &&
+    diagnostic !== "1"
+  ) {
+
     return json({
       ok: true,
+
       connected: true,
+
       selected_account: {
-        account_id: accountId,
+        account_id:
+          accountId,
+
         account_type:
           selected.account_type ||
           "demo",
+
         currency:
           selected.currency ||
           "USD"
       }
     });
+
   }
 
   /*
    * ==========================================
-   * DIAGNOSTIC MODE
+   * CONTRACT DIAGNOSTIC
    * ==========================================
-   *
-   * We are NOT requesting a proposal yet.
-   *
-   * We are asking Deriv exactly which
-   * contracts are available for 1HZ100V.
    */
 
-  try {
+  if (
+    diagnostic === "1"
+  ) {
 
-    const wsUrl =
-      await getOTP(
-        token,
-        accountId
-      );
+    try {
 
-    const result =
-      await websocketRequest(
-        wsUrl,
+      const wsUrl =
+        await getOTP(
+          token,
+          accountId
+        );
 
-        {
-          contracts_for:
-            "1HZ100V",
+      const result =
+        await websocketRequest(
 
-          req_id:
-            1001
-        },
+          wsUrl,
 
-        "contracts_for"
-      );
+          {
+            contracts_for:
+              "1HZ100V",
 
-    const available =
-      result
-        ?.contracts_for
-        ?.available || [];
+            req_id:
+              1001
+          },
 
-    return json({
-      ok: true,
+          "contracts_for"
 
-      diagnostic:
-        "contracts_for",
+        );
 
-      market:
-        "1HZ100V",
+      const contractsFor =
+        result?.contracts_for ||
+        {};
 
-      contract_count:
-        available.length,
+      const available =
+        contractsFor.available ||
+        [];
 
-      contracts:
-        available.map(contract => ({
-          contract_type:
-            contract.contract_type,
+      return json({
 
-          contract_category:
-            contract.contract_category,
+        ok: true,
 
-          market:
-            contract.market,
-
-          submarket:
-            contract.submarket,
-
-          underlying_symbol:
-            contract.underlying_symbol,
-
-          expiry_type:
-            contract.expiry_type
-        })),
-
-      raw:
-        result.contracts_for
-    });
-
-  } catch (error) {
-
-    console.error(
-      "contracts_for diagnostic failed:",
-      error
-    );
-
-    return json(
-      {
-        ok: false,
         diagnostic:
           "contracts_for",
+
         market:
           "1HZ100V",
-        error:
-          error.message
-      },
-      502
-    );
+
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            selected.account_type ||
+            "demo",
+
+          currency:
+            selected.currency ||
+            "USD"
+        },
+
+        contract_count:
+          available.length,
+
+        contracts:
+          available.map(contract => ({
+
+            contract_type:
+              contract.contract_type ||
+              null,
+
+            contract_category:
+              contract.contract_category ||
+              null,
+
+            market:
+              contract.market ||
+              null,
+
+            submarket:
+              contract.submarket ||
+              null,
+
+            underlying_symbol:
+              contract.underlying_symbol ||
+              null,
+
+            expiry_type:
+              contract.expiry_type ||
+              null
+
+          })),
+
+        raw:
+          contractsFor
+
+      });
+
+    } catch (error) {
+
+      console.error(
+        "DollarTicks diagnostic failed:",
+        error
+      );
+
+      return json(
+
+        {
+          ok: false,
+
+          diagnostic:
+            "contracts_for",
+
+          market:
+            "1HZ100V",
+
+          error:
+            error.message
+        },
+
+        502
+
+      );
+
+    }
+
   }
-}
+
+  /*
+   * ==========================================
+   * BLOCK NORMAL POST FOR NOW
+   * ==========================================
+   *
+   * We intentionally do NOT send proposals yet.
+   * First we need the exact contracts returned
+   * by Deriv.
+   */
+
+  return json({
+
+    ok: false,
+
+    error:
+      "Diagnostic mode required. Open /trading?diagnostic=1 first.",
+
+    market:
+      "1HZ100V"
+
+  }, 400);
+
+            }
