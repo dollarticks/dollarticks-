@@ -3,58 +3,45 @@ const DERIV_API = "https://api.derivws.com";
 
 
 function json(data, status = 200) {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store"
-      }
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
     }
-  );
+  });
 }
 
 
 function getCookie(request, name) {
-
   const cookies =
     request.headers.get("Cookie") || "";
 
   for (const part of cookies.split(";")) {
-
-    const index =
-      part.indexOf("=");
+    const index = part.indexOf("=");
 
     if (index === -1) continue;
 
-    const key =
-      part.slice(0, index).trim();
+    const key = part.slice(0, index).trim();
 
     if (key !== name) continue;
 
     try {
-
       return decodeURIComponent(
         part.slice(index + 1).trim()
       );
-
     } catch {
-
       return part.slice(index + 1).trim();
-
     }
-
   }
 
   return null;
-
 }
 
 
-/* =========================================
+/* ==========================================
    FIND ACCOUNTS
-========================================= */
+========================================== */
 
 function findAccounts(value) {
 
@@ -65,119 +52,81 @@ function findAccounts(value) {
     if (!item) return;
 
     if (Array.isArray(item)) {
-
       item.forEach(scan);
-
       return;
-
     }
 
-    if (
-      typeof item !== "object"
-    ) return;
-
+    if (typeof item !== "object") return;
 
     if (
       item.account_id ||
       item.loginid ||
       item.id
     ) {
-
       accounts.push(item);
-
     }
 
+    Object.values(item).forEach(child => {
 
-    Object.values(item)
-      .forEach(child => {
+      if (
+        child &&
+        typeof child === "object"
+      ) {
+        scan(child);
+      }
 
-        if (
-          child &&
-          typeof child === "object"
-        ) {
-
-          scan(child);
-
-        }
-
-      });
+    });
 
   }
 
-
   scan(value);
 
+  const seen = new Set();
 
-  const seen =
-    new Set();
+  return accounts.filter(account => {
 
+    const id =
+      account.account_id ||
+      account.loginid ||
+      account.id;
 
-  return accounts.filter(
-    account => {
+    if (!id) return false;
 
-      const id =
-        account.account_id ||
-        account.loginid ||
-        account.id;
+    const key = String(id);
 
+    if (seen.has(key)) return false;
 
-      if (!id) return false;
+    seen.add(key);
 
+    return true;
 
-      const key =
-        String(id);
-
-
-      if (seen.has(key))
-        return false;
-
-
-      seen.add(key);
-
-      return true;
-
-    }
-  );
+  });
 
 }
 
 
-/* =========================================
+/* ==========================================
    GET OPTIONS ACCOUNTS
-========================================= */
+========================================== */
 
 async function getAccounts(token) {
 
-  const response =
-    await fetch(
-      `${DERIV_API}/trading/v1/options/accounts`,
-      {
+  const response = await fetch(
+    `${DERIV_API}/trading/v1/options/accounts`,
+    {
+      method: "GET",
 
-        method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Deriv-App-ID": CLIENT_ID,
+        "Accept": "application/json"
+      },
 
-        headers: {
+      cache: "no-store"
+    }
+  );
 
-          "Authorization":
-            `Bearer ${token}`,
-
-          "Deriv-App-ID":
-            CLIENT_ID,
-
-          "Accept":
-            "application/json"
-
-        },
-
-        cache:
-          "no-store"
-
-      }
-    );
-
-
-  const data =
-    await response.json();
-
+  const data = await response.json();
 
   if (!response.ok) {
 
@@ -189,51 +138,33 @@ async function getAccounts(token) {
 
   }
 
-
   return findAccounts(data);
 
 }
 
 
-/* =========================================
-   GET OTP / WEBSOCKET URL
-========================================= */
+/* ==========================================
+   GET AUTHENTICATED WEBSOCKET URL
+========================================== */
 
-async function getOTP(
-  token,
-  accountId
-) {
+async function getOTP(token, accountId) {
 
-  const response =
-    await fetch(
-      `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
-      {
+  const response = await fetch(
+    `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
+    {
+      method: "POST",
 
-        method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Deriv-App-ID": CLIENT_ID,
+        "Accept": "application/json"
+      },
 
-        headers: {
+      cache: "no-store"
+    }
+  );
 
-          "Authorization":
-            `Bearer ${token}`,
-
-          "Deriv-App-ID":
-            CLIENT_ID,
-
-          "Accept":
-            "application/json"
-
-        },
-
-        cache:
-          "no-store"
-
-      }
-    );
-
-
-  const data =
-    await response.json();
-
+  const data = await response.json();
 
   if (!response.ok) {
 
@@ -245,7 +176,6 @@ async function getOTP(
 
   }
 
-
   if (!data?.data?.url) {
 
     throw new Error(
@@ -254,79 +184,121 @@ async function getOTP(
 
   }
 
-
   return data.data.url;
 
 }
 
 
-/* =========================================
+/* ==========================================
    WEBSOCKET REQUEST
-========================================= */
+========================================== */
 
-function wsRequest(
+function websocketRequest(
   wsUrl,
   request,
   expectedType
 ) {
 
-  return new Promise(
-    (resolve, reject) => {
+  return new Promise((resolve, reject) => {
 
-      let ws = null;
+    let ws = null;
+    let finished = false;
 
-      let finished =
-        false;
+    const timeout = setTimeout(() => {
 
+      finish(
+        reject,
+        new Error(
+          "Deriv request timed out."
+        )
+      );
 
-      const timeout =
-        setTimeout(
-          () => {
-
-            finish(
-              reject,
-              new Error(
-                "Deriv request timed out."
-              )
-            );
-
-          },
-          15000
-        );
+    }, 15000);
 
 
-      function finish(
-        callback,
-        value
-      ) {
+    function finish(callback, value) {
 
-        if (finished)
-          return;
+      if (finished) return;
 
+      finished = true;
 
-        finished = true;
+      clearTimeout(timeout);
 
-        clearTimeout(timeout);
+      try {
+        ws?.close();
+      } catch {}
 
+      callback(value);
 
-        try {
-
-          ws?.close();
-
-        } catch {}
+    }
 
 
-        callback(value);
+    try {
 
-      }
+      ws = new WebSocket(wsUrl);
 
+    } catch (error) {
+
+      finish(reject, error);
+
+      return;
+
+    }
+
+
+    ws.onopen = () => {
+
+      console.log(
+        "DollarTicks → Deriv:",
+        request
+      );
+
+      ws.send(
+        JSON.stringify(request)
+      );
+
+    };
+
+
+    ws.onmessage = event => {
 
       try {
 
-        ws =
-          new WebSocket(
-            wsUrl
+        const data =
+          JSON.parse(event.data);
+
+        console.log(
+          "DollarTicks ← Deriv:",
+          data
+        );
+
+
+        if (data.error) {
+
+          finish(
+            reject,
+            new Error(
+              data.error.message ||
+              JSON.stringify(data.error)
+            )
           );
+
+          return;
+
+        }
+
+
+        if (
+          data.msg_type ===
+          expectedType
+        ) {
+
+          finish(
+            resolve,
+            data
+          );
+
+        }
 
       } catch (error) {
 
@@ -335,133 +307,56 @@ function wsRequest(
           error
         );
 
-        return;
+      }
+
+    };
+
+
+    ws.onerror = () => {
+
+      finish(
+        reject,
+        new Error(
+          "Trading WebSocket connection failed."
+        )
+      );
+
+    };
+
+
+    ws.onclose = () => {
+
+      if (!finished) {
+
+        finish(
+          reject,
+          new Error(
+            "Trading WebSocket closed unexpectedly."
+          )
+        );
 
       }
 
+    };
 
-      ws.onopen =
-        () => {
-
-          console.log(
-            "DollarTicks → Deriv:",
-            request
-          );
-
-
-          ws.send(
-            JSON.stringify(
-              request
-            )
-          );
-
-        };
-
-
-      ws.onmessage =
-        event => {
-
-          try {
-
-            const data =
-              JSON.parse(
-                event.data
-              );
-
-
-            console.log(
-              "DollarTicks ← Deriv:",
-              data
-            );
-
-
-            if (data.error) {
-
-              finish(
-                reject,
-                new Error(
-                  data.error.message ||
-                  JSON.stringify(
-                    data.error
-                  )
-                )
-              );
-
-              return;
-
-            }
-
-
-            if (
-              data.msg_type ===
-              expectedType
-            ) {
-
-              finish(
-                resolve,
-                data
-              );
-
-            }
-
-          } catch (error) {
-
-            finish(
-              reject,
-              error
-            );
-
-          }
-
-        };
-
-
-      ws.onerror =
-        () => {
-
-          finish(
-            reject,
-            new Error(
-              "Trading WebSocket connection failed."
-            )
-          );
-
-        };
-
-
-      ws.onclose =
-        () => {
-
-          if (!finished) {
-
-            finish(
-              reject,
-              new Error(
-                "Trading WebSocket closed unexpectedly."
-              )
-            );
-
-          }
-
-        };
-
-    }
-  );
+  });
 
 }
 
 
-/* =========================================
-   MAIN
-========================================= */
+/* ==========================================
+   MAIN HANDLER
+========================================== */
 
-export async function onRequest(
-  context
-) {
+export async function onRequest(context) {
 
   const request =
     context.request;
 
+
+  /* ========================================
+     GET TOKEN
+  ======================================== */
 
   const token =
     getCookie(
@@ -469,10 +364,6 @@ export async function onRequest(
       "dt_access_token"
     );
 
-
-  /* =======================================
-     LOGIN CHECK
-  ======================================= */
 
   if (!token) {
 
@@ -489,19 +380,16 @@ export async function onRequest(
   }
 
 
-  /* =======================================
+  /* ========================================
      GET ACCOUNTS
-  ======================================= */
+  ======================================== */
 
   let accounts;
-
 
   try {
 
     accounts =
-      await getAccounts(
-        token
-      );
+      await getAccounts(token);
 
   } catch (error) {
 
@@ -509,8 +397,7 @@ export async function onRequest(
       {
         ok: false,
         connected: false,
-        error:
-          error.message
+        error: error.message
       },
       401
     );
@@ -520,49 +407,43 @@ export async function onRequest(
 
   if (!accounts.length) {
 
-    return json(
-      {
-        ok: false,
-        connected: false,
-        error:
-          "No Deriv Options account found."
-      }
-    );
+    return json({
+      ok: false,
+      connected: false,
+      error:
+        "No Deriv Options account found."
+    });
 
   }
 
 
-  /*
-   * IMPORTANT:
-   *
-   * Prefer an account whose actual ID
-   * starts with DOT.
-   */
+  /* ========================================
+     SELECT DOT DEMO ACCOUNT
+  ======================================== */
 
   const selected =
-    accounts.find(
-      account => {
+    accounts.find(account => {
 
-        const id =
-          account.account_id ||
-          account.loginid ||
-          account.id ||
-          "";
+      const id =
+        account.account_id ||
+        account.loginid ||
+        account.id ||
+        "";
 
-        return String(id)
-          .toUpperCase()
-          .startsWith("DOT");
+      return String(id)
+        .toUpperCase()
+        .startsWith("DOT");
 
-      }
-    ) ||
-    accounts.find(
-      account =>
-        String(
-          account.account_type ||
-          ""
-        ).toLowerCase() ===
-        "demo"
-    ) ||
+    }) ||
+
+    accounts.find(account => {
+
+      return String(
+        account.account_type || ""
+      ).toLowerCase() === "demo";
+
+    }) ||
+
     accounts[0];
 
 
@@ -584,14 +465,11 @@ export async function onRequest(
     "USD";
 
 
-  /* =======================================
+  /* ========================================
      GET /trading
-  ======================================= */
+  ======================================== */
 
-  if (
-    request.method ===
-    "GET"
-  ) {
+  if (request.method === "GET") {
 
     return json({
 
@@ -617,14 +495,11 @@ export async function onRequest(
   }
 
 
-  /* =======================================
-     ONLY POST ALLOWED
-  ======================================= */
+  /* ========================================
+     POST ONLY
+  ======================================== */
 
-  if (
-    request.method !==
-    "POST"
-  ) {
+  if (request.method !== "POST") {
 
     return json(
       {
@@ -638,12 +513,11 @@ export async function onRequest(
   }
 
 
-  /* =======================================
-     READ BODY
-  ======================================= */
+  /* ========================================
+     READ REQUEST BODY
+  ======================================== */
 
   let body;
-
 
   try {
 
@@ -668,31 +542,29 @@ export async function onRequest(
     body.action;
 
 
-  /* =======================================
-     MARKET
-  ======================================= */
-
   const market =
     body.market ||
     body.underlying_symbol ||
     "1HZ100V";
 
 
-  /* =======================================
-     CONTRACT
-  ======================================= */
-
   const contractType =
     body.contract_type ||
     "DIGITOVER";
 
 
-  /* =======================================
-     STAKE
-  ======================================= */
-
   const stake =
     Number(body.stake);
+
+
+  const duration =
+    Number(body.duration);
+
+
+  const barrier =
+    String(
+      body.barrier ?? "5"
+    );
 
 
   if (
@@ -712,14 +584,6 @@ export async function onRequest(
   }
 
 
-  /* =======================================
-     DURATION
-  ======================================= */
-
-  const duration =
-    Number(body.duration);
-
-
   if (
     !Number.isInteger(duration) ||
     duration < 1
@@ -737,22 +601,11 @@ export async function onRequest(
   }
 
 
-  /* =======================================
-     BARRIER
-  ======================================= */
-
-  const barrier =
-    String(
-      body.barrier ?? "5"
-    );
-
-
-  /* =======================================
-     GET AUTHENTICATED WEBSOCKET
-  ======================================= */
+  /* ========================================
+     GET FRESH AUTHENTICATED SESSION
+  ======================================== */
 
   let wsUrl;
-
 
   try {
 
@@ -768,7 +621,18 @@ export async function onRequest(
       {
         ok: false,
         error:
-          error.message
+          error.message,
+
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            accountType,
+
+          currency:
+            currency
+        }
       },
       502
     );
@@ -776,22 +640,11 @@ export async function onRequest(
   }
 
 
-  /* =======================================
+  /* ========================================
      PROPOSAL
-  ======================================= */
+  ======================================== */
 
-  if (
-    action ===
-    "proposal"
-  ) {
-
-    /*
-     * Current Deriv API format.
-     *
-     * NO "symbol".
-     * NO loginid.
-     * NO subscribe for now.
-     */
+  if (action === "proposal") {
 
     const proposalRequest = {
 
@@ -830,7 +683,7 @@ export async function onRequest(
     try {
 
       const result =
-        await wsRequest(
+        await websocketRequest(
           wsUrl,
           proposalRequest,
           "proposal"
@@ -840,12 +693,6 @@ export async function onRequest(
       const proposal =
         result?.proposal;
 
-
-      /*
-       * Show the complete Deriv
-       * response if something is
-       * missing.
-       */
 
       if (
         !proposal ||
@@ -893,9 +740,7 @@ export async function onRequest(
         proposal: {
 
           id:
-            String(
-              proposal.id
-            ),
+            String(proposal.id),
 
           ask_price:
             proposal.ask_price ??
@@ -907,23 +752,14 @@ export async function onRequest(
 
           spot:
             proposal.spot ??
-            null,
-
-          display_value:
-            proposal.display_value ??
             null
 
         }
 
       });
 
+
     } catch (error) {
-
-      console.error(
-        "PROPOSAL ERROR:",
-        error
-      );
-
 
       return json(
         {
@@ -958,14 +794,11 @@ export async function onRequest(
   }
 
 
-  /* =======================================
-     BUY
-  ======================================= */
+  /* ========================================
+     BUY DEMO CONTRACT
+  ======================================== */
 
-  if (
-    action ===
-    "buy"
-  ) {
+  if (action === "buy") {
 
     if (
       accountType !==
@@ -975,8 +808,18 @@ export async function onRequest(
       return json(
         {
           ok: false,
+
           error:
-            "Only the DEMO account can purchase contracts."
+            "The selected Deriv account is not a DEMO account.",
+
+          account: {
+            account_id:
+              accountId,
+
+            account_type:
+              accountType
+          }
+
         },
         403
       );
@@ -1028,6 +871,16 @@ export async function onRequest(
     }
 
 
+    /*
+     * IMPORTANT:
+     *
+     * This is a NEW authenticated
+     * WebSocket session.
+     *
+     * The OTP URL is tied to
+     * accountId above.
+     */
+
     const buyRequest = {
 
       buy:
@@ -1045,7 +898,7 @@ export async function onRequest(
     try {
 
       const result =
-        await wsRequest(
+        await websocketRequest(
           wsUrl,
           buyRequest,
           "buy"
@@ -1068,8 +921,23 @@ export async function onRequest(
             error:
               "Deriv returned an incomplete purchase response.",
 
+            account: {
+              account_id:
+                accountId,
+
+              account_type:
+                accountType,
+
+              currency:
+                currency
+            },
+
+            proposal_id:
+              proposalId,
+
             raw:
               result
+
           },
           502
         );
@@ -1080,6 +948,19 @@ export async function onRequest(
       return json({
 
         ok: true,
+
+        account: {
+
+          account_id:
+            accountId,
+
+          account_type:
+            accountType,
+
+          currency:
+            currency
+
+        },
 
         contract: {
 
@@ -1106,6 +987,7 @@ export async function onRequest(
 
       });
 
+
     } catch (error) {
 
       console.error(
@@ -1117,8 +999,27 @@ export async function onRequest(
       return json(
         {
           ok: false,
+
           error:
-            error.message
+            error.message,
+
+          account: {
+            account_id:
+              accountId,
+
+            account_type:
+              accountType,
+
+            currency:
+              currency
+          },
+
+          proposal_id:
+            proposalId,
+
+          market:
+            market
+
         },
         502
       );
@@ -1128,9 +1029,9 @@ export async function onRequest(
   }
 
 
-  /* =======================================
+  /* ========================================
      UNKNOWN ACTION
-  ======================================= */
+  ======================================== */
 
   return json(
     {
@@ -1145,4 +1046,4 @@ export async function onRequest(
     400
   );
 
-}
+      }
