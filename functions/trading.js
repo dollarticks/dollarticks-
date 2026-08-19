@@ -159,10 +159,7 @@ async function getAuthenticatedAccounts(accessToken) {
   return findAccounts(data);
 }
 
-async function getOtpUrl(
-  accessToken,
-  accountId
-) {
+async function getOtpUrl(accessToken, accountId) {
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
     {
@@ -198,11 +195,7 @@ async function getOtpUrl(
   return wsUrl;
 }
 
-function websocketRequest(
-  wsUrl,
-  payload,
-  expectedType
-) {
+function websocketRequest(wsUrl, payload, expectedType) {
   return new Promise((resolve, reject) => {
     let settled = false;
 
@@ -230,9 +223,7 @@ function websocketRequest(
     const timeout = setTimeout(() => {
       finish(
         reject,
-        new Error(
-          "Timed out waiting for Deriv."
-        )
+        new Error("Timed out waiting for Deriv.")
       );
     }, 15000);
 
@@ -241,18 +232,13 @@ function websocketRequest(
         ws.send(JSON.stringify(payload));
       } catch (error) {
         clearTimeout(timeout);
-
-        finish(
-          reject,
-          error
-        );
+        finish(reject, error);
       }
     };
 
     ws.onmessage = event => {
       try {
-        const data =
-          JSON.parse(event.data);
+        const data = JSON.parse(event.data);
 
         if (data.error) {
           clearTimeout(timeout);
@@ -269,23 +255,13 @@ function websocketRequest(
           return;
         }
 
-        if (
-          data.msg_type === expectedType
-        ) {
+        if (data.msg_type === expectedType) {
           clearTimeout(timeout);
-
-          finish(
-            resolve,
-            data
-          );
+          finish(resolve, data);
         }
       } catch (error) {
         clearTimeout(timeout);
-
-        finish(
-          reject,
-          error
-        );
+        finish(reject, error);
       }
     };
 
@@ -319,10 +295,7 @@ async function handleRequest(context) {
   const request = context.request;
 
   const accessToken =
-    getCookie(
-      request,
-      "dt_access_token"
-    );
+    getCookie(request, "dt_access_token");
 
   if (!accessToken) {
     return json(
@@ -348,8 +321,7 @@ async function handleRequest(context) {
       {
         ok: false,
         connected: false,
-        error:
-          error.message
+        error: error.message
       },
       401
     );
@@ -387,14 +359,6 @@ async function handleRequest(context) {
       "demo"
     ).toLowerCase();
 
-  /*
-   * =====================================================
-   * GET /trading
-   *
-   * Used by DollarTicks to check connection status.
-   * =====================================================
-   */
-
   if (request.method === "GET") {
     return json({
       ok: true,
@@ -415,12 +379,6 @@ async function handleRequest(context) {
     });
   }
 
-  /*
-   * =====================================================
-   * POST /trading
-   * =====================================================
-   */
-
   if (request.method !== "POST") {
     return json(
       {
@@ -434,8 +392,7 @@ async function handleRequest(context) {
   let body;
 
   try {
-    body =
-      await request.json();
+    body = await request.json();
   } catch {
     return json(
       {
@@ -445,11 +402,6 @@ async function handleRequest(context) {
       400
     );
   }
-
-  /*
-   * Safety:
-   * This version only allows DEMO trading.
-   */
 
   if (
     body.account_type &&
@@ -477,12 +429,6 @@ async function handleRequest(context) {
     );
   }
 
-  /*
-   * =====================================================
-   * GET OTP AUTHENTICATED WEBSOCKET
-   * =====================================================
-   */
-
   let wsUrl;
 
   try {
@@ -495,18 +441,11 @@ async function handleRequest(context) {
     return json(
       {
         ok: false,
-        error:
-          error.message
+        error: error.message
       },
       502
     );
   }
-
-  /*
-   * =====================================================
-   * PROPOSAL
-   * =====================================================
-   */
 
   if (body.action === "proposal") {
     const market =
@@ -526,8 +465,7 @@ async function handleRequest(context) {
 
     const contractType =
       String(
-        body.contract_type ||
-        ""
+        body.contract_type || ""
       ).toUpperCase();
 
     const allowedContracts = [
@@ -567,8 +505,7 @@ async function handleRequest(context) {
       return json(
         {
           ok: false,
-          error:
-            "Invalid stake."
+          error: "Invalid stake."
         },
         400
       );
@@ -592,8 +529,7 @@ async function handleRequest(context) {
       proposal: 1,
       amount: stake,
       basis: "stake",
-      contract_type:
-        contractType,
+      contract_type: contractType,
       currency:
         selectedAccount.currency ||
         "USD",
@@ -601,9 +537,7 @@ async function handleRequest(context) {
         Math.floor(duration),
       duration_unit:
         body.duration_unit || "t",
-      underlying_symbol:
-        market,
-      subscribe: 0,
+      underlying_symbol: market,
       req_id: 1
     };
 
@@ -616,9 +550,7 @@ async function handleRequest(context) {
       ].includes(contractType)
     ) {
       proposalRequest.barrier =
-        String(
-          body.barrier ?? 5
-        );
+        String(body.barrier ?? 5);
     }
 
     try {
@@ -638,25 +570,17 @@ async function handleRequest(context) {
       return json(
         {
           ok: false,
-          error:
-            error.message
+          error: error.message
         },
         502
       );
     }
   }
 
-  /*
-   * =====================================================
-   * BUY
-   * =====================================================
-   */
-
   if (body.action === "buy") {
     const proposalId =
       String(
-        body.proposal_id ||
-        ""
+        body.proposal_id || ""
       );
 
     const price =
@@ -692,12 +616,9 @@ async function handleRequest(context) {
         await websocketRequest(
           wsUrl,
           {
-            buy:
-              proposalId,
-            price:
-              price,
-            req_id:
-              2
+            buy: proposalId,
+            price: price,
+            req_id: 2
           },
           "buy"
         );
@@ -711,8 +632,7 @@ async function handleRequest(context) {
       return json(
         {
           ok: false,
-          error:
-            error.message
+          error: error.message
         },
         502
       );
@@ -748,4 +668,4 @@ export async function onRequest(context) {
       500
     );
   }
-      }
+    }
