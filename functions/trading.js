@@ -12,9 +12,9 @@ function json(data, status = 200) {
 }
 
 function getCookie(request, name) {
-  const cookieHeader = request.headers.get("Cookie") || "";
+  const header = request.headers.get("Cookie") || "";
 
-  for (const part of cookieHeader.split(";")) {
+  for (const part of header.split(";")) {
     const index = part.indexOf("=");
 
     if (index === -1) continue;
@@ -23,12 +23,12 @@ function getCookie(request, name) {
 
     if (key !== name) continue;
 
-    const value = part.slice(index + 1).trim();
-
     try {
-      return decodeURIComponent(value);
+      return decodeURIComponent(
+        part.slice(index + 1).trim()
+      );
     } catch {
-      return value;
+      return part.slice(index + 1).trim();
     }
   }
 
@@ -36,15 +36,13 @@ function getCookie(request, name) {
 }
 
 function findAccounts(value) {
-  const accounts = [];
+  const result = [];
 
   function scan(item) {
     if (!item) return;
 
     if (Array.isArray(item)) {
-      for (const child of item) {
-        scan(child);
-      }
+      item.forEach(scan);
       return;
     }
 
@@ -55,24 +53,24 @@ function findAccounts(value) {
       item.loginid ||
       item.id
     ) {
-      accounts.push(item);
+      result.push(item);
     }
 
-    for (const child of Object.values(item)) {
+    Object.values(item).forEach(child => {
       if (
         child &&
         typeof child === "object"
       ) {
         scan(child);
       }
-    }
+    });
   }
 
   scan(value);
 
   const seen = new Set();
 
-  return accounts.filter(account => {
+  return result.filter(account => {
     const id =
       account.account_id ||
       account.loginid ||
@@ -91,53 +89,44 @@ function findAccounts(value) {
 }
 
 function findDemoAccount(accounts) {
-  if (!Array.isArray(accounts) || !accounts.length) {
-    return null;
-  }
+  if (!accounts.length) return null;
 
-  const explicitDemo = accounts.find(account => {
-    return String(
+  const demo = accounts.find(account =>
+    String(
       account.account_type || ""
-    ).toLowerCase() === "demo";
-  });
+    ).toLowerCase() === "demo"
+  );
 
-  if (explicitDemo) return explicitDemo;
+  if (demo) return demo;
 
-  const dotAccount = accounts.find(account => {
-    const id = String(
+  const dot = accounts.find(account =>
+    String(
       account.account_id ||
       account.id ||
       ""
-    ).toUpperCase();
+    ).toUpperCase().startsWith("DOT")
+  );
 
-    return id.startsWith("DOT");
-  });
+  if (dot) return dot;
 
-  if (dotAccount) return dotAccount;
-
-  const vrtDemo = accounts.find(account => {
-    const loginid = String(
+  const vrt = accounts.find(account =>
+    String(
       account.loginid || ""
-    ).toUpperCase();
+    ).toUpperCase().startsWith("VRT")
+  );
 
-    return (
-      loginid.startsWith("VRT") ||
-      loginid.startsWith("VRTC")
-    );
-  });
+  if (vrt) return vrt;
 
-  if (vrtDemo) return vrtDemo;
-
-  return accounts[0] || null;
+  return accounts[0];
 }
 
-async function getAuthenticatedAccounts(accessToken) {
+async function getAccounts(token) {
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts`,
     {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${token}`,
         "Deriv-App-ID": CLIENT_ID,
         "Accept": "application/json"
       },
@@ -148,24 +137,26 @@ async function getAuthenticatedAccounts(accessToken) {
   const data = await response.json();
 
   if (!response.ok) {
-    const message =
+    throw new Error(
       data?.errors?.[0]?.message ||
       data?.error?.message ||
-      "Deriv rejected the account request.";
-
-    throw new Error(message);
+      "Unable to retrieve Deriv accounts."
+    );
   }
 
   return findAccounts(data);
 }
 
-async function getOtpUrl(accessToken, accountId) {
+async function getTradingWebSocketUrl(
+  token,
+  accountId
+) {
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
     {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${accessToken}`,
+        "Authorization": `Bearer ${token}`,
         "Deriv-App-ID": CLIENT_ID,
         "Accept": "application/json"
       },
@@ -176,98 +167,103 @@ async function getOtpUrl(accessToken, accountId) {
   const data = await response.json();
 
   if (!response.ok) {
-    const message =
+    throw new Error(
       data?.errors?.[0]?.message ||
       data?.error?.message ||
-      "Deriv could not create a trading WebSocket session.";
-
-    throw new Error(message);
-  }
-
-  const wsUrl = data?.data?.url;
-
-  if (!wsUrl) {
-    throw new Error(
-      "Deriv did not return an authenticated WebSocket URL."
+      "Unable to create Deriv trading session."
     );
   }
 
-  return wsUrl;
+  if (!data?.data?.url) {
+    throw new Error(
+      "Deriv did not return a trading WebSocket URL."
+    );
+  }
+
+  return data.data.url;
 }
 
-function websocketRequest(wsUrl, payload, expectedType) {
+function sendWebSocketRequest(
+  wsUrl,
+  payload,
+  expectedType
+) {
   return new Promise((resolve, reject) => {
-    let settled = false;
-
-    const finish = (callback, value) => {
-      if (settled) return;
-
-      settled = true;
-
-      try {
-        ws.close();
-      } catch {}
-
-      callback(value);
-    };
+    let finished = false;
 
     let ws;
-
-    try {
-      ws = new WebSocket(wsUrl);
-    } catch (error) {
-      reject(error);
-      return;
-    }
 
     const timeout = setTimeout(() => {
       finish(
         reject,
-        new Error("Timed out waiting for Deriv.")
+        new Error(
+          "Deriv trading request timed out."
+        )
       );
     }, 15000);
 
+    function finish(callback, value) {
+      if (finished) return;
+
+      finished = true;
+      clearTimeout(timeout);
+
+      try {
+        ws?.close();
+      } catch {}
+
+      callback(value);
+    }
+
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch (error) {
+      finish(reject, error);
+      return;
+    }
+
     ws.onopen = () => {
       try {
-        ws.send(JSON.stringify(payload));
+        ws.send(
+          JSON.stringify(payload)
+        );
       } catch (error) {
-        clearTimeout(timeout);
         finish(reject, error);
       }
     };
 
     ws.onmessage = event => {
       try {
-        const data = JSON.parse(event.data);
+        const data =
+          JSON.parse(event.data);
+
+        console.log(
+          "Deriv WS response:",
+          data
+        );
 
         if (data.error) {
-          clearTimeout(timeout);
-
-          const message =
-            data.error.message ||
-            "Deriv returned an error.";
-
           finish(
             reject,
-            new Error(message)
+            new Error(
+              data.error.message ||
+              "Deriv returned an error."
+            )
           );
-
           return;
         }
 
-        if (data.msg_type === expectedType) {
-          clearTimeout(timeout);
+        if (
+          data.msg_type === expectedType
+        ) {
           finish(resolve, data);
         }
       } catch (error) {
-        clearTimeout(timeout);
         finish(reject, error);
       }
     };
 
     ws.onerror = () => {
-      clearTimeout(timeout);
-
       finish(
         reject,
         new Error(
@@ -277,9 +273,7 @@ function websocketRequest(wsUrl, payload, expectedType) {
     };
 
     ws.onclose = () => {
-      if (!settled) {
-        clearTimeout(timeout);
-
+      if (!finished) {
         finish(
           reject,
           new Error(
@@ -294,10 +288,13 @@ function websocketRequest(wsUrl, payload, expectedType) {
 async function handleRequest(context) {
   const request = context.request;
 
-  const accessToken =
-    getCookie(request, "dt_access_token");
+  const token =
+    getCookie(
+      request,
+      "dt_access_token"
+    );
 
-  if (!accessToken) {
+  if (!token) {
     return json(
       {
         ok: false,
@@ -313,9 +310,7 @@ async function handleRequest(context) {
 
   try {
     accounts =
-      await getAuthenticatedAccounts(
-        accessToken
-      );
+      await getAccounts(token);
   } catch (error) {
     return json(
       {
@@ -332,30 +327,30 @@ async function handleRequest(context) {
       ok: false,
       connected: false,
       error:
-        "No Deriv Options account was returned."
+        "No Deriv Options account found."
     });
   }
 
-  const selectedAccount =
+  const selected =
     findDemoAccount(accounts);
 
-  if (!selectedAccount) {
+  if (!selected) {
     return json({
       ok: false,
       connected: false,
       error:
-        "No usable Deriv Options account found."
+        "No usable Deriv account found."
     });
   }
 
   const accountId =
-    selectedAccount.account_id ||
-    selectedAccount.id ||
-    selectedAccount.loginid;
+    selected.account_id ||
+    selected.id ||
+    selected.loginid;
 
   const accountType =
     String(
-      selectedAccount.account_type ||
+      selected.account_type ||
       "demo"
     ).toLowerCase();
 
@@ -366,15 +361,12 @@ async function handleRequest(context) {
       selected_account: {
         account_id: accountId,
         loginid:
-          selectedAccount.loginid ||
-          null,
+          selected.loginid || null,
         account_type: accountType,
         currency:
-          selectedAccount.currency ||
-          "USD",
+          selected.currency || "USD",
         status:
-          selectedAccount.status ||
-          "active"
+          selected.status || "active"
       }
     });
   }
@@ -397,24 +389,9 @@ async function handleRequest(context) {
     return json(
       {
         ok: false,
-        error: "Invalid JSON request."
+        error: "Invalid JSON."
       },
       400
-    );
-  }
-
-  if (
-    body.account_type &&
-    String(body.account_type).toLowerCase() !==
-      "demo"
-  ) {
-    return json(
-      {
-        ok: false,
-        error:
-          "Only DEMO trading is enabled."
-      },
-      403
     );
   }
 
@@ -423,7 +400,7 @@ async function handleRequest(context) {
       {
         ok: false,
         error:
-          "A DEMO Deriv account must be connected."
+          "Please connect a DEMO account."
       },
       403
     );
@@ -433,8 +410,8 @@ async function handleRequest(context) {
 
   try {
     wsUrl =
-      await getOtpUrl(
-        accessToken,
+      await getTradingWebSocketUrl(
+        token,
         accountId
       );
   } catch (error) {
@@ -447,10 +424,27 @@ async function handleRequest(context) {
     );
   }
 
+  /*
+   * =================================================
+   * PROPOSAL
+   * =================================================
+   */
+
   if (body.action === "proposal") {
     const market =
       body.market ||
       body.underlying_symbol;
+
+    const contractType =
+      String(
+        body.contract_type || ""
+      ).toUpperCase();
+
+    const stake =
+      Number(body.stake);
+
+    const duration =
+      Number(body.duration);
 
     if (!market) {
       return json(
@@ -463,12 +457,7 @@ async function handleRequest(context) {
       );
     }
 
-    const contractType =
-      String(
-        body.contract_type || ""
-      ).toUpperCase();
-
-    const allowedContracts = [
+    const validContracts = [
       "DIGITOVER",
       "DIGITUNDER",
       "DIGITMATCH",
@@ -478,7 +467,7 @@ async function handleRequest(context) {
     ];
 
     if (
-      !allowedContracts.includes(
+      !validContracts.includes(
         contractType
       )
     ) {
@@ -486,17 +475,11 @@ async function handleRequest(context) {
         {
           ok: false,
           error:
-            "Unsupported digit contract type."
+            "Invalid digit contract type."
         },
         400
       );
     }
-
-    const stake =
-      Number(body.stake);
-
-    const duration =
-      Number(body.duration);
 
     if (
       !Number.isFinite(stake) ||
@@ -525,37 +508,62 @@ async function handleRequest(context) {
       );
     }
 
+    /*
+     * This follows Deriv's current
+     * proposal request structure.
+     */
+
     const proposalRequest = {
       proposal: 1,
+
       amount: stake,
+
       basis: "stake",
-      contract_type: contractType,
+
+      contract_type:
+        contractType,
+
       currency:
-        selectedAccount.currency ||
-        "USD",
+        selected.currency || "USD",
+
       duration:
         Math.floor(duration),
+
       duration_unit:
         body.duration_unit || "t",
-      underlying_symbol: market,
+
+      underlying_symbol:
+        market,
+
+      subscribe: 1,
+
       req_id: 1
     };
 
+    /*
+     * Digit contracts require a barrier.
+     */
+
     if (
-      [
-        "DIGITOVER",
-        "DIGITUNDER",
-        "DIGITMATCH",
-        "DIGITDIFF"
-      ].includes(contractType)
+      contractType === "DIGITOVER" ||
+      contractType === "DIGITUNDER" ||
+      contractType === "DIGITMATCH" ||
+      contractType === "DIGITDIFF"
     ) {
       proposalRequest.barrier =
-        String(body.barrier ?? 5);
+        String(
+          body.barrier ?? "5"
+        );
     }
+
+    console.log(
+      "DollarTicks proposal request:",
+      proposalRequest
+    );
 
     try {
       const result =
-        await websocketRequest(
+        await sendWebSocketRequest(
           wsUrl,
           proposalRequest,
           "proposal"
@@ -566,7 +574,13 @@ async function handleRequest(context) {
         proposal:
           result.proposal
       });
+
     } catch (error) {
+      console.error(
+        "Proposal error:",
+        error
+      );
+
       return json(
         {
           ok: false,
@@ -576,6 +590,12 @@ async function handleRequest(context) {
       );
     }
   }
+
+  /*
+   * =================================================
+   * BUY
+   * =================================================
+   */
 
   if (body.action === "buy") {
     const proposalId =
@@ -613,12 +633,17 @@ async function handleRequest(context) {
 
     try {
       const result =
-        await websocketRequest(
+        await sendWebSocketRequest(
           wsUrl,
           {
-            buy: proposalId,
-            price: price,
-            req_id: 2
+            buy:
+              proposalId,
+
+            price:
+              price,
+
+            req_id:
+              2
           },
           "buy"
         );
@@ -628,6 +653,7 @@ async function handleRequest(context) {
         contract:
           result.buy
       });
+
     } catch (error) {
       return json(
         {
@@ -654,7 +680,7 @@ export async function onRequest(context) {
     return await handleRequest(context);
   } catch (error) {
     console.error(
-      "DollarTicks trading error:",
+      "DollarTicks error:",
       error
     );
 
@@ -663,9 +689,9 @@ export async function onRequest(context) {
         ok: false,
         error:
           error?.message ||
-          "Internal trading function error."
+          "Internal server error."
       },
       500
     );
   }
-    }
+      }
