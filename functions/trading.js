@@ -3,26 +3,33 @@ const DERIV_API = "https://api.derivws.com";
 
 
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store"
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store"
+      }
     }
-  });
+  );
 }
 
 
 function getCookie(request, name) {
+
   const cookies =
     request.headers.get("Cookie") || "";
 
   for (const part of cookies.split(";")) {
-    const index = part.indexOf("=");
+
+    const index =
+      part.indexOf("=");
 
     if (index === -1) continue;
 
-    const key = part.slice(0, index).trim();
+    const key =
+      part.slice(0, index).trim();
 
     if (key !== name) continue;
 
@@ -33,6 +40,7 @@ function getCookie(request, name) {
     } catch {
       return part.slice(index + 1).trim();
     }
+
   }
 
   return null;
@@ -126,7 +134,8 @@ async function getAccounts(token) {
     }
   );
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
   if (!response.ok) {
 
@@ -144,10 +153,13 @@ async function getAccounts(token) {
 
 
 /* ==========================================
-   GET AUTHENTICATED WEBSOCKET URL
+   GET OTP
 ========================================== */
 
-async function getOTP(token, accountId) {
+async function getOTP(
+  token,
+  accountId
+) {
 
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
@@ -164,7 +176,8 @@ async function getOTP(token, accountId) {
     }
   );
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
   if (!response.ok) {
 
@@ -204,19 +217,23 @@ function websocketRequest(
     let ws = null;
     let finished = false;
 
-    const timeout = setTimeout(() => {
+    const timeout =
+      setTimeout(() => {
 
-      finish(
-        reject,
-        new Error(
-          "Deriv request timed out."
-        )
-      );
+        finish(
+          reject,
+          new Error(
+            "Deriv request timed out."
+          )
+        );
 
-    }, 15000);
+      }, 15000);
 
 
-    function finish(callback, value) {
+    function finish(
+      callback,
+      value
+    ) {
 
       if (finished) return;
 
@@ -235,11 +252,15 @@ function websocketRequest(
 
     try {
 
-      ws = new WebSocket(wsUrl);
+      ws =
+        new WebSocket(wsUrl);
 
     } catch (error) {
 
-      finish(reject, error);
+      finish(
+        reject,
+        error
+      );
 
       return;
 
@@ -345,7 +366,7 @@ function websocketRequest(
 
 
 /* ==========================================
-   MAIN HANDLER
+   MAIN
 ========================================== */
 
 export async function onRequest(context) {
@@ -355,7 +376,7 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     GET TOKEN
+     TOKEN
   ======================================== */
 
   const token =
@@ -381,7 +402,7 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     GET ACCOUNTS
+     ACCOUNTS
   ======================================== */
 
   let accounts;
@@ -397,7 +418,8 @@ export async function onRequest(context) {
       {
         ok: false,
         connected: false,
-        error: error.message
+        error:
+          error.message
       },
       401
     );
@@ -411,14 +433,14 @@ export async function onRequest(context) {
       ok: false,
       connected: false,
       error:
-        "No Deriv Options account found."
+        "No Options account returned by Deriv."
     });
 
   }
 
 
   /* ========================================
-     SELECT DOT DEMO ACCOUNT
+     SELECT DOT ACCOUNT
   ======================================== */
 
   const selected =
@@ -439,7 +461,8 @@ export async function onRequest(context) {
     accounts.find(account => {
 
       return String(
-        account.account_type || ""
+        account.account_type ||
+        ""
       ).toLowerCase() === "demo";
 
     }) ||
@@ -466,10 +489,12 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     GET /trading
+     GET
   ======================================== */
 
-  if (request.method === "GET") {
+  if (
+    request.method === "GET"
+  ) {
 
     return json({
 
@@ -499,7 +524,9 @@ export async function onRequest(context) {
      POST ONLY
   ======================================== */
 
-  if (request.method !== "POST") {
+  if (
+    request.method !== "POST"
+  ) {
 
     return json(
       {
@@ -514,7 +541,7 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     READ REQUEST BODY
+     BODY
   ======================================== */
 
   let body;
@@ -530,7 +557,7 @@ export async function onRequest(context) {
       {
         ok: false,
         error:
-          "Invalid JSON request."
+          "Invalid JSON."
       },
       400
     );
@@ -541,6 +568,159 @@ export async function onRequest(context) {
   const action =
     body.action;
 
+
+  /* ========================================
+     DIAGNOSTIC ACTION
+  ======================================== */
+
+  if (
+    action === "diagnostic"
+  ) {
+
+    let wsUrl;
+
+    try {
+
+      wsUrl =
+        await getOTP(
+          token,
+          accountId
+        );
+
+    } catch (error) {
+
+      return json(
+        {
+          ok: false,
+
+          diagnostic:
+            "otp",
+
+          account: {
+            account_id:
+              accountId,
+
+            account_type:
+              accountType,
+
+            currency:
+              currency
+          },
+
+          error:
+            error.message
+        },
+        502
+      );
+
+    }
+
+
+    /*
+     * We use the authenticated
+     * session to ask for balance.
+     *
+     * This does NOT place a trade.
+     */
+
+    try {
+
+      const result =
+        await websocketRequest(
+          wsUrl,
+
+          {
+            balance: 1,
+
+            req_id: 9001
+
+          },
+
+          "balance"
+        );
+
+
+      return json({
+
+        ok: true,
+
+        diagnostic:
+          "authenticated_account",
+
+        account: {
+
+          account_id:
+            accountId,
+
+          account_type:
+            accountType,
+
+          currency:
+            currency
+
+        },
+
+        websocket: {
+
+          authenticated:
+            true,
+
+          balance:
+            result?.balance?.balance ??
+            null,
+
+          balance_currency:
+            result?.balance?.currency ??
+            null
+
+        },
+
+        message:
+          "Authenticated WebSocket can read the selected account."
+
+      });
+
+
+    } catch (error) {
+
+      return json(
+        {
+          ok: false,
+
+          diagnostic:
+            "authenticated_account",
+
+          account: {
+
+            account_id:
+              accountId,
+
+            account_type:
+              accountType,
+
+            currency:
+              currency
+
+          },
+
+          error:
+            error.message,
+
+          message:
+            "The account was found by REST, but the authenticated trading WebSocket could not access it."
+
+        },
+        502
+      );
+
+    }
+
+  }
+
+
+  /* ========================================
+     MARKET
+  ======================================== */
 
   const market =
     body.market ||
@@ -602,7 +782,7 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     GET FRESH AUTHENTICATED SESSION
+     AUTHENTICATED WEBSOCKET
   ======================================== */
 
   let wsUrl;
@@ -620,10 +800,12 @@ export async function onRequest(context) {
     return json(
       {
         ok: false,
+
         error:
           error.message,
 
         account: {
+
           account_id:
             accountId,
 
@@ -632,7 +814,9 @@ export async function onRequest(context) {
 
           currency:
             currency
+
         }
+
       },
       502
     );
@@ -644,7 +828,9 @@ export async function onRequest(context) {
      PROPOSAL
   ======================================== */
 
-  if (action === "proposal") {
+  if (
+    action === "proposal"
+  ) {
 
     const proposalRequest = {
 
@@ -707,6 +893,7 @@ export async function onRequest(context) {
               "Deriv returned an incomplete proposal.",
 
             account: {
+
               account_id:
                 accountId,
 
@@ -715,13 +902,8 @@ export async function onRequest(context) {
 
               currency:
                 currency
+
             },
-
-            market:
-              market,
-
-            contract_type:
-              contractType,
 
             raw:
               result
@@ -740,7 +922,9 @@ export async function onRequest(context) {
         proposal: {
 
           id:
-            String(proposal.id),
+            String(
+              proposal.id
+            ),
 
           ask_price:
             proposal.ask_price ??
@@ -769,6 +953,7 @@ export async function onRequest(context) {
             error.message,
 
           account: {
+
             account_id:
               accountId,
 
@@ -777,6 +962,7 @@ export async function onRequest(context) {
 
             currency:
               currency
+
           },
 
           market:
@@ -795,14 +981,15 @@ export async function onRequest(context) {
 
 
   /* ========================================
-     BUY DEMO CONTRACT
+     BUY
   ======================================== */
 
-  if (action === "buy") {
+  if (
+    action === "buy"
+  ) {
 
     if (
-      accountType !==
-      "demo"
+      accountType !== "demo"
     ) {
 
       return json(
@@ -810,15 +997,10 @@ export async function onRequest(context) {
           ok: false,
 
           error:
-            "The selected Deriv account is not a DEMO account.",
+            "Selected account is not demo.",
 
-          account: {
-            account_id:
-              accountId,
-
-            account_type:
-              accountType
-          }
+          account:
+            accountId
 
         },
         403
@@ -871,16 +1053,6 @@ export async function onRequest(context) {
     }
 
 
-    /*
-     * IMPORTANT:
-     *
-     * This is a NEW authenticated
-     * WebSocket session.
-     *
-     * The OTP URL is tied to
-     * accountId above.
-     */
-
     const buyRequest = {
 
       buy:
@@ -922,6 +1094,7 @@ export async function onRequest(context) {
               "Deriv returned an incomplete purchase response.",
 
             account: {
+
               account_id:
                 accountId,
 
@@ -930,6 +1103,7 @@ export async function onRequest(context) {
 
               currency:
                 currency
+
             },
 
             proposal_id:
@@ -990,12 +1164,6 @@ export async function onRequest(context) {
 
     } catch (error) {
 
-      console.error(
-        "BUY ERROR:",
-        error
-      );
-
-
       return json(
         {
           ok: false,
@@ -1004,6 +1172,7 @@ export async function onRequest(context) {
             error.message,
 
           account: {
+
             account_id:
               accountId,
 
@@ -1012,6 +1181,7 @@ export async function onRequest(context) {
 
             currency:
               currency
+
           },
 
           proposal_id:
@@ -1029,10 +1199,6 @@ export async function onRequest(context) {
   }
 
 
-  /* ========================================
-     UNKNOWN ACTION
-  ======================================== */
-
   return json(
     {
       ok: false,
@@ -1046,4 +1212,4 @@ export async function onRequest(context) {
     400
   );
 
-      }
+        }
