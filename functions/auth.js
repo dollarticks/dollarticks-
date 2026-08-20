@@ -2,51 +2,97 @@ const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const REDIRECT_URI = "https://dollarticks.pages.dev/callback";
 
 export async function onRequest(context) {
-  const url = new URL(context.request.url);
 
-  // /auth = login
-  // /auth?mode=signup = sign up
-  const mode = url.searchParams.get("mode");
-  const isSignup = mode === "signup";
+  const request = context.request;
+  const url = new URL(request.url);
 
-  const randomBytes = crypto.getRandomValues(
-    new Uint8Array(64)
-  );
+
+  /* =====================================================
+     LOGIN / SIGNUP MODE
+  ===================================================== */
+
+  const mode =
+    url.searchParams.get("mode");
+
+  const isSignup =
+    mode === "signup";
+
+
+  /* =====================================================
+     CREATE PKCE VERIFIER
+  ===================================================== */
+
+  const randomBytes =
+    crypto.getRandomValues(
+      new Uint8Array(64)
+    );
 
   const alphabet =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
-  const codeVerifier = Array.from(randomBytes)
-    .map(byte => alphabet[byte % alphabet.length])
-    .join("");
+  const codeVerifier =
+    Array.from(randomBytes)
+      .map(
+        byte =>
+          alphabet[
+            byte % alphabet.length
+          ]
+      )
+      .join("");
 
-  const hash = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(codeVerifier)
-  );
 
-  const codeChallenge = btoa(
-    String.fromCharCode(
-      ...new Uint8Array(hash)
+  /* =====================================================
+     CREATE CODE CHALLENGE
+  ===================================================== */
+
+  const hash =
+    await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(
+        codeVerifier
+      )
+    );
+
+  const codeChallenge =
+    btoa(
+      String.fromCharCode(
+        ...new Uint8Array(hash)
+      )
     )
-  )
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
 
-  const stateBytes = crypto.getRandomValues(
-    new Uint8Array(32)
-  );
 
-  const state = Array.from(stateBytes)
-    .map(byte =>
-      byte.toString(16).padStart(2, "0")
-    )
-    .join("");
+  /* =====================================================
+     CREATE OAUTH STATE
+  ===================================================== */
 
-  const authUrl = new URL(
-    "https://auth.deriv.com/oauth2/auth"
-  );
+  const stateBytes =
+    crypto.getRandomValues(
+      new Uint8Array(32)
+    );
+
+  const state =
+    Array.from(stateBytes)
+      .map(
+        byte =>
+          byte
+            .toString(16)
+            .padStart(2, "0")
+      )
+      .join("");
+
+
+  /* =====================================================
+     DERIV AUTHORIZATION URL
+  ===================================================== */
+
+  const authUrl =
+    new URL(
+      "https://auth.deriv.com/oauth2/auth"
+    );
+
 
   authUrl.searchParams.set(
     "response_type",
@@ -63,7 +109,9 @@ export async function onRequest(context) {
     REDIRECT_URI
   );
 
-  // Trading permission
+  /*
+   * Trading permission.
+   */
   authUrl.searchParams.set(
     "scope",
     "trade"
@@ -84,24 +132,58 @@ export async function onRequest(context) {
     "S256"
   );
 
-  // Tell Deriv to show the registration page
-  // only when Sign Up was selected.
+
+  /* =====================================================
+     SIGNUP
+  ===================================================== */
+
   if (isSignup) {
+
     authUrl.searchParams.set(
       "prompt",
       "registration"
     );
+
   }
 
-  const cookieOptions =
-    "Path=/; Max-Age=600; Secure; HttpOnly; SameSite=Lax";
 
-  const headers = new Headers();
+  /* =====================================================
+     COOKIE OPTIONS
+  ===================================================== */
+
+  /*
+   * SameSite=None + Secure makes the OAuth
+   * redirect cookie more reliable across
+   * the Deriv -> DollarTicks navigation.
+   */
+
+  const cookieOptions =
+    "Path=/; Max-Age=600; Secure; HttpOnly; SameSite=None";
+
+
+  /* =====================================================
+     RESPONSE HEADERS
+  ===================================================== */
+
+  const headers =
+    new Headers();
+
 
   headers.set(
     "Location",
     authUrl.toString()
   );
+
+
+  headers.set(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate"
+  );
+
+
+  /* =====================================================
+     SAVE PKCE VERIFIER
+  ===================================================== */
 
   headers.append(
     "Set-Cookie",
@@ -110,6 +192,11 @@ export async function onRequest(context) {
     )}; ${cookieOptions}`
   );
 
+
+  /* =====================================================
+     SAVE OAUTH STATE
+  ===================================================== */
+
   headers.append(
     "Set-Cookie",
     `dt_oauth_state=${encodeURIComponent(
@@ -117,8 +204,17 @@ export async function onRequest(context) {
     )}; ${cookieOptions}`
   );
 
-  return new Response(null, {
-    status: 302,
-    headers
-  });
+
+  /* =====================================================
+     REDIRECT TO DERIV
+  ===================================================== */
+
+  return new Response(
+    null,
+    {
+      status: 302,
+      headers
+    }
+  );
+
 }
