@@ -75,18 +75,12 @@ button.primary{
   color:#061014
 }
 
-button.connect{
-  margin-top:10px;
-  background:#18c6d8;
-  border-color:#18c6d8;
-  color:#061014
-}
-
 button.buy{
   margin-top:10px;
   background:#62e6a7;
   border-color:#62e6a7;
-  color:#061014
+  color:#061014;
+  font-size:17px
 }
 
 button.clear{
@@ -638,12 +632,29 @@ TRADE ENTRY
 
 <select id="contractType">
 
-<option value="DIGITOVER">Over</option>
-<option value="DIGITUNDER">Under</option>
-<option value="DIGITMATCH">Matches</option>
-<option value="DIGITDIFF">Differs</option>
-<option value="DIGITEVEN">Even</option>
-<option value="DIGITODD">Odd</option>
+<option value="DIGITOVER">
+Over
+</option>
+
+<option value="DIGITUNDER">
+Under
+</option>
+
+<option value="DIGITMATCH">
+Matches
+</option>
+
+<option value="DIGITDIFF">
+Differs
+</option>
+
+<option value="DIGITEVEN">
+Even
+</option>
+
+<option value="DIGITODD">
+Odd
+</option>
 
 </select>
 
@@ -694,34 +705,25 @@ value="1">
 
 <div style="height:10px"></div>
 
+<!-- ONE BUTTON ONLY -->
+
 <button
-id="getProposal"
-class="primary"
+id="buyButton"
+class="buy"
 type="button">
 
-Get Trade Proposal
+BUY
 
 </button>
 
-<div id="proposalInfo" class="tradeStatus">
-
-No proposal requested yet.
-
-</div>
-
-<button
-id="buyContract"
-class="buy hidden"
-type="button">
-
-Buy Contract
-
-</button>
 
 <div id="tradeStatus" class="tradeStatus">
 
-Proposal mode only — no contract will be purchased.
+Ready. Tap BUY to request a fresh proposal and purchase the contract.
 
+</div>
+
+<div id="proposalInfo" class="tradeStatus hidden">
 </div>
 
 <div id="debug" class="debug hidden"></div>
@@ -883,12 +885,8 @@ Percentages are based on recent ticks and are
 
 <br><br>
 
-The proposal button requests a Deriv proposal.
-
-<br><br>
-
-The Buy button purchases a contract on the
-currently selected account.
+The <b>BUY</b> button requests a fresh Deriv
+proposal and purchases the contract automatically.
 
 <br><br>
 
@@ -936,8 +934,6 @@ const marketNames = {
 let ws = null;
 let history = [];
 let latestDigit = null;
-let currentProposal = null;
-let currentContractId = null;
 
 let currentAccountType = "demo";
 let currentAccountId = null;
@@ -945,6 +941,7 @@ let currentBalance = null;
 let currentCurrency = "USD";
 
 let contractTimer = null;
+let currentContractId = null;
 let currentTradeRecorded = false;
 
 const $ = id =>
@@ -955,7 +952,7 @@ document.getElementById(id);
 STATUS
 ===================================================== */
 
-function setStatus(text,live=false){
+function setStatus(text, live=false){
 
 $("status").textContent = text;
 
@@ -1297,9 +1294,6 @@ data.history?.prices || [];
 const times =
 data.history?.times || [];
 
-const pipSize =
-data.pip_size;
-
 history = [];
 
 for(
@@ -1311,7 +1305,7 @@ i++
 const digit =
 getLastDigit(
 prices[i],
-pipSize
+data.pip_size
 );
 
 if(digit !== null){
@@ -1556,14 +1550,19 @@ async function selectAccount(type){
 type =
 String(type).toLowerCase();
 
-if(type !== "demo" && type !== "real"){
-throw new Error("Invalid account type.");
+if(
+type !== "demo" &&
+type !== "real"
+){
+
+throw new Error(
+"Invalid account type."
+);
+
 }
 
 $("moneyStatus").textContent =
 `Switching to ${type.toUpperCase()} account…`;
-
-try{
 
 const response =
 await fetch(
@@ -1573,9 +1572,7 @@ method:"POST",
 
 headers:{
 "Content-Type":
-"application/json",
-"Cache-Control":
-"no-cache"
+"application/json"
 },
 
 credentials:"same-origin",
@@ -1584,9 +1581,11 @@ cache:"no-store",
 
 body:JSON.stringify({
 
-action:"select_account",
+action:
+"select_account",
 
-account_type:type
+account_type:
+type
 
 })
 
@@ -1608,7 +1607,8 @@ data.error ||
 
 }
 
-currentAccountType = type;
+currentAccountType =
+type;
 
 if(data.account){
 
@@ -1639,22 +1639,11 @@ $("moneyStatus").textContent =
 
 return data;
 
-}catch(error){
-
-console.error(
-"Account switch error:",
-error
-);
-
-throw error;
-
-}
-
 }
 
 
 /* =====================================================
-DEMO BUTTON
+ACCOUNT BUTTONS
 ===================================================== */
 
 $("demoMode").addEventListener(
@@ -1667,7 +1656,6 @@ $("realMode").disabled = true;
 try{
 
 await selectAccount("demo");
-
 await checkAccount();
 
 }catch(error){
@@ -1686,10 +1674,6 @@ $("realMode").disabled = false;
 );
 
 
-/* =====================================================
-REAL BUTTON
-===================================================== */
-
 $("realMode").addEventListener(
 "click",
 async function(){
@@ -1700,7 +1684,6 @@ $("realMode").disabled = true;
 try{
 
 await selectAccount("real");
-
 await checkAccount();
 
 }catch(error){
@@ -1708,7 +1691,8 @@ await checkAccount();
 $("moneyStatus").textContent =
 error.message;
 
-currentAccountType = "demo";
+currentAccountType =
+"demo";
 
 updateAccountDisplay();
 
@@ -1732,7 +1716,7 @@ $("depositButton").addEventListener(
 function(){
 
 $("moneyStatus").textContent =
-"Deposit is not connected yet. We will connect the official Deriv payment flow next.";
+"Deposit is not connected yet.";
 
 }
 );
@@ -1747,29 +1731,7 @@ $("withdrawButton").addEventListener(
 function(){
 
 $("moneyStatus").textContent =
-"Withdraw is not connected yet. We will connect the official Deriv withdrawal flow next.";
-
-}
-);
-
-
-/* =====================================================
-CONNECT DERIV
-===================================================== */
-
-document.addEventListener(
-"click",
-function(event){
-
-if(
-event.target &&
-event.target.id === "connectDeriv"
-){
-
-window.location.href =
-"/auth";
-
-}
+"Withdraw is not connected yet.";
 
 }
 );
@@ -1808,27 +1770,54 @@ updateContractUI();
 
 
 /* =====================================================
-BUILD TRADE PAYLOAD
+BUY
 ===================================================== */
 
-function buildTradePayload(){
+$("buyButton").addEventListener(
+"click",
+async function(){
 
-const market =
-getSelectedMarket();
+const button =
+$("buyButton");
 
-return {
+const status =
+$("tradeStatus");
+
+const debug =
+$("debug");
+
+button.disabled = true;
+
+debug.classList.add("hidden");
+
+status.className =
+"tradeStatus";
+
+status.textContent =
+`Requesting fresh ${currentAccountType.toUpperCase()} proposal and purchasing…`;
+
+$("proposalInfo").classList.add(
+"hidden"
+);
+
+try{
+
+const payload = {
+
+action:
+"buy",
 
 account_type:
 currentAccountType,
 
 market:
-market,
+getSelectedMarket(),
 
 symbol:
-market,
+getSelectedMarket(),
 
 underlying_symbol:
-market,
+getSelectedMarket(),
 
 contract_type:
 $("contractType").value,
@@ -1851,23 +1840,6 @@ duration_unit:
 
 };
 
-}
-
-
-/* =====================================================
-REQUEST PROPOSAL
-===================================================== */
-
-async function requestFreshProposal(){
-
-const payload = {
-
-action:
-"proposal",
-
-...buildTradePayload()
-
-};
 
 const response =
 await fetch(
@@ -1896,8 +1868,10 @@ JSON.stringify(payload)
 }
 );
 
+
 const data =
 await response.json();
+
 
 if(
 !response.ok ||
@@ -1906,275 +1880,53 @@ if(
 
 throw new Error(
 data.error ||
-"Proposal request failed."
+"Purchase failed."
 );
 
 }
 
-if(
-!data.proposal ||
-!data.proposal.id
-){
 
-throw new Error(
-"Deriv returned an incomplete proposal."
-);
-
-}
-
-return data.proposal;
-
-}
-
-
-/* =====================================================
-GET PROPOSAL
-===================================================== */
-
-$("getProposal").addEventListener(
-"click",
-async function(){
-
-const button =
-$("getProposal");
-
-const status =
-$("tradeStatus");
-
-const info =
-$("proposalInfo");
-
-const debug =
-$("debug");
-
-button.disabled = true;
-
-$("buyContract")
-.classList.add("hidden");
-
-currentProposal = null;
-
-debug.classList.add("hidden");
-
-status.className =
-"tradeStatus";
-
-status.textContent =
-`Requesting ${currentAccountType.toUpperCase()} proposal…`;
-
-info.textContent =
-"Waiting for Deriv…";
-
-try{
-
-const proposal =
-await requestFreshProposal();
-
-currentProposal =
-proposal;
-
-info.innerHTML = `
-
-Proposal ID:
-<b>${proposal.id}</b>
-
-<br>
-
-Purchase Price:
-<b>${proposal.ask_price ?? "—"}</b>
-
-<br>
-
-Payout:
-<b>${proposal.payout ?? "—"}</b>
-
-<br>
-
-Spot:
-<b>${proposal.spot ?? "—"}</b>
-
-`;
-
-status.className =
-"tradeStatus success";
-
-status.textContent =
-`✓ Fresh ${currentAccountType.toUpperCase()} proposal received.`;
-
-$("buyContract")
-.classList.remove("hidden");
-
-}catch(error){
-
-console.error(error);
-
-status.className =
-"tradeStatus error";
-
-status.textContent =
-error.message;
-
-info.textContent =
-"No valid proposal.";
-
-debug.textContent =
-"Market sent: " +
-getSelectedMarket() +
-" | Account: " +
-currentAccountType;
-
-debug.classList.remove("hidden");
-
-}finally{
-
-button.disabled = false;
-
-}
-
-}
-);
-
-
-/* =====================================================
-BUY CONTRACT
-===================================================== */
-
-$("buyContract").addEventListener(
-"click",
-async function(){
-
-const button =
-$("buyContract");
-
-const status =
-$("tradeStatus");
-
-button.disabled = true;
-
-$("getProposal").disabled = true;
-
-status.className =
-"tradeStatus";
-
-status.textContent =
-`Getting fresh ${currentAccountType.toUpperCase()} proposal and purchasing…`;
-
-try{
-
-const freshProposal =
-await requestFreshProposal();
-
-currentProposal =
-freshProposal;
-
-const buyPayload = {
-
-action:
-"buy",
-
-account_type:
-currentAccountType,
-
-market:
-getSelectedMarket(),
-
-proposal_id:
-String(
-freshProposal.id
-),
-
-price:
-Number(
-freshProposal.ask_price
-)
-
-};
-
-const buyResponse =
-await fetch(
-"/trading",
-{
-
-method:"POST",
-
-headers:{
-"Content-Type":
-"application/json",
-
-"Cache-Control":
-"no-cache"
-},
-
-credentials:
-"same-origin",
-
-cache:
-"no-store",
-
-body:
-JSON.stringify(buyPayload)
-
-}
-);
-
-const data =
-await buyResponse.json();
-
-if(
-!buyResponse.ok ||
-!data.ok
-){
-
-throw new Error(
-data.error ||
-`${currentAccountType} purchase failed.`
-);
-
-}
-
-const contractId =
-data.contract?.contract_id;
+const contract =
+data.contract || {};
 
 currentContractId =
-contractId
-? String(contractId)
+contract.contract_id
+? String(
+contract.contract_id
+)
 : null;
 
-currentTradeRecorded = false;
+currentTradeRecorded =
+false;
+
 
 status.className =
 "tradeStatus success";
 
 status.textContent =
-`✓ ${currentAccountType.toUpperCase()} contract purchased successfully.
-Contract ID: ${contractId || "—"}`;
+`✓ ${currentAccountType.toUpperCase()} contract purchased successfully.`;
 
 $("proposalInfo").innerHTML = `
 
-Proposal ID:
-<b>${freshProposal.id}</b>
+Contract ID:
+<b>${contract.contract_id ?? "—"}</b>
 
 <br>
 
-Purchase Price:
-<b>${
-data.contract?.buy_price ??
-freshProposal.ask_price
-}</b>
+Buy Price:
+<b>${contract.buy_price ?? "—"}</b>
 
 <br>
 
 Payout:
-<b>${
-data.contract?.payout ??
-freshProposal.payout ??
-"—"
-}</b>
+<b>${contract.payout ?? "—"}</b>
 
 `;
 
-$("buyContract")
-.classList.add("hidden");
+$("proposalInfo").classList.remove(
+"hidden"
+);
+
 
 if(currentContractId){
 
@@ -2184,11 +1936,16 @@ currentContractId
 
 }
 
+
 await checkAccount();
+
 
 }catch(error){
 
-console.error(error);
+console.error(
+"BUY ERROR:",
+error
+);
 
 status.className =
 "tradeStatus error";
@@ -2196,11 +1953,19 @@ status.className =
 status.textContent =
 error.message;
 
+debug.textContent =
+"Market: " +
+getSelectedMarket() +
+" | Account: " +
+currentAccountType;
+
+debug.classList.remove(
+"hidden"
+);
+
 }finally{
 
 button.disabled = false;
-
-$("getProposal").disabled = false;
 
 }
 
@@ -2285,8 +2050,9 @@ getTradeHistory();
 if(
 existing.some(
 trade =>
-String(trade.contract_id) ===
-contractId
+String(
+trade.contract_id
+) === contractId
 )
 ){
 
@@ -2335,7 +2101,8 @@ contract.profit ?? 0
 
 status:
 String(
-contract.status || "OPEN"
+contract.status ||
+"OPEN"
 ).toUpperCase(),
 
 time:
@@ -2355,7 +2122,7 @@ renderTradeHistory();
 
 
 /* =====================================================
-RENDER TRADE HISTORY
+RENDER HISTORY
 ===================================================== */
 
 function renderTradeHistory(){
@@ -2369,14 +2136,22 @@ $("tradeHistory");
 let wins = 0;
 let totalProfit = 0;
 
-for(const trade of list){
+for(
+const trade of list
+){
 
-if(trade.status === "WON"){
+if(
+trade.status === "WON"
+){
+
 wins++;
+
 }
 
 totalProfit +=
-Number(trade.profit || 0);
+Number(
+trade.profit || 0
+);
 
 }
 
@@ -2521,13 +2296,15 @@ $("clearHistory").addEventListener(
 "click",
 function(){
 
-const confirmed =
-confirm(
+if(
+!confirm(
 "Clear all DollarTicks trade history on this device?"
-);
+)
+){
 
-if(!confirmed)
 return;
+
+}
 
 localStorage.removeItem(
 "dollarticks_trade_history"
@@ -2561,10 +2338,7 @@ method:"POST",
 
 headers:{
 "Content-Type":
-"application/json",
-
-"Cache-Control":
-"no-cache"
+"application/json"
 },
 
 credentials:
@@ -2576,7 +2350,8 @@ cache:
 body:
 JSON.stringify({
 
-action:"contract_status",
+action:
+"contract_status",
 
 contract_id:
 String(contractId)
@@ -2606,17 +2381,29 @@ data.contract || {};
 
 const statusValue =
 String(
-contract.status || "OPEN"
+contract.status ||
+"OPEN"
 ).toUpperCase();
 
-let statusClass = "open";
+let statusClass =
+"open";
 
-if(statusValue === "WON"){
-statusClass = "win";
+if(
+statusValue === "WON"
+){
+
+statusClass =
+"win";
+
 }
 
-if(statusValue === "LOST"){
-statusClass = "loss";
+if(
+statusValue === "LOST"
+){
+
+statusClass =
+"loss";
+
 }
 
 $("contractStatus").innerHTML = `
@@ -2674,6 +2461,7 @@ Exit Spot:
 
 `;
 
+
 if(
 statusValue === "WON" ||
 statusValue === "LOST"
@@ -2681,13 +2469,18 @@ statusValue === "LOST"
 
 if(contractTimer){
 
-clearInterval(contractTimer);
+clearInterval(
+contractTimer
+);
 
-contractTimer = null;
+contractTimer =
+null;
 
 }
 
-if(!currentTradeRecorded){
+if(
+!currentTradeRecorded
+){
 
 addTradeToHistory({
 
@@ -2709,7 +2502,8 @@ contract.payout ?? 0
 
 });
 
-currentTradeRecorded = true;
+currentTradeRecorded =
+true;
 
 }
 
@@ -2750,7 +2544,7 @@ ${error.message}
 
 
 /* =====================================================
-AUTOMATIC CONTRACT STATUS POLLING
+CONTRACT POLLING
 ===================================================== */
 
 function startContractStatusPolling(
@@ -2759,13 +2553,17 @@ contractId
 
 if(contractTimer){
 
-clearInterval(contractTimer);
+clearInterval(
+contractTimer
+);
 
-contractTimer = null;
+contractTimer =
+null;
 
 }
 
-currentTradeRecorded = false;
+currentTradeRecorded =
+false;
 
 $("contractStatus").innerHTML = `
 
@@ -2784,13 +2582,17 @@ Waiting for contract result…
 
 `;
 
-checkContractStatus(contractId);
+checkContractStatus(
+contractId
+);
 
 contractTimer =
 setInterval(
 function(){
 
-checkContractStatus(contractId);
+checkContractStatus(
+contractId
+);
 
 },
 2000
@@ -2826,4 +2628,4 @@ renderTradeHistory();
 </script>
 
 </body>
-  </html>
+      </html>
