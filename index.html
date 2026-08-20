@@ -291,10 +291,6 @@ button:disabled{
   font-weight:800
 }
 
-/* ================================
-   ACCOUNT PANEL
-================================ */
-
 .accountHeader{
   display:flex;
   justify-content:space-between;
@@ -380,10 +376,6 @@ button:disabled{
   font-size:11px;
   margin-top:9px
 }
-
-/* ================================
-   TRADE HISTORY
-================================ */
 
 .historyItem{
   background:#0d1219;
@@ -471,8 +463,6 @@ button:disabled{
 
 <div class="wrap">
 
-<!-- HEADER -->
-
 <div class="top">
 
   <div class="brand">
@@ -503,7 +493,6 @@ button:disabled{
 
   </div>
 
-
   <div class="balanceBox">
 
     <div class="balanceLabel">
@@ -520,28 +509,22 @@ button:disabled{
 
   </div>
 
-
   <div class="accountSwitch">
 
     <button
       id="demoMode"
       class="active"
       type="button">
-
       DEMO
-
     </button>
 
     <button
       id="realMode"
       type="button">
-
       REAL
-
     </button>
 
   </div>
-
 
   <div class="moneyRow">
 
@@ -549,37 +532,27 @@ button:disabled{
       id="depositButton"
       class="money deposit"
       type="button">
-
       Deposit
-
     </button>
 
     <button
       id="withdrawButton"
       class="money"
       type="button">
-
       Withdraw
-
     </button>
 
   </div>
 
-
   <div
     id="moneyStatus"
     class="accountInfo">
-
     Demo account selected.
-
   </div>
 
-
   <div class="accountInfo">
-
     Account:
     <b id="accountId">—</b>
-
   </div>
 
 </div>
@@ -741,7 +714,7 @@ id="buyContract"
 class="buy hidden"
 type="button">
 
-Buy DEMO Contract
+Buy Contract
 
 </button>
 
@@ -914,7 +887,8 @@ The proposal button requests a Deriv proposal.
 
 <br><br>
 
-The Buy DEMO button purchases a demo contract.
+The Buy button purchases a contract on the
+currently selected account.
 
 <br><br>
 
@@ -923,7 +897,7 @@ and displays the final WIN/LOSS result.
 
 <br><br>
 
-TRADE HISTORY records completed demo trades
+TRADE HISTORY records completed trades
 on this device.
 
 </div>
@@ -964,14 +938,17 @@ let history = [];
 let latestDigit = null;
 let currentProposal = null;
 let currentContractId = null;
+
 let currentAccountType = "demo";
+let currentAccountId = null;
 let currentBalance = null;
 let currentCurrency = "USD";
+
 let contractTimer = null;
 let currentTradeRecorded = false;
 
-const $ =
-id => document.getElementById(id);
+const $ = id =>
+document.getElementById(id);
 
 
 /* =====================================================
@@ -1095,9 +1072,7 @@ function render(){
 const counts =
 Array(10).fill(0);
 
-for(
-const digit of history
-){
+for(const digit of history){
 counts[digit]++;
 }
 
@@ -1107,23 +1082,13 @@ history.length;
 let mostDigit = 0;
 let leastDigit = 0;
 
-for(
-let i = 1;
-i < 10;
-i++
-){
+for(let i = 1; i < 10; i++){
 
-if(
-counts[i] >
-counts[mostDigit]
-){
+if(counts[i] > counts[mostDigit]){
 mostDigit = i;
 }
 
-if(
-counts[i] <
-counts[leastDigit]
-){
+if(counts[i] < counts[leastDigit]){
 leastDigit = i;
 }
 
@@ -1135,9 +1100,7 @@ counts.map(
 
 const percentage =
 history.length
-? count /
-history.length *
-100
+? count / history.length * 100
 : 0;
 
 const isMost =
@@ -1185,9 +1148,7 @@ history
 (digit,index)=>`
 
 <div class="tick ${
-index === 0
-? "new"
-: ""
+index === 0 ? "new" : ""
 }">
 
 ${digit}
@@ -1281,8 +1242,7 @@ setStatus("Connecting…");
 ws =
 new WebSocket(WS_URL);
 
-ws.onopen =
-function(){
+ws.onopen = function(){
 
 setStatus("LIVE",true);
 
@@ -1312,8 +1272,7 @@ req_id:
 
 };
 
-ws.onmessage =
-function(event){
+ws.onmessage = function(event){
 
 try{
 
@@ -1330,9 +1289,7 @@ return;
 
 }
 
-if(
-data.msg_type === "history"
-){
+if(data.msg_type === "history"){
 
 const prices =
 data.history?.prices || [];
@@ -1364,17 +1321,13 @@ history.push(digit);
 }
 
 if(history.length > MAX_TICKS){
-
 history =
 history.slice(-MAX_TICKS);
-
 }
 
 if(history.length){
-
 latestDigit =
 history[history.length - 1];
-
 }
 
 if(prices.length){
@@ -1400,9 +1353,7 @@ return;
 
 }
 
-if(
-data.msg_type === "tick"
-){
+if(data.msg_type === "tick"){
 
 if(!data.tick)
 return;
@@ -1434,15 +1385,13 @@ error
 
 };
 
-ws.onerror =
-function(){
+ws.onerror = function(){
 
 setStatus("Connection error");
 
 };
 
-ws.onclose =
-function(){
+ws.onclose = function(){
 
 setStatus("Disconnected");
 
@@ -1507,10 +1456,8 @@ type === "real"
 
 
 /* =====================================================
-ACCOUNT
+CHECK ACCOUNT
 ===================================================== */
-
-let currentAccountId = null;
 
 async function checkAccount(){
 
@@ -1548,11 +1495,6 @@ account.account_id || null;
 currentCurrency =
 account.currency || "USD";
 
-/*
- * Balance will be supplied by the
- * updated trading backend.
- */
-
 if(
 account.balance !== undefined &&
 account.balance !== null
@@ -1570,29 +1512,18 @@ currentAccountType === "demo"
 ? "Demo account selected."
 : "Real account selected.";
 
-$("moneyStatus").className =
-"accountInfo";
-
-$("accountStatusFallback");
-
-$("status").textContent =
-"LIVE";
+setStatus("LIVE",true);
 
 }else{
 
 currentAccountType = "demo";
-
 currentAccountId = null;
-
 currentBalance = null;
 
 updateAccountDisplay();
 
 $("moneyStatus").textContent =
 "Connect your Deriv account to view your balance.";
-
-$("accountModeText").textContent =
-"DEMO";
 
 }
 
@@ -1604,7 +1535,6 @@ error
 );
 
 currentAccountType = "demo";
-
 currentBalance = null;
 
 updateAccountDisplay();
@@ -1618,41 +1548,178 @@ $("moneyStatus").textContent =
 
 
 /* =====================================================
-ACCOUNT MODE BUTTONS
+SELECT ACCOUNT
+===================================================== */
+
+async function selectAccount(type){
+
+type =
+String(type).toLowerCase();
+
+if(type !== "demo" && type !== "real"){
+throw new Error("Invalid account type.");
+}
+
+$("moneyStatus").textContent =
+`Switching to ${type.toUpperCase()} account…`;
+
+try{
+
+const response =
+await fetch(
+"/trading",
+{
+method:"POST",
+
+headers:{
+"Content-Type":
+"application/json",
+"Cache-Control":
+"no-cache"
+},
+
+credentials:"same-origin",
+
+cache:"no-store",
+
+body:JSON.stringify({
+
+action:"select_account",
+
+account_type:type
+
+})
+
+}
+);
+
+const data =
+await response.json();
+
+if(
+!response.ok ||
+!data.ok
+){
+
+throw new Error(
+data.error ||
+`Could not switch to ${type} account.`
+);
+
+}
+
+currentAccountType = type;
+
+if(data.account){
+
+currentAccountId =
+data.account.account_id ||
+currentAccountId;
+
+currentCurrency =
+data.account.currency ||
+currentCurrency;
+
+if(
+data.account.balance !== undefined &&
+data.account.balance !== null
+){
+
+currentBalance =
+Number(data.account.balance);
+
+}
+
+}
+
+updateAccountDisplay();
+
+$("moneyStatus").textContent =
+`${type.toUpperCase()} account selected.`;
+
+return data;
+
+}catch(error){
+
+console.error(
+"Account switch error:",
+error
+);
+
+throw error;
+
+}
+
+}
+
+
+/* =====================================================
+DEMO BUTTON
 ===================================================== */
 
 $("demoMode").addEventListener(
 "click",
 async function(){
 
-currentAccountType = "demo";
+$("demoMode").disabled = true;
+$("realMode").disabled = true;
 
-updateAccountDisplay();
+try{
 
-$("moneyStatus").textContent =
-"DEMO selected. Updating account…";
+await selectAccount("demo");
 
 await checkAccount();
+
+}catch(error){
+
+$("moneyStatus").textContent =
+error.message;
+
+}finally{
+
+$("demoMode").disabled = false;
+$("realMode").disabled = false;
+
+}
 
 }
 );
 
 
+/* =====================================================
+REAL BUTTON
+===================================================== */
+
 $("realMode").addEventListener(
 "click",
 async function(){
 
-/*
- * Real trading is intentionally not enabled
- * by this UI until the backend supports safe
- * real-account selection.
- */
+$("demoMode").disabled = true;
+$("realMode").disabled = true;
+
+try{
+
+await selectAccount("real");
+
+await checkAccount();
+
+}catch(error){
 
 $("moneyStatus").textContent =
-"REAL account switching will be enabled after the real-account backend is connected.";
+error.message;
+
+currentAccountType = "demo";
+
+updateAccountDisplay();
+
+}finally{
+
+$("demoMode").disabled = false;
+$("realMode").disabled = false;
 
 }
 
+}
 );
 
 
@@ -1752,7 +1819,7 @@ getSelectedMarket();
 return {
 
 account_type:
-"demo",
+currentAccountType,
 
 market:
 market,
@@ -1893,7 +1960,7 @@ status.className =
 "tradeStatus";
 
 status.textContent =
-"Requesting fresh proposal…";
+`Requesting ${currentAccountType.toUpperCase()} proposal…`;
 
 info.textContent =
 "Waiting for Deriv…";
@@ -1932,7 +1999,7 @@ status.className =
 "tradeStatus success";
 
 status.textContent =
-"✓ Fresh proposal received.";
+`✓ Fresh ${currentAccountType.toUpperCase()} proposal received.`;
 
 $("buyContract")
 .classList.remove("hidden");
@@ -1952,7 +2019,9 @@ info.textContent =
 
 debug.textContent =
 "Market sent: " +
-getSelectedMarket();
+getSelectedMarket() +
+" | Account: " +
+currentAccountType;
 
 debug.classList.remove("hidden");
 
@@ -1967,7 +2036,7 @@ button.disabled = false;
 
 
 /* =====================================================
-BUY DEMO CONTRACT
+BUY CONTRACT
 ===================================================== */
 
 $("buyContract").addEventListener(
@@ -1980,20 +2049,6 @@ $("buyContract");
 const status =
 $("tradeStatus");
 
-if(
-currentAccountType !== "demo"
-){
-
-status.className =
-"tradeStatus error";
-
-status.textContent =
-"Please select the DEMO account first.";
-
-return;
-
-}
-
 button.disabled = true;
 
 $("getProposal").disabled = true;
@@ -2002,7 +2057,7 @@ status.className =
 "tradeStatus";
 
 status.textContent =
-"Getting fresh proposal and purchasing…";
+`Getting fresh ${currentAccountType.toUpperCase()} proposal and purchasing…`;
 
 try{
 
@@ -2014,17 +2069,22 @@ freshProposal;
 
 const buyPayload = {
 
-action:"buy",
+action:
+"buy",
 
-account_type:"demo",
+account_type:
+currentAccountType,
 
-market:getSelectedMarket(),
+market:
+getSelectedMarket(),
 
-proposal_id:String(
+proposal_id:
+String(
 freshProposal.id
 ),
 
-price:Number(
+price:
+Number(
 freshProposal.ask_price
 )
 
@@ -2067,7 +2127,7 @@ if(
 
 throw new Error(
 data.error ||
-"Demo purchase failed."
+`${currentAccountType} purchase failed.`
 );
 
 }
@@ -2086,7 +2146,7 @@ status.className =
 "tradeStatus success";
 
 status.textContent =
-`✓ DEMO contract purchased successfully.
+`✓ ${currentAccountType.toUpperCase()} contract purchased successfully.
 Contract ID: ${contractId || "—"}`;
 
 $("proposalInfo").innerHTML = `
@@ -2124,6 +2184,8 @@ currentContractId
 
 }
 
+await checkAccount();
+
 }catch(error){
 
 console.error(error);
@@ -2147,7 +2209,7 @@ $("getProposal").disabled = false;
 
 
 /* =====================================================
-TRADE HISTORY STORAGE
+TRADE HISTORY
 ===================================================== */
 
 function getTradeHistory(){
@@ -2204,10 +2266,6 @@ error
 }
 
 
-/* =====================================================
-ADD COMPLETED TRADE
-===================================================== */
-
 function addTradeToHistory(contract){
 
 if(!contract)
@@ -2240,6 +2298,9 @@ const trade = {
 
 contract_id:
 contractId,
+
+account_type:
+currentAccountType,
 
 market:
 getSelectedMarket(),
@@ -2306,12 +2367,9 @@ const container =
 $("tradeHistory");
 
 let wins = 0;
-
 let totalProfit = 0;
 
-for(
-const trade of list
-){
+for(const trade of list){
 
 if(trade.status === "WON"){
 wins++;
@@ -2404,6 +2462,13 @@ ${profit >= 0 ? "+" : ""}${profit.toFixed(2)}
 </div>
 
 <div class="historyMeta">
+Account:
+<b>${String(
+trade.account_type || "demo"
+).toUpperCase()}</b>
+</div>
+
+<div class="historyMeta">
 Contract ID:
 <b>${trade.contract_id}</b>
 </div>
@@ -2449,7 +2514,7 @@ Time:
 
 
 /* =====================================================
-CLEAR TRADE HISTORY
+CLEAR HISTORY
 ===================================================== */
 
 $("clearHistory").addEventListener(
@@ -2564,6 +2629,11 @@ ${statusValue}
 </div>
 
 <div>
+Account:
+<b>${currentAccountType.toUpperCase()}</b>
+</div>
+
+<div>
 Contract ID:
 <b>${contract.contract_id ?? contractId}</b>
 </div>
@@ -2642,10 +2712,6 @@ contract.payout ?? 0
 currentTradeRecorded = true;
 
 }
-
-/*
- * Refresh balance after completed trade.
- */
 
 setTimeout(
 checkAccount,
@@ -2731,6 +2797,16 @@ checkContractStatus(contractId);
 );
 
 }
+
+
+/* =====================================================
+MARKET CHANGE
+===================================================== */
+
+$("market").addEventListener(
+"change",
+connectMarket
+);
 
 
 /* =====================================================
