@@ -63,9 +63,10 @@ export async function onRequest(context) {
     REDIRECT_URI
   );
 
+  // Trading permission
   authUrl.searchParams.set(
     "scope",
-    "trade account_manage payment"
+    "trade"
   );
 
   authUrl.searchParams.set(
