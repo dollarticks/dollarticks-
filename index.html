@@ -240,7 +240,8 @@ button:disabled{
   border-radius:11px;
   background:#0d1219;
   color:#aeb8c7;
-  font-size:13px
+  font-size:13px;
+  line-height:1.5
 }
 
 .success{
@@ -257,6 +258,10 @@ button:disabled{
 
 .connectionBad{
   color:#ff7b7b
+}
+
+.openStatus{
+  color:#ffd166
 }
 
 .hidden{
@@ -330,6 +335,8 @@ button:disabled{
 </div>
 
 
+<!-- MARKET -->
+
 <div class="card">
 
   <label>Volatility Market</label>
@@ -369,6 +376,8 @@ button:disabled{
 </div>
 
 
+<!-- FREQUENCY -->
+
 <div class="card">
 
   <div class="latestBadge">
@@ -381,6 +390,8 @@ button:disabled{
 </div>
 
 
+<!-- LIVE DIGITS -->
+
 <div class="card">
 
   <div class="latestBadge">
@@ -392,6 +403,8 @@ button:disabled{
 </div>
 
 
+<!-- TRADE ENTRY -->
+
 <div class="card">
 
   <div class="latestBadge">
@@ -402,12 +415,29 @@ button:disabled{
 
   <select id="contractType">
 
-    <option value="DIGITOVER">Over</option>
-    <option value="DIGITUNDER">Under</option>
-    <option value="DIGITMATCH">Matches</option>
-    <option value="DIGITDIFF">Differs</option>
-    <option value="DIGITEVEN">Even</option>
-    <option value="DIGITODD">Odd</option>
+    <option value="DIGITOVER">
+      Over
+    </option>
+
+    <option value="DIGITUNDER">
+      Under
+    </option>
+
+    <option value="DIGITMATCH">
+      Matches
+    </option>
+
+    <option value="DIGITDIFF">
+      Differs
+    </option>
+
+    <option value="DIGITEVEN">
+      Even
+    </option>
+
+    <option value="DIGITODD">
+      Odd
+    </option>
 
   </select>
 
@@ -468,7 +498,10 @@ button:disabled{
     Get Trade Proposal
   </button>
 
-  <div id="proposalInfo" class="tradeStatus">
+  <div
+    id="proposalInfo"
+    class="tradeStatus"
+  >
     No proposal requested yet.
   </div>
 
@@ -480,49 +513,31 @@ button:disabled{
     Buy DEMO Contract
   </button>
 
-  <div id="tradeStatus" class="tradeStatus">
+  <div
+    id="tradeStatus"
+    class="tradeStatus"
+  >
     Proposal mode only — no contract will be purchased.
   </div>
 
-  <!-- NEW CONTRACT RESULT AREA -->
-
   <div
-    id="contractResult"
+    id="contractTracker"
     class="tradeStatus hidden"
   >
-    <b>CONTRACT RESULT</b>
-
-    <br><br>
-
-    Contract ID:
-    <b id="contractId">—</b>
-
+    <b>CONTRACT STATUS</b>
     <br>
-
-    Status:
-    <b id="contractState">—</b>
-
-    <br>
-
-    Buy Price:
-    <b id="contractBuyPrice">—</b>
-
-    <br>
-
-    Payout:
-    <b id="contractPayout">—</b>
-
-    <br>
-
-    Profit:
-    <b id="contractProfit">—</b>
-
+    Waiting for contract…
   </div>
 
-  <div id="debug" class="debug hidden"></div>
+  <div
+    id="debug"
+    class="debug hidden"
+  ></div>
 
 </div>
 
+
+<!-- METRICS -->
 
 <div class="row">
 
@@ -547,6 +562,8 @@ button:disabled{
 
 <div style="height:12px"></div>
 
+
+<!-- OVER UNDER -->
 
 <div class="card">
 
@@ -581,6 +598,8 @@ button:disabled{
 </div>
 
 
+<!-- ACCOUNT -->
+
 <div class="card">
 
   <div class="latestBadge">
@@ -607,6 +626,8 @@ button:disabled{
 
 </div>
 
+
+<!-- NOTE -->
 
 <div class="card">
 
@@ -640,12 +661,12 @@ button:disabled{
 
     <br><br>
 
-    The Buy DEMO button purchases the contract.
+    The Buy DEMO button purchases a DEMO contract.
 
     <br><br>
 
-    After purchase, DollarTicks automatically checks
-    the contract until it is finished.
+    After purchase, DollarTicks checks the contract
+    until Deriv reports the final result.
 
   </div>
 
@@ -689,6 +710,7 @@ const marketNames = {
 
 };
 
+
 let ws = null;
 
 let history = [];
@@ -697,11 +719,12 @@ let latestDigit = null;
 
 let currentProposal = null;
 
+let currentAccountType = "demo";
+
 let currentContractId = null;
 
-let contractPollingTimer = null;
+let contractTimer = null;
 
-let currentAccountType = "demo";
 
 const $ =
   id => document.getElementById(id);
@@ -711,10 +734,7 @@ const $ =
    STATUS
 ===================================================== */
 
-function setStatus(
-  text,
-  live = false
-){
+function setStatus(text, live = false){
 
   $("status").textContent = text;
 
@@ -726,7 +746,7 @@ function setStatus(
 
 
 /* =====================================================
-   GET MARKET
+   MARKET
 ===================================================== */
 
 function getSelectedMarket(){
@@ -750,13 +770,10 @@ function getSelectedMarket(){
 
 
 /* =====================================================
-   GET LAST DIGIT
+   LAST DIGIT
 ===================================================== */
 
-function getLastDigit(
-  quote,
-  pipSize
-){
+function getLastDigit(quote, pipSize){
 
   const n =
     Number(quote);
@@ -808,11 +825,7 @@ function getLastDigit(
    ADD DIGIT
 ===================================================== */
 
-function addDigit(
-  digit,
-  quote,
-  epoch
-){
+function addDigit(digit, quote, epoch){
 
   if(
     digit === null ||
@@ -822,12 +835,9 @@ function addDigit(
     return;
   }
 
-  latestDigit =
-    digit;
+  latestDigit = digit;
 
-  history.push(
-    digit
-  );
+  history.push(digit);
 
   if(
     history.length >
@@ -849,7 +859,7 @@ function addDigit(
 
 
 /* =====================================================
-   RENDER DIGITS
+   RENDER
 ===================================================== */
 
 function render(){
@@ -928,9 +938,7 @@ function render(){
                 : ""
             }
 
-            <strong>
-              ${digit}
-            </strong>
+            <strong>${digit}</strong>
 
             <small>
               ${count} •
@@ -956,9 +964,7 @@ function render(){
               ? "new"
               : ""
           }">
-
             ${digit}
-
           </div>
 
         `
@@ -1045,9 +1051,7 @@ function connectMarket(){
   $("marketName").textContent =
     marketNames[symbol];
 
-  setStatus(
-    "Connecting…"
-  );
+  setStatus("Connecting…");
 
   ws =
     new WebSocket(
@@ -1145,9 +1149,7 @@ function connectMarket(){
             if(
               digit !== null
             ){
-              history.push(
-                digit
-              );
+              history.push(digit);
             }
 
           }
@@ -1156,21 +1158,17 @@ function connectMarket(){
             history.length >
             MAX_TICKS
           ){
-
             history =
               history.slice(
                 -MAX_TICKS
               );
-
           }
 
           if(history.length){
-
             latestDigit =
               history[
                 history.length - 1
               ];
-
           }
 
           if(prices.length){
@@ -1289,14 +1287,9 @@ async function checkAccount(){
       await fetch(
         "/trading",
         {
-          method:
-            "GET",
-
-          credentials:
-            "same-origin",
-
-          cache:
-            "no-store"
+          method:"GET",
+          credentials:"same-origin",
+          cache:"no-store"
         }
       );
 
@@ -1347,9 +1340,7 @@ async function checkAccount(){
 
   }catch(error){
 
-    console.error(
-      error
-    );
+    console.error(error);
 
     $("accountStatus").textContent =
       "Not connected";
@@ -1484,13 +1475,11 @@ async function requestFreshProposal(){
       "/trading",
       {
 
-        method:
-          "POST",
+        method:"POST",
 
         headers:{
           "Content-Type":
             "application/json",
-
           "Cache-Control":
             "no-cache"
         },
@@ -1502,9 +1491,7 @@ async function requestFreshProposal(){
           "no-store",
 
         body:
-          JSON.stringify(
-            payload
-          )
+          JSON.stringify(payload)
 
       }
     );
@@ -1564,16 +1551,12 @@ $("getProposal").addEventListener(
       true;
 
     $("buyContract")
-      .classList.add(
-        "hidden"
-      );
+      .classList.add("hidden");
 
     currentProposal =
       null;
 
-    debug.classList.add(
-      "hidden"
-    );
+    debug.classList.add("hidden");
 
     status.className =
       "tradeStatus";
@@ -1599,7 +1582,7 @@ $("getProposal").addEventListener(
 
         <br>
 
-        Purchase Price:
+        Ask price:
         <b>${proposal.ask_price ?? "—"}</b>
 
         <br>
@@ -1621,15 +1604,11 @@ $("getProposal").addEventListener(
         "✓ Fresh proposal received.";
 
       $("buyContract")
-        .classList.remove(
-          "hidden"
-        );
+        .classList.remove("hidden");
 
     }catch(error){
 
-      console.error(
-        error
-      );
+      console.error(error);
 
       status.className =
         "tradeStatus error";
@@ -1644,9 +1623,7 @@ $("getProposal").addEventListener(
         "Market sent: " +
         getSelectedMarket();
 
-      debug.classList.remove(
-        "hidden"
-      );
+      debug.classList.remove("hidden");
 
     }finally{
 
@@ -1660,67 +1637,19 @@ $("getProposal").addEventListener(
 
 
 /* =====================================================
-   SHOW CONTRACT RESULT
+   CONTRACT TRACKER
 ===================================================== */
 
-function showContractResult(
-  contract
-){
+function stopContractTracking(){
 
-  $("contractResult")
-    .classList.remove(
-      "hidden"
+  if(contractTimer){
+
+    clearInterval(
+      contractTimer
     );
 
-  $("contractId").textContent =
-    contract.contract_id ?? "—";
-
-  $("contractState").textContent =
-    contract.status ?? "—";
-
-  $("contractBuyPrice").textContent =
-    contract.buy_price != null
-      ? "$" + contract.buy_price
-      : "—";
-
-  $("contractPayout").textContent =
-    contract.payout != null
-      ? "$" + contract.payout
-      : "—";
-
-  $("contractProfit").textContent =
-    contract.profit != null
-      ? "$" + contract.profit
-      : "—";
-
-  const state =
-    String(
-      contract.status || ""
-    ).toUpperCase();
-
-  if(state === "WON"){
-
-    $("contractState").className =
-      "success";
-
-    $("contractProfit").className =
-      "success";
-
-  }else if(state === "LOST"){
-
-    $("contractState").className =
-      "error";
-
-    $("contractProfit").className =
-      "error";
-
-  }else{
-
-    $("contractState").className =
-      "";
-
-    $("contractProfit").className =
-      "";
+    contractTimer =
+      null;
 
   }
 
@@ -1744,12 +1673,13 @@ async function checkContractStatus(){
         "/trading",
         {
 
-          method:
-            "POST",
+          method:"POST",
 
           headers:{
             "Content-Type":
-              "application/json"
+              "application/json",
+            "Cache-Control":
+              "no-cache"
           },
 
           credentials:
@@ -1780,77 +1710,141 @@ async function checkContractStatus(){
       !data.ok
     ){
 
-      console.error(
-        "Contract status error:",
-        data
+      throw new Error(
+        data.error ||
+        "Could not check contract."
       );
-
-      return;
 
     }
 
+    const contract =
+      data.contract;
+
+    const tracker =
+      $("contractTracker");
+
+    tracker.classList.remove(
+      "hidden"
+    );
+
+    const status =
+      contract.status;
+
+    let statusClass =
+      "openStatus";
+
+    if(status === "WON"){
+      statusClass = "success";
+    }
+
+    if(status === "LOST"){
+      statusClass = "error";
+    }
+
+    tracker.innerHTML = `
+
+      <b>CONTRACT STATUS</b>
+
+      <br><br>
+
+      Status:
+      <b class="${statusClass}">
+        ${status}
+      </b>
+
+      <br>
+
+      Contract ID:
+      <b>${contract.contract_id}</b>
+
+      <br>
+
+      Profit/Loss:
+      <b class="${statusClass}">
+        ${
+          contract.profit !== null
+            ? Number(contract.profit).toFixed(2)
+            : "—"
+        }
+      </b>
+
+      <br>
+
+      Buy Price:
+      <b>
+        ${
+          contract.buy_price !== null
+            ? Number(contract.buy_price).toFixed(2)
+            : "—"
+        }
+      </b>
+
+      <br>
+
+      Payout:
+      <b>
+        ${
+          contract.payout !== null
+            ? Number(contract.payout).toFixed(2)
+            : "—"
+        }
+      </b>
+
+      ${
+        contract.current_spot !== null
+          ? `
+            <br>
+            Current Spot:
+            <b>${contract.current_spot}</b>
+          `
+          : ""
+      }
+
+    `;
+
+
     if(
-      data.contract
+      status === "WON" ||
+      status === "LOST"
     ){
 
-      showContractResult(
-        data.contract
-      );
+      stopContractTracking();
 
-      const state =
-        String(
-          data.contract.status ||
-          ""
-        ).toUpperCase();
+      $("tradeStatus").className =
+        status === "WON"
+          ? "tradeStatus success"
+          : "tradeStatus error";
 
-      if(
-        state === "OPEN"
-      ){
-
-        $("tradeStatus").className =
-          "tradeStatus";
-
-        $("tradeStatus").textContent =
-          "Contract is still OPEN — waiting for result…";
-
-      }
-
-      if(
-        state === "WON"
-      ){
-
-        $("tradeStatus").className =
-          "tradeStatus success";
-
-        $("tradeStatus").textContent =
-          "🎉 Contract WON.";
-
-        stopContractPolling();
-
-      }
-
-      if(
-        state === "LOST"
-      ){
-
-        $("tradeStatus").className =
-          "tradeStatus error";
-
-        $("tradeStatus").textContent =
-          "Contract LOST.";
-
-        stopContractPolling();
-
-      }
+      $("tradeStatus").textContent =
+        status === "WON"
+          ? "✓ Contract WON."
+          : "✕ Contract LOST.";
 
     }
 
   }catch(error){
 
     console.error(
-      "Contract status request failed:",
+      "Contract status error:",
       error
     );
+
+    $("contractTracker")
+      .classList.remove(
+        "hidden"
+      );
+
+    $("contractTracker").innerHTML = `
+
+      <b>CONTRACT STATUS</b>
+
+      <br><br>
+
+      <span class="error">
+        ${error.message}
+      </span>
+
+    `;
 
   }
 
@@ -1858,42 +1852,47 @@ async function checkContractStatus(){
 
 
 /* =====================================================
-   START CONTRACT POLLING
+   START CONTRACT TRACKING
 ===================================================== */
 
-function startContractPolling(){
+function startContractTracking(
+  contractId
+){
 
-  stopContractPolling();
+  stopContractTracking();
+
+  currentContractId =
+    String(contractId);
+
+  $("contractTracker")
+    .classList.remove(
+      "hidden"
+    );
+
+  $("contractTracker").innerHTML = `
+
+    <b>CONTRACT STATUS</b>
+
+    <br><br>
+
+    <span class="openStatus">
+      OPEN — waiting for result…
+    </span>
+
+    <br>
+
+    Contract ID:
+    <b>${currentContractId}</b>
+
+  `;
 
   checkContractStatus();
 
-  contractPollingTimer =
+  contractTimer =
     setInterval(
       checkContractStatus,
       2000
     );
-
-}
-
-
-/* =====================================================
-   STOP CONTRACT POLLING
-===================================================== */
-
-function stopContractPolling(){
-
-  if(
-    contractPollingTimer
-  ){
-
-    clearInterval(
-      contractPollingTimer
-    );
-
-    contractPollingTimer =
-      null;
-
-  }
 
 }
 
@@ -1939,7 +1938,7 @@ $("buyContract").addEventListener(
     status.textContent =
       "Getting fresh proposal and purchasing…";
 
-    $("contractResult")
+    $("contractTracker")
       .classList.add(
         "hidden"
       );
@@ -1980,13 +1979,11 @@ $("buyContract").addEventListener(
           "/trading",
           {
 
-            method:
-              "POST",
+            method:"POST",
 
             headers:{
               "Content-Type":
                 "application/json",
-
               "Cache-Control":
                 "no-cache"
             },
@@ -2020,19 +2017,23 @@ $("buyContract").addEventListener(
 
       }
 
-      currentContractId =
-        data.contract?.contract_id ||
-        null;
+      const contractId =
+        data.contract?.contract_id;
+
+      if(!contractId){
+
+        throw new Error(
+          "Deriv purchased the contract but returned no contract ID."
+        );
+
+      }
 
       status.className =
         "tradeStatus success";
 
       status.textContent =
         `✓ DEMO contract purchased successfully.
-         Contract ID: ${
-           currentContractId ||
-           "—"
-         }`;
+         Contract ID: ${contractId}`;
 
       $("proposalInfo").innerHTML = `
 
@@ -2058,40 +2059,6 @@ $("buyContract").addEventListener(
 
       `;
 
-      if(
-        currentContractId
-      ){
-
-        $("contractResult")
-          .classList.remove(
-            "hidden"
-          );
-
-        $("contractId").textContent =
-          currentContractId;
-
-        $("contractState").textContent =
-          "OPEN";
-
-        $("contractBuyPrice").textContent =
-          data.contract?.buy_price != null
-            ? "$" +
-              data.contract.buy_price
-            : "—";
-
-        $("contractPayout").textContent =
-          data.contract?.payout != null
-            ? "$" +
-              data.contract.payout
-            : "—";
-
-        $("contractProfit").textContent =
-          "Waiting…";
-
-        startContractPolling();
-
-      }
-
       currentProposal =
         null;
 
@@ -2099,6 +2066,10 @@ $("buyContract").addEventListener(
         .classList.add(
           "hidden"
         );
+
+      startContractTracking(
+        contractId
+      );
 
     }catch(error){
 
