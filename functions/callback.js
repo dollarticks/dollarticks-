@@ -1,13 +1,10 @@
+const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
+const REDIRECT_URI = "https://dollarticks.pages.dev/callback";
+const DERIV_API = "https://api.derivws.com";
+
 export async function onRequest(context) {
   const request = context.request;
   const url = new URL(request.url);
-
-  const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
-  const REDIRECT_URI =
-    "https://dollarticks.pages.dev/callback";
-
-  const DERIV_API =
-    "https://api.derivws.com";
 
   function html(message, status = 400) {
     return new Response(
@@ -17,33 +14,26 @@ export async function onRequest(context) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DollarTicks</title>
 </head>
-
 <body style="
-  font-family:system-ui;
-  background:#080b10;
-  color:white;
-  padding:30px;
+font-family:system-ui;
+background:#080b10;
+color:white;
+padding:30px;
 ">
-
 <h2>DollarTicks</h2>
-
 <p>${message}</p>
-
 <p>
-<a
-href="https://dollarticks.pages.dev/"
-style="color:#18c6d8"
->
+<a href="https://dollarticks.pages.dev/"
+style="color:#18c6d8">
 Return to DollarTicks
 </a>
 </p>
-
 </body>
 </html>`,
       {
         status,
         headers: {
-          "Content-Type": "text/html",
+          "Content-Type": "text/html; charset=utf-8",
           "Cache-Control": "no-store"
         }
       }
@@ -51,28 +41,25 @@ Return to DollarTicks
   }
 
   function getCookie(name) {
-    const cookies =
+    const cookieHeader =
       request.headers.get("Cookie") || "";
 
-    const parts = cookies.split(";");
-
-    for (const part of parts) {
+    for (const part of cookieHeader.split(";")) {
       const index = part.indexOf("=");
 
       if (index === -1) continue;
 
-      const key =
-        part.slice(0, index).trim();
+      const key = part.slice(0, index).trim();
+
+      if (key !== name) continue;
 
       const value =
         part.slice(index + 1).trim();
 
-      if (key === name) {
-        try {
-          return decodeURIComponent(value);
-        } catch {
-          return value;
-        }
+      try {
+        return decodeURIComponent(value);
+      } catch {
+        return value;
       }
     }
 
@@ -81,7 +68,7 @@ Return to DollarTicks
 
   /*
    * ==========================================
-   * READ OAUTH RESPONSE
+   * OAUTH RESPONSE
    * ==========================================
    */
 
@@ -95,9 +82,7 @@ Return to DollarTicks
     url.searchParams.get("error");
 
   const oauthErrorDescription =
-    url.searchParams.get(
-      "error_description"
-    );
+    url.searchParams.get("error_description");
 
   if (oauthError) {
     return html(
@@ -121,7 +106,7 @@ Return to DollarTicks
 
   /*
    * ==========================================
-   * READ SAVED PKCE DATA
+   * READ PKCE COOKIES
    * ==========================================
    */
 
@@ -157,7 +142,7 @@ Return to DollarTicks
 
   /*
    * ==========================================
-   * EXCHANGE CODE FOR ACCESS TOKEN
+   * EXCHANGE CODE FOR TOKEN
    * ==========================================
    */
 
@@ -196,7 +181,7 @@ Return to DollarTicks
     );
   } catch (error) {
     console.error(
-      "Token request failed:",
+      "DollarTicks token request failed:",
       error
     );
 
@@ -216,19 +201,25 @@ Return to DollarTicks
     );
   }
 
+  console.log(
+    "DollarTicks OAuth token response:",
+    {
+      ok: tokenResponse.ok,
+      hasAccessToken:
+        Boolean(tokenData?.access_token),
+      error:
+        tokenData?.error || null
+    }
+  );
+
   if (
     !tokenResponse.ok ||
-    !tokenData.access_token
+    !tokenData?.access_token
   ) {
-    console.error(
-      "Deriv token exchange failed:",
-      tokenData
-    );
-
     return html(
       `Deriv did not issue an access token.<br><br>
-       ${tokenData.error || ""}
-       ${tokenData.error_description || ""}`
+       ${tokenData?.error || ""}<br>
+       ${tokenData?.error_description || ""}`
     );
   }
 
@@ -237,8 +228,7 @@ Return to DollarTicks
 
   /*
    * ==========================================
-   * IMPORTANT:
-   * TEST THE TOKEN BEFORE SAVING IT
+   * VERIFY TOKEN WITH OPTIONS API
    * ==========================================
    */
 
@@ -266,12 +256,12 @@ Return to DollarTicks
     );
   } catch (error) {
     console.error(
-      "Options account request failed:",
+      "DollarTicks Options account request failed:",
       error
     );
 
     return html(
-      "The OAuth login succeeded, but DollarTicks could not contact Deriv Options."
+      "OAuth succeeded, but DollarTicks could not contact Deriv Options."
     );
   }
 
@@ -286,21 +276,15 @@ Return to DollarTicks
     );
   }
 
-  /*
-   * If this fails, the problem is NOT the cookie.
-   * It means the OAuth token itself does not have
-   * access to the Options API.
-   */
+  console.log(
+    "DollarTicks Options account response:",
+    accountData
+  );
 
   if (!accountResponse.ok) {
-    console.error(
-      "Options account API rejected token:",
-      accountData
-    );
-
     const message =
-      accountData.errors?.[0]?.message ||
-      accountData.error?.message ||
+      accountData?.errors?.[0]?.message ||
+      accountData?.error?.message ||
       "Deriv rejected the authenticated Options request.";
 
     return html(
@@ -311,7 +295,7 @@ Return to DollarTicks
 
   /*
    * ==========================================
-   * FIND OPTIONS ACCOUNTS
+   * MAKE SURE AN OPTIONS ACCOUNT EXISTS
    * ==========================================
    */
 
@@ -343,35 +327,30 @@ Return to DollarTicks
       }
 
       for (
-        const value of Object.values(item)
+        const child of Object.values(item)
       ) {
         if (
-          value &&
-          typeof value === "object"
+          child &&
+          typeof child === "object"
         ) {
-          scan(value);
+          scan(child);
         }
       }
     }
 
     scan(value);
 
-    const seen =
-      new Set();
+    const seen = new Set();
 
     return result.filter(account => {
-
       const id =
         account.account_id ||
         account.loginid ||
         account.id;
 
-      if (!id) {
-        return false;
-      }
+      if (!id) return false;
 
-      const key =
-        String(id);
+      const key = String(id);
 
       if (seen.has(key)) {
         return false;
@@ -386,16 +365,19 @@ Return to DollarTicks
   const accounts =
     findAccounts(accountData);
 
+  if (!accounts.length) {
+    return html(
+      "Deriv login succeeded, but no Options account was returned."
+    );
+  }
+
   console.log(
-    "DollarTicks Options accounts:",
+    "DollarTicks authenticated accounts:",
     accounts.map(account => ({
       account_id:
         account.account_id ||
-        account.id ||
-        null,
-
-      loginid:
         account.loginid ||
+        account.id ||
         null,
 
       account_type:
@@ -408,41 +390,28 @@ Return to DollarTicks
     }))
   );
 
-  if (!accounts.length) {
-    return html(
-      "Deriv login succeeded, but Deriv returned no Options accounts."
-    );
-  }
-
   /*
    * ==========================================
    * SAVE ACCESS TOKEN
+   *
+   * THIS IS THE IMPORTANT PART
    * ==========================================
    */
 
   const tokenCookie =
-    `dt_access_token=${encodeURIComponent(accessToken)}; ` +
-    `Path=/; ` +
-    `Max-Age=3500; ` +
-    `Secure; ` +
-    `HttpOnly; ` +
-    `SameSite=Lax`;
+    "dt_access_token=" +
+    encodeURIComponent(accessToken) +
+    "; Path=/; Max-Age=3500; Secure; HttpOnly; SameSite=Lax";
+
+  /*
+   * Remove OAuth cookies after successful login.
+   */
 
   const expiredStateCookie =
-    "dt_oauth_state=; " +
-    "Path=/; " +
-    "Max-Age=0; " +
-    "Secure; " +
-    "HttpOnly; " +
-    "SameSite=Lax";
+    "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
 
   const expiredVerifierCookie =
-    "dt_pkce_verifier=; " +
-    "Path=/; " +
-    "Max-Age=0; " +
-    "Secure; " +
-    "HttpOnly; " +
-    "SameSite=Lax";
+    "dt_pkce_verifier=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
 
   const headers =
     new Headers();
@@ -454,8 +423,14 @@ Return to DollarTicks
 
   headers.set(
     "Cache-Control",
-    "no-store"
+    "no-store, no-cache, must-revalidate"
   );
+
+  /*
+   * IMPORTANT:
+   * append() is used so all three
+   * Set-Cookie headers are preserved.
+   */
 
   headers.append(
     "Set-Cookie",
@@ -482,4 +457,4 @@ Return to DollarTicks
     status: 303,
     headers
   });
-    }
+}
