@@ -77,6 +77,7 @@ async function getAccounts(token) {
     throw new Error(
       data?.errors?.[0]?.message ||
       data?.error?.message ||
+      data?.message ||
       "Trading service could not retrieve the account."
     );
   }
@@ -157,18 +158,20 @@ async function getSelectedAccount(
     );
   }
 
-  const wantedType = String(
-    requestedType || "demo"
-  ).toLowerCase();
+  const wanted =
+    requestedType === "real"
+      ? "real"
+      : "demo";
 
-  const account = findAccount(
-    accounts,
-    wantedType
-  );
+  const account =
+    findAccount(
+      accounts,
+      wanted
+    );
 
   if (!account) {
     throw new Error(
-      `No ${wantedType.toUpperCase()} trading account is available.`
+      `No ${wanted.toUpperCase()} trading account is available.`
     );
   }
 
@@ -194,6 +197,20 @@ async function getSelectedAccount(
 }
 
 /* =====================================================
+   GET FRESH ACCOUNT BALANCE
+===================================================== */
+
+async function getFreshAccount(
+  token,
+  requestedType
+) {
+  return await getSelectedAccount(
+    token,
+    requestedType
+  );
+}
+
+/* =====================================================
    GET AUTHENTICATED WEBSOCKET URL
 ===================================================== */
 
@@ -206,9 +223,12 @@ async function getOTP(
     {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
-        "Deriv-App-ID": CLIENT_ID,
-        Accept: "application/json"
+        Authorization:
+          `Bearer ${token}`,
+        "Deriv-App-ID":
+          CLIENT_ID,
+        Accept:
+          "application/json"
       },
       cache: "no-store"
     }
@@ -220,7 +240,8 @@ async function getOTP(
   let data;
 
   try {
-    data = JSON.parse(raw);
+    data =
+      JSON.parse(raw);
   } catch {
     throw new Error(
       `Trading session service returned HTTP ${response.status}.`
@@ -252,9 +273,7 @@ async function getOTP(
   }
 
   if (
-    !String(wsUrl).startsWith(
-      "wss://"
-    )
+    !String(wsUrl).startsWith("wss://")
   ) {
     throw new Error(
       "Trading service returned an invalid WebSocket URL."
@@ -271,12 +290,10 @@ async function getOTP(
 function openWebSocket(wsUrl) {
   return new Promise(
     (resolve, reject) => {
-
       let ws;
 
       const timeout =
         setTimeout(() => {
-
           try {
             ws?.close();
           } catch {}
@@ -286,14 +303,17 @@ function openWebSocket(wsUrl) {
               "Trading connection timed out."
             )
           );
-
         }, 20000);
 
       try {
         ws =
-          new WebSocket(wsUrl);
+          new WebSocket(
+            wsUrl
+          );
       } catch {
-        clearTimeout(timeout);
+        clearTimeout(
+          timeout
+        );
 
         reject(
           new Error(
@@ -307,8 +327,9 @@ function openWebSocket(wsUrl) {
       ws.addEventListener(
         "open",
         () => {
-
-          clearTimeout(timeout);
+          clearTimeout(
+            timeout
+          );
 
           console.log(
             "DollarTicks WebSocket connected."
@@ -321,8 +342,9 @@ function openWebSocket(wsUrl) {
       ws.addEventListener(
         "error",
         () => {
-
-          clearTimeout(timeout);
+          clearTimeout(
+            timeout
+          );
 
           try {
             ws?.close();
@@ -340,7 +362,7 @@ function openWebSocket(wsUrl) {
 }
 
 /* =====================================================
-   SEND REQUEST
+   SEND REQUEST ON WEBSOCKET
 ===================================================== */
 
 function sendRequest(
@@ -350,17 +372,15 @@ function sendRequest(
 ) {
   return new Promise(
     (resolve, reject) => {
-
       let finished =
         false;
 
       const timeout =
         setTimeout(() => {
+          if (finished) return;
 
-          if (finished)
-            return;
-
-          finished = true;
+          finished =
+            true;
 
           cleanup();
 
@@ -369,11 +389,9 @@ function sendRequest(
               "Trading service timed out."
             )
           );
-
         }, 20000);
 
       function cleanup() {
-
         clearTimeout(
           timeout
         );
@@ -397,11 +415,10 @@ function sendRequest(
       function finishError(
         message
       ) {
+        if (finished) return;
 
-        if (finished)
-          return;
-
-        finished = true;
+        finished =
+          true;
 
         cleanup();
 
@@ -410,8 +427,9 @@ function sendRequest(
         );
       }
 
-      function onMessage(event) {
-
+      function onMessage(
+        event
+      ) {
         let data;
 
         try {
@@ -429,7 +447,6 @@ function sendRequest(
         );
 
         if (data.error) {
-
           finishError(
             data.error.message ||
             "Deriv rejected the trading request."
@@ -442,11 +459,11 @@ function sendRequest(
           data.msg_type ===
           wantedMsgType
         ) {
-
           if (finished)
             return;
 
-          finished = true;
+          finished =
+            true;
 
           cleanup();
 
@@ -455,14 +472,12 @@ function sendRequest(
       }
 
       function onError() {
-
         finishError(
           "Trading connection failed."
         );
       }
 
       function onClose() {
-
         finishError(
           "Trading connection closed unexpectedly."
         );
@@ -484,7 +499,6 @@ function sendRequest(
       );
 
       try {
-
         ws.send(
           JSON.stringify(
             payload
@@ -495,9 +509,7 @@ function sendRequest(
           "DollarTicks request sent:",
           payload
         );
-
       } catch {
-
         finishError(
           "Could not send the trading request."
         );
@@ -511,110 +523,168 @@ function sendRequest(
 ===================================================== */
 
 function closeWebSocket(ws) {
-
   try {
-
     if (
       ws &&
       (
         ws.readyState ===
-        WebSocket.OPEN ||
+          WebSocket.OPEN ||
         ws.readyState ===
-        WebSocket.CONNECTING
+          WebSocket.CONNECTING
       )
     ) {
-
       ws.close();
     }
-
   } catch {}
 }
 
 /* =====================================================
-   GET FRESH BALANCE FROM DERIV
+   NORMALIZE CONTRACT
 ===================================================== */
 
-async function getFreshBalance(
-  token,
-  accountId
+function normalizeContract(
+  contract,
+  fallback = {}
 ) {
-
-  let ws;
-
-  try {
-
-    const wsUrl =
-      await getOTP(
-        token,
-        accountId
-      );
-
-    ws =
-      await openWebSocket(
-        wsUrl
-      );
-
-    const response =
-      await sendRequest(
-        ws,
-        {
-          balance: 1,
-          req_id: 101
-        },
-        "balance"
-      );
-
-    const balanceData =
-      response?.balance;
-
-    if (!balanceData) {
-      throw new Error(
-        "Deriv did not return balance information."
-      );
-    }
-
-    const balance =
-      Number(
-        balanceData.balance
-      );
-
-    if (
-      !Number.isFinite(
-        balance
-      )
-    ) {
-      throw new Error(
-        "Deriv returned an invalid balance."
-      );
-    }
-
-    return {
-      balance,
-      currency:
-        balanceData.currency ||
-        "USD"
-    };
-
-  } finally {
-
-    closeWebSocket(ws);
+  if (!contract) {
+    return null;
   }
+
+  let status =
+    String(
+      contract.status ||
+      fallback.status ||
+      ""
+    ).toUpperCase();
+
+  /*
+   * Deriv may expose the final state through
+   * is_sold / status.
+   */
+  if (
+    contract.is_sold === 1 &&
+    !["WON", "LOST"].includes(
+      status
+    )
+  ) {
+    const profit =
+      Number(
+        contract.profit ??
+        fallback.profit ??
+        0
+      );
+
+    status =
+      profit >= 0
+        ? "WON"
+        : "LOST";
+  }
+
+  if (!status) {
+    status =
+      "OPEN";
+  }
+
+  const buyPrice =
+    Number(
+      contract.buy_price ??
+      fallback.buy_price ??
+      0
+    );
+
+  const payout =
+    Number(
+      contract.payout ??
+      fallback.payout ??
+      0
+    );
+
+  const profit =
+    Number(
+      contract.profit ??
+      fallback.profit ??
+      0
+    );
+
+  return {
+    contract_id:
+      contract.contract_id ??
+      fallback.contract_id ??
+      null,
+
+    status,
+
+    buy_price:
+      Number.isFinite(
+        buyPrice
+      )
+        ? buyPrice
+        : 0,
+
+    payout:
+      Number.isFinite(
+        payout
+      )
+        ? payout
+        : 0,
+
+    profit:
+      Number.isFinite(
+        profit
+      )
+        ? profit
+        : 0,
+
+    exit_spot:
+      contract.exit_tick_display ??
+      contract.exit_tick ??
+      contract.exit_spot ??
+      fallback.exit_spot ??
+      null,
+
+    account_type:
+      fallback.account_type ??
+      null,
+
+    account_id:
+      fallback.account_id ??
+      null,
+
+    market:
+      fallback.market ??
+      contract.underlying ??
+      contract.underlying_symbol ??
+      null,
+
+    contract_type:
+      fallback.contract_type ??
+      contract.contract_type ??
+      null,
+
+    barrier:
+      fallback.barrier ??
+      contract.barrier ??
+      null,
+
+    is_sold:
+      contract.is_sold ??
+      null
+  };
 }
 
 /* =====================================================
-   GET CONTRACT STATUS
+   GET CONTRACT STATUS FROM DERIV
 ===================================================== */
 
 async function getContractStatus(
   token,
   accountId,
-  contractId
+  contractId,
+  fallback
 ) {
-
   let ws;
 
   try {
-
     const wsUrl =
       await getOTP(
         token,
@@ -630,11 +700,19 @@ async function getContractStatus(
       await sendRequest(
         ws,
         {
-          proposal_open_contract: 1,
+          proposal_open_contract:
+            1,
+
           contract_id:
-            Number(contractId),
-          subscribe: 0,
-          req_id: 202
+            Number(
+              contractId
+            ),
+
+          subscribe:
+            0,
+
+          req_id:
+            50
         },
         "proposal_open_contract"
       );
@@ -648,90 +726,14 @@ async function getContractStatus(
       );
     }
 
-    const status =
-      String(
-        contract.status ||
-        "open"
-      ).toUpperCase();
-
-    const isFinished =
-      Boolean(
-        contract.is_sold ||
-        status === "WON" ||
-        status === "LOST" ||
-        status === "SOLD" ||
-        status === "EXPIRED"
-      );
-
-    let finalStatus =
-      status;
-
-    if (
-      isFinished &&
-      Number(contract.profit) > 0
-    ) {
-      finalStatus =
-        "WON";
-    } else if (
-      isFinished &&
-      Number(contract.profit) <= 0
-    ) {
-      finalStatus =
-        "LOST";
-    } else {
-      finalStatus =
-        "OPEN";
-    }
-
-    return {
-      contract_id:
-        contract.contract_id ||
-        contractId,
-
-      status:
-        finalStatus,
-
-      buy_price:
-        Number(
-          contract.buy_price ??
-          contract.buy_price ??
-          0
-        ),
-
-      payout:
-        Number(
-          contract.payout ??
-          0
-        ),
-
-      profit:
-        Number(
-          contract.profit ??
-          0
-        ),
-
-      exit_spot:
-        contract.exit_tick ??
-        contract.exit_spot ??
-        contract.exit_tick_display_value ??
-        null,
-
-      entry_spot:
-        contract.entry_tick ??
-        null,
-
-      is_sold:
-        Boolean(
-          contract.is_sold
-        ),
-
-      finished:
-        isFinished
-    };
-
+    return normalizeContract(
+      contract,
+      fallback
+    );
   } finally {
-
-    closeWebSocket(ws);
+    closeWebSocket(
+      ws
+    );
   }
 }
 
@@ -742,7 +744,6 @@ async function getContractStatus(
 export async function onRequest(
   context
 ) {
-
   const request =
     context.request;
 
@@ -750,7 +751,6 @@ export async function onRequest(
     request.method !== "GET" &&
     request.method !== "POST"
   ) {
-
     return json(
       {
         ok: false,
@@ -768,7 +768,6 @@ export async function onRequest(
     );
 
   if (!token) {
-
     return json(
       {
         ok: false,
@@ -783,16 +782,13 @@ export async function onRequest(
   let body = {};
 
   if (
-    request.method === "POST"
+    request.method ===
+    "POST"
   ) {
-
     try {
-
       body =
         await request.json();
-
     } catch {
-
       return json(
         {
           ok: false,
@@ -804,15 +800,10 @@ export async function onRequest(
     }
   }
 
-  /* ===================================================
-     ACCOUNT TYPE
-  =================================================== */
-
   let requestedType =
     "demo";
 
   try {
-
     const url =
       new URL(
         request.url
@@ -827,11 +818,9 @@ export async function onRequest(
       queryType === "demo" ||
       queryType === "real"
     ) {
-
       requestedType =
         queryType;
     }
-
   } catch {}
 
   if (
@@ -840,27 +829,73 @@ export async function onRequest(
     body.account_type ===
       "real"
   ) {
-
     requestedType =
       body.account_type;
   }
 
   /* ===================================================
-     GET ACCOUNT
+     SELECT ACCOUNT
+  =================================================== */
+
+  if (
+    body.action ===
+    "select_account"
+  ) {
+    try {
+      const selected =
+        await getFreshAccount(
+          token,
+          requestedType
+        );
+
+      return json({
+        ok: true,
+        connected: true,
+        account: {
+          account_id:
+            selected.accountId,
+
+          account_type:
+            selected.accountType,
+
+          balance:
+            selected.balance,
+
+          currency:
+            selected.currency,
+
+          status:
+            selected.account.status ||
+            "active"
+        }
+      });
+    } catch (error) {
+      return json(
+        {
+          ok: false,
+          connected: false,
+          error:
+            error.message ||
+            "Could not switch account."
+        },
+        400
+      );
+    }
+  }
+
+  /* ===================================================
+     GET CURRENT ACCOUNT
   =================================================== */
 
   let selected;
 
   try {
-
     selected =
       await getSelectedAccount(
         token,
         requestedType
       );
-
   } catch (error) {
-
     return json(
       {
         ok: false,
@@ -882,16 +917,15 @@ export async function onRequest(
   } = selected;
 
   /* ===================================================
-     GET
+     GET ACCOUNT
   =================================================== */
 
   if (
-    request.method === "GET"
+    request.method ===
+    "GET"
   ) {
-
     return json({
       ok: true,
-
       connected: true,
 
       account: {
@@ -915,100 +949,23 @@ export async function onRequest(
   }
 
   /* ===================================================
-     SELECT ACCOUNT
-  =================================================== */
-
-  if (
-    body.action ===
-    "select_account"
-  ) {
-
-    const type =
-      body.account_type;
-
-    if (
-      type !== "demo" &&
-      type !== "real"
-    ) {
-
-      return json(
-        {
-          ok: false,
-          error:
-            "Invalid account type."
-        },
-        400
-      );
-    }
-
-    try {
-
-      const selectedAccount =
-        await getSelectedAccount(
-          token,
-          type
-        );
-
-      return json({
-        ok: true,
-
-        connected: true,
-
-        message:
-          `${type.toUpperCase()} account selected.`,
-
-        account: {
-          account_id:
-            selectedAccount.accountId,
-
-          account_type:
-            selectedAccount.accountType,
-
-          balance:
-            selectedAccount.balance,
-
-          currency:
-            selectedAccount.currency,
-
-          status:
-            selectedAccount.account.status ||
-            "active"
-        }
-      });
-
-    } catch (error) {
-
-      return json(
-        {
-          ok: false,
-          error:
-            error.message ||
-            "Could not switch account."
-        },
-        400
-      );
-    }
-  }
-
-  /* ===================================================
-     BALANCE
+     FRESH BALANCE
   =================================================== */
 
   if (
     body.action ===
     "balance"
   ) {
-
     try {
-
       const fresh =
-        await getFreshBalance(
+        await getFreshAccount(
           token,
-          accountId
+          requestedType
         );
 
       return json({
         ok: true,
+        connected: true,
 
         balance:
           fresh.balance,
@@ -1018,23 +975,21 @@ export async function onRequest(
 
         account: {
           account_id:
-            accountId,
+            fresh.accountId,
 
           account_type:
-            accountType
+            fresh.accountType
         }
       });
-
     } catch (error) {
-
       return json(
         {
           ok: false,
           error:
             error.message ||
-            "Could not retrieve fresh balance."
+            "Could not retrieve the latest balance."
         },
-        502
+        400
       );
     }
   }
@@ -1049,11 +1004,9 @@ export async function onRequest(
     body.action ===
       "trading_session"
   ) {
-
     let ws;
 
     try {
-
       const wsUrl =
         await getOTP(
           token,
@@ -1077,9 +1030,7 @@ export async function onRequest(
 
       return json({
         ok: true,
-
         connected: true,
-
         trading_ready:
           true,
 
@@ -1099,9 +1050,7 @@ export async function onRequest(
             accountType
         }
       });
-
     } catch (error) {
-
       console.error(
         "DollarTicks SESSION ERROR:",
         error
@@ -1110,9 +1059,7 @@ export async function onRequest(
       return json(
         {
           ok: false,
-
           connected: true,
-
           trading_ready:
             false,
 
@@ -1122,10 +1069,10 @@ export async function onRequest(
         },
         502
       );
-
     } finally {
-
-      closeWebSocket(ws);
+      closeWebSocket(
+        ws
+      );
     }
   }
 
@@ -1137,7 +1084,6 @@ export async function onRequest(
     body.action ===
     "contract_status"
   ) {
-
     const contractId =
       Number(
         body.contract_id
@@ -1146,9 +1092,9 @@ export async function onRequest(
     if (
       !Number.isFinite(
         contractId
-      )
+      ) ||
+      contractId <= 0
     ) {
-
       return json(
         {
           ok: false,
@@ -1160,40 +1106,54 @@ export async function onRequest(
     }
 
     try {
+      const fallback = {
+        contract_id:
+          contractId,
+
+        account_type:
+          accountType,
+
+        account_id:
+          accountId
+      };
 
       const contract =
         await getContractStatus(
           token,
           accountId,
-          contractId
+          contractId,
+          fallback
         );
 
-      let freshBalance =
+      /*
+       * Once Deriv says the contract is finished,
+       * retrieve the account again so the frontend
+       * receives the latest balance immediately.
+       */
+      let latestBalance =
         null;
 
-      /*
-       * Only refresh the account balance
-       * when the contract is actually finished.
-       */
-
       if (
-        contract.finished
+        contract.status ===
+          "WON" ||
+        contract.status ===
+          "LOST" ||
+        contract.is_sold === 1
       ) {
-
         try {
-
-          freshBalance =
-            await getFreshBalance(
+          const fresh =
+            await getFreshAccount(
               token,
-              accountId
+              accountType
             );
 
+          latestBalance =
+            fresh.balance;
         } catch (
           balanceError
         ) {
-
           console.error(
-            "Fresh balance error:",
+            "DollarTicks BALANCE REFRESH ERROR:",
             balanceError
           );
         }
@@ -1201,25 +1161,27 @@ export async function onRequest(
 
       return json({
         ok: true,
+        connected: true,
 
         contract,
 
         balance:
-          freshBalance?.balance ??
-          null,
+          latestBalance !== null
+            ? latestBalance
+            : undefined,
 
         currency:
-          freshBalance?.currency ??
           currency,
 
-        balance_updated:
-          Boolean(
-            freshBalance
-          )
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            accountType
+        }
       });
-
     } catch (error) {
-
       console.error(
         "DollarTicks CONTRACT STATUS ERROR:",
         error
@@ -1228,11 +1190,12 @@ export async function onRequest(
       return json(
         {
           ok: false,
+          connected: true,
           error:
             error.message ||
-            "Could not check contract status."
+            "Could not check contract."
         },
-        502
+        400
       );
     }
   }
@@ -1245,11 +1208,9 @@ export async function onRequest(
     body.action ===
     "buy"
   ) {
-
     let ws;
 
     try {
-
       const market =
         String(
           body.market ||
@@ -1259,7 +1220,6 @@ export async function onRequest(
         ).trim();
 
       if (!market) {
-
         throw new Error(
           "No trading market was selected."
         );
@@ -1272,7 +1232,6 @@ export async function onRequest(
         ).trim();
 
       if (!contractType) {
-
         throw new Error(
           "No contract type was selected."
         );
@@ -1289,15 +1248,23 @@ export async function onRequest(
         ) ||
         stake <= 0
       ) {
-
         throw new Error(
           "Enter a valid stake."
         );
       }
 
+      if (
+        stake > balance
+      ) {
+        throw new Error(
+          "Insufficient account balance."
+        );
+      }
+
       const duration =
         Number(
-          body.duration || 1
+          body.duration ||
+          1
         );
 
       if (
@@ -1306,7 +1273,6 @@ export async function onRequest(
         ) ||
         duration < 1
       ) {
-
         throw new Error(
           "Enter a valid duration."
         );
@@ -1319,7 +1285,7 @@ export async function onRequest(
         );
 
       /* -----------------------------------------------
-         GET FRESH WEBSOCKET
+         GET FRESH AUTHENTICATED WEBSOCKET
       ----------------------------------------------- */
 
       const wsUrl =
@@ -1338,7 +1304,6 @@ export async function onRequest(
       ----------------------------------------------- */
 
       const proposalPayload = {
-
         proposal: 1,
 
         amount:
@@ -1378,7 +1343,6 @@ export async function onRequest(
           contractType
         )
       ) {
-
         proposalPayload.barrier =
           String(
             body.barrier ??
@@ -1399,7 +1363,6 @@ export async function onRequest(
       if (
         !proposal?.id
       ) {
-
         throw new Error(
           "Deriv did not return a valid proposal."
         );
@@ -1418,14 +1381,13 @@ export async function onRequest(
         ) ||
         askPrice <= 0
       ) {
-
         throw new Error(
           "Deriv returned an invalid contract price."
         );
       }
 
       /* -----------------------------------------------
-         BUY ON SAME WEBSOCKET
+         BUY USING SAME WEBSOCKET
       ----------------------------------------------- */
 
       const buyResponse =
@@ -1452,68 +1414,75 @@ export async function onRequest(
       if (
         !buy?.contract_id
       ) {
-
         throw new Error(
           "Deriv did not return a contract ID."
         );
       }
 
+      /*
+       * IMPORTANT:
+       * At this point the contract has only been
+       * PURCHASED. It has NOT WON yet.
+       *
+       * Therefore profit is deliberately 0 until
+       * contract_status gets the actual result.
+       */
+
+      const purchasedContract = {
+        contract_id:
+          buy.contract_id,
+
+        buy_price:
+          Number(
+            buy.buy_price ??
+            askPrice
+          ),
+
+        payout:
+          Number(
+            buy.payout ??
+            proposal.payout ??
+            0
+          ),
+
+        profit:
+          0,
+
+        status:
+          "OPEN",
+
+        account_type:
+          accountType,
+
+        account_id:
+          accountId,
+
+        market:
+          market,
+
+        contract_type:
+          contractType,
+
+        barrier:
+          body.barrier ??
+          null
+      };
+
       return json({
         ok: true,
 
-        message:
-          "Contract purchased successfully.",
+        contract:
+          purchasedContract,
 
-        contract: {
-
-          contract_id:
-            buy.contract_id,
-
-          buy_price:
-            Number(
-              buy.buy_price ??
-              askPrice
-            ),
-
-          payout:
-            Number(
-              buy.payout ??
-              proposal.payout ??
-              0
-            ),
-
-          profit:
-            Number(
-              buy.profit ??
-              0
-            ),
-
-          status:
-            String(
-              buy.status ||
-              "OPEN"
-            ).toUpperCase(),
-
-          account_type:
-            accountType,
-
+        account: {
           account_id:
             accountId,
 
-          market:
-            market,
-
-          contract_type:
-            contractType,
-
-          barrier:
-            body.barrier ??
-            null
+          account_type:
+            accountType
         }
       });
-
     } catch (error) {
-
       console.error(
         "DollarTicks BUY ERROR:",
         error
@@ -1522,7 +1491,6 @@ export async function onRequest(
       return json(
         {
           ok: false,
-
           connected: true,
 
           error:
@@ -1531,10 +1499,10 @@ export async function onRequest(
         },
         400
       );
-
     } finally {
-
-      closeWebSocket(ws);
+      closeWebSocket(
+        ws
+      );
     }
   }
 
@@ -1554,4 +1522,4 @@ export async function onRequest(
     },
     400
   );
-      }
+             }
