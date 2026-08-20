@@ -6,9 +6,8 @@ export async function onRequest(context) {
   const request = context.request;
   const url = new URL(request.url);
 
-
   /* =====================================================
-     LOGIN / SIGNUP MODE
+     LOGIN / SIGNUP
   ===================================================== */
 
   const mode =
@@ -17,9 +16,8 @@ export async function onRequest(context) {
   const isSignup =
     mode === "signup";
 
-
   /* =====================================================
-     CREATE PKCE VERIFIER
+     PKCE VERIFIER
   ===================================================== */
 
   const randomBytes =
@@ -40,9 +38,8 @@ export async function onRequest(context) {
       )
       .join("");
 
-
   /* =====================================================
-     CREATE CODE CHALLENGE
+     PKCE CHALLENGE
   ===================================================== */
 
   const hash =
@@ -63,9 +60,8 @@ export async function onRequest(context) {
       .replace(/\//g, "_")
       .replace(/=+$/, "");
 
-
   /* =====================================================
-     CREATE OAUTH STATE
+     OAUTH STATE
   ===================================================== */
 
   const stateBytes =
@@ -83,7 +79,6 @@ export async function onRequest(context) {
       )
       .join("");
 
-
   /* =====================================================
      DERIV AUTHORIZATION URL
   ===================================================== */
@@ -92,7 +87,6 @@ export async function onRequest(context) {
     new URL(
       "https://auth.deriv.com/oauth2/auth"
     );
-
 
   authUrl.searchParams.set(
     "response_type",
@@ -109,9 +103,6 @@ export async function onRequest(context) {
     REDIRECT_URI
   );
 
-  /*
-   * Trading permission.
-   */
   authUrl.searchParams.set(
     "scope",
     "trade"
@@ -132,7 +123,6 @@ export async function onRequest(context) {
     "S256"
   );
 
-
   /* =====================================================
      SIGNUP
   ===================================================== */
@@ -146,44 +136,35 @@ export async function onRequest(context) {
 
   }
 
-
   /* =====================================================
-     COOKIE OPTIONS
+     OAUTH COOKIES
   ===================================================== */
 
-  /*
-   * SameSite=None + Secure makes the OAuth
-   * redirect cookie more reliable across
-   * the Deriv -> DollarTicks navigation.
-   */
-
   const cookieOptions =
-    "Path=/; Max-Age=600; Secure; HttpOnly; SameSite=None";
-
+    [
+      "Path=/",
+      "Max-Age=600",
+      "Secure",
+      "HttpOnly",
+      "SameSite=Lax"
+    ].join("; ");
 
   /* =====================================================
-     RESPONSE HEADERS
+     RESPONSE
   ===================================================== */
 
   const headers =
     new Headers();
-
 
   headers.set(
     "Location",
     authUrl.toString()
   );
 
-
   headers.set(
     "Cache-Control",
     "no-store, no-cache, must-revalidate"
   );
-
-
-  /* =====================================================
-     SAVE PKCE VERIFIER
-  ===================================================== */
 
   headers.append(
     "Set-Cookie",
@@ -192,22 +173,12 @@ export async function onRequest(context) {
     )}; ${cookieOptions}`
   );
 
-
-  /* =====================================================
-     SAVE OAUTH STATE
-  ===================================================== */
-
   headers.append(
     "Set-Cookie",
     `dt_oauth_state=${encodeURIComponent(
       state
     )}; ${cookieOptions}`
   );
-
-
-  /* =====================================================
-     REDIRECT TO DERIV
-  ===================================================== */
 
   return new Response(
     null,
@@ -217,4 +188,4 @@ export async function onRequest(context) {
     }
   );
 
-}
+    }
