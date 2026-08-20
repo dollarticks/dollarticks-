@@ -2,462 +2,988 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>DollarTicks — Live Digit Dashboard</title>
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#080b10;color:#f5f7fa;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-.wrap{max-width:760px;margin:auto;padding:12px}
-.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.brand{font-size:25px;font-weight:800}
-.brand span{color:#18c6d8}
-.status{padding:7px 11px;border-radius:20px;background:#171c24;color:#aab4c3;font-size:12px}
-.status.live{color:#62e6a7}
-.card{background:#10151d;border:1px solid #202733;border-radius:16px;padding:14px;margin-bottom:12px}
-select,button,input{width:100%;padding:12px;border-radius:11px;border:1px solid #2b3442;background:#151b24;color:#fff;font-size:15px}
-button{cursor:pointer;font-weight:700}
-button.primary{background:#13aebf;border-color:#13aebf;color:#061014}
-button.connect{margin-top:10px;background:#18c6d8;border-color:#18c6d8;color:#061014}
-button.buy{margin-top:10px;background:#62e6a7;border-color:#62e6a7;color:#061014}
-button:disabled{opacity:.5;cursor:not-allowed}
-.market{font-size:18px;font-weight:800;margin-top:10px}
-.quote{color:#9da8b8;font-size:13px;margin-top:4px}
-.latestBadge{color:#8d98aa;font-size:12px;margin-bottom:9px}
-.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
-.digit{position:relative;aspect-ratio:1;border-radius:50%;background:#0d1219;border:4px solid #252d39;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.digit strong{font-size:22px}
-.digit small{color:#aeb8c7;font-size:11px}
-.digit.most::before{content:"";position:absolute;inset:-5px;border-radius:50%;border:5px solid transparent;border-top-color:#39e58c;border-left-color:#39e58c;transform:rotate(-45deg);pointer-events:none}
-.digit.least::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:5px solid transparent;border-bottom-color:#ff4d5a;border-right-color:#ff4d5a;transform:rotate(-45deg);pointer-events:none}
-.digit.latest .pointer{position:absolute;top:-23px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:13px solid #9b6cff;z-index:10}
-.ticks{display:flex;flex-wrap:wrap;gap:6px;max-height:110px;overflow:hidden}
-.tick{width:30px;height:30px;border-radius:8px;background:#171e28;display:grid;place-items:center;font-weight:800}
-.tick.new{outline:2px solid #18c6d8}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.metric{background:#0d1219;border-radius:12px;padding:12px}
-.metric label{display:block;color:#8f9aab;font-size:12px;margin-bottom:4px}
-.metric b{font-size:19px}
-.tradeStatus{margin-top:10px;padding:11px;border-radius:11px;background:#0d1219;color:#aeb8c7;font-size:13px}
-.success,.connectionOk{color:#62e6a7}
-.error,.connectionBad{color:#ff7b7b}
-.hidden{display:none}
-.note{color:#8995a6;font-size:12px;line-height:1.5}
-.footer{text-align:center;color:#697486;font-size:11px;padding:10px 0 20px}
-.debug{margin-top:10px;padding:10px;border-radius:10px;background:#080b10;color:#8995a6;font-size:11px;word-break:break-word}
+
+body{
+  margin:0;
+  background:#080b10;
+  color:#f5f7fa;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif
+}
+
+.wrap{
+  max-width:760px;
+  margin:auto;
+  padding:12px
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px
+}
+
+.brand{
+  font-size:25px;
+  font-weight:800
+}
+
+.brand span{
+  color:#18c6d8
+}
+
+.status{
+  padding:7px 11px;
+  border-radius:20px;
+  background:#171c24;
+  color:#aab4c3;
+  font-size:12px
+}
+
+.status.live{
+  color:#62e6a7
+}
+
+.card{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px
+}
+
+select,
+button,
+input{
+  width:100%;
+  padding:12px;
+  border-radius:11px;
+  border:1px solid #2b3442;
+  background:#151b24;
+  color:#fff;
+  font-size:15px
+}
+
+button{
+  cursor:pointer;
+  font-weight:700
+}
+
+button.primary{
+  background:#13aebf;
+  border-color:#13aebf;
+  color:#061014
+}
+
+button.connect{
+  margin-top:10px;
+  background:#18c6d8;
+  border-color:#18c6d8;
+  color:#061014
+}
+
+button.buy{
+  margin-top:10px;
+  background:#62e6a7;
+  border-color:#62e6a7;
+  color:#061014
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed
+}
+
+.market{
+  font-size:18px;
+  font-weight:800;
+  margin-top:10px
+}
+
+.quote{
+  color:#9da8b8;
+  font-size:13px;
+  margin-top:4px
+}
+
+.latestBadge{
+  color:#8d98aa;
+  font-size:12px;
+  margin-bottom:9px
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:10px
+}
+
+.digit{
+  position:relative;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#0d1219;
+  border:4px solid #252d39;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center
+}
+
+.digit strong{
+  font-size:22px
+}
+
+.digit small{
+  color:#aeb8c7;
+  font-size:11px
+}
+
+.digit.most::before{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:5px solid transparent;
+  border-top-color:#39e58c;
+  border-left-color:#39e58c;
+  transform:rotate(-45deg);
+  pointer-events:none
+}
+
+.digit.least::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:5px solid transparent;
+  border-bottom-color:#ff4d5a;
+  border-right-color:#ff4d5a;
+  transform:rotate(-45deg);
+  pointer-events:none
+}
+
+.digit.latest{
+  box-shadow:none
+}
+
+.digit.latest .pointer{
+  position:absolute;
+  top:-23px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:13px solid #9b6cff;
+  z-index:10
+}
+
+.ticks{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  max-height:110px;
+  overflow:hidden
+}
+
+.tick{
+  width:30px;
+  height:30px;
+  border-radius:8px;
+  background:#171e28;
+  display:grid;
+  place-items:center;
+  font-weight:800
+}
+
+.tick.new{
+  outline:2px solid #18c6d8
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.metric{
+  background:#0d1219;
+  border-radius:12px;
+  padding:12px
+}
+
+.metric label{
+  display:block;
+  color:#8f9aab;
+  font-size:12px;
+  margin-bottom:4px
+}
+
+.metric b{
+  font-size:19px
+}
+
+.tradeStatus{
+  margin-top:10px;
+  padding:11px;
+  border-radius:11px;
+  background:#0d1219;
+  color:#aeb8c7;
+  font-size:13px
+}
+
+.success{
+  color:#62e6a7
+}
+
+.error{
+  color:#ff7b7b
+}
+
+.connectionOk{
+  color:#62e6a7
+}
+
+.connectionBad{
+  color:#ff7b7b
+}
+
+.hidden{
+  display:none
+}
+
+.note{
+  color:#8995a6;
+  font-size:12px;
+  line-height:1.5
+}
+
+.footer{
+  text-align:center;
+  color:#697486;
+  font-size:11px;
+  padding:10px 0 20px
+}
+
+.debug{
+  margin-top:10px;
+  padding:10px;
+  border-radius:10px;
+  background:#080b10;
+  color:#8995a6;
+  font-size:11px;
+  word-break:break-word
+}
+
 @media(max-width:430px){
-.wrap{padding:9px}.grid{gap:7px}.digit{border-width:3px}.digit strong{font-size:19px}.digit small{font-size:10px}
+  .wrap{padding:9px}
+  .grid{gap:7px}
+  .digit{border-width:3px}
+  .digit strong{font-size:19px}
+  .digit small{font-size:10px}
 }
 </style>
 </head>
 
 <body>
+
 <div class="wrap">
 
 <div class="top">
-<div class="brand">Dollar<span>Ticks</span></div>
-<div id="status" class="status">Connecting…</div>
+  <div class="brand">
+    Dollar<span>Ticks</span>
+  </div>
+
+  <div id="status" class="status">
+    Connecting…
+  </div>
 </div>
 
-<div class="card">
-<label>Volatility Market</label>
-
-<select id="market">
-<option value="1HZ100V">Volatility 100 (1s)</option>
-<option value="1HZ75V">Volatility 75 (1s)</option>
-<option value="1HZ50V">Volatility 50 (1s)</option>
-<option value="1HZ25V">Volatility 25 (1s)</option>
-<option value="1HZ10V">Volatility 10 (1s)</option>
-</select>
-
-<div class="market" id="marketName">Volatility 100 (1s)</div>
-<div class="quote" id="quote">Waiting for tick…</div>
-</div>
-
-<div class="card">
-<div class="latestBadge">
-LAST DIGIT FREQUENCY — LAST <b id="countLabel">100</b> TICKS
-</div>
-<div id="digits" class="grid"></div>
-</div>
-
-<div class="card">
-<div class="latestBadge">LIVE LAST DIGITS</div>
-<div id="ticks" class="ticks"></div>
-</div>
 
 <div class="card">
 
-<div class="latestBadge">TRADE ENTRY</div>
+  <label>Volatility Market</label>
 
-<label>Contract type</label>
-<select id="contractType">
-<option value="DIGITOVER">Over</option>
-<option value="DIGITUNDER">Under</option>
-<option value="DIGITMATCH">Matches</option>
-<option value="DIGITDIFF">Differs</option>
-<option value="DIGITEVEN">Even</option>
-<option value="DIGITODD">Odd</option>
-</select>
+  <select id="market">
 
-<div style="height:10px"></div>
+    <option value="1HZ100V">
+      Volatility 100 (1s)
+    </option>
 
-<div id="digitControl">
-<label>Digit / Barrier</label>
-<select id="barrier">
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5" selected>5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-</select>
-</div>
+    <option value="1HZ75V">
+      Volatility 75 (1s)
+    </option>
 
-<div style="height:10px"></div>
+    <option value="1HZ50V">
+      Volatility 50 (1s)
+    </option>
 
-<label>Stake</label>
-<input id="stake" type="number" min="0.35" step="0.01" value="1">
+    <option value="1HZ25V">
+      Volatility 25 (1s)
+    </option>
 
-<div style="height:10px"></div>
+    <option value="1HZ10V">
+      Volatility 10 (1s)
+    </option>
 
-<label>Duration</label>
-<input id="duration" type="number" min="1" max="10" value="1">
+  </select>
 
-<div style="height:10px"></div>
+  <div class="market" id="marketName">
+    Volatility 100 (1s)
+  </div>
 
-<button id="getProposal" class="primary">
-Get Trade Proposal
-</button>
-
-<div id="proposalInfo" class="tradeStatus">
-No proposal requested yet.
-</div>
-
-<button id="buyContract" class="buy hidden">
-Buy DEMO Contract
-</button>
-
-<div id="tradeStatus" class="tradeStatus">
-Ready.
-</div>
-
-<div id="contractStatus" class="tradeStatus">
-CONTRACT STATUS<br>
-Status: —
-</div>
-
-<div id="debug" class="debug hidden"></div>
+  <div class="quote" id="quote">
+    Waiting for tick…
+  </div>
 
 </div>
+
+
+<div class="card">
+
+  <div class="latestBadge">
+    LAST DIGIT FREQUENCY —
+    LAST <b id="countLabel">100</b> TICKS
+  </div>
+
+  <div id="digits" class="grid"></div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="latestBadge">
+    LIVE LAST DIGITS
+  </div>
+
+  <div id="ticks" class="ticks"></div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="latestBadge">
+    TRADE ENTRY
+  </div>
+
+  <label>Contract type</label>
+
+  <select id="contractType">
+
+    <option value="DIGITOVER">Over</option>
+    <option value="DIGITUNDER">Under</option>
+    <option value="DIGITMATCH">Matches</option>
+    <option value="DIGITDIFF">Differs</option>
+    <option value="DIGITEVEN">Even</option>
+    <option value="DIGITODD">Odd</option>
+
+  </select>
+
+  <div style="height:10px"></div>
+
+  <div id="digitControl">
+
+    <label>Digit / Barrier</label>
+
+    <select id="barrier">
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5" selected>5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+    </select>
+
+  </div>
+
+  <div style="height:10px"></div>
+
+  <label>Stake</label>
+
+  <input
+    id="stake"
+    type="number"
+    min="0.35"
+    step="0.01"
+    value="1"
+  >
+
+  <div style="height:10px"></div>
+
+  <label>Duration</label>
+
+  <input
+    id="duration"
+    type="number"
+    min="1"
+    max="10"
+    value="1"
+  >
+
+  <div style="height:10px"></div>
+
+  <button id="getProposal" class="primary" type="button">
+    Get Trade Proposal
+  </button>
+
+  <div id="proposalInfo" class="tradeStatus">
+    No proposal requested yet.
+  </div>
+
+  <button id="buyContract" class="buy hidden" type="button">
+    Buy DEMO Contract
+  </button>
+
+  <div id="tradeStatus" class="tradeStatus">
+    Proposal mode only — no contract will be purchased.
+  </div>
+
+  <div id="debug" class="debug hidden"></div>
+
+</div>
+
 
 <div class="row">
-<div class="metric">
-<label>Most frequent</label>
-<b id="most">—</b>
+
+  <div class="metric">
+    <label>Most frequent</label>
+    <b id="most">—</b>
+  </div>
+
+  <div class="metric">
+    <label>Least frequent</label>
+    <b id="least">—</b>
+  </div>
+
 </div>
 
-<div class="metric">
-<label>Least frequent</label>
-<b id="least">—</b>
-</div>
-</div>
 
 <div style="height:12px"></div>
 
-<div class="card">
-<div class="latestBadge">OVER / UNDER</div>
-
-<div class="row">
-<div class="metric">
-<label>Over 5 — digits 6–9</label>
-<b id="over5">—</b>
-</div>
-
-<div class="metric">
-<label>Under 5 — digits 0–4</label>
-<b id="under5">—</b>
-</div>
-</div>
-</div>
 
 <div class="card">
-<div class="latestBadge">ACCOUNT CONNECTION</div>
 
-<div class="metric">
-<label>Deriv account</label>
-<b id="accountStatus">Checking…</b>
+  <div class="latestBadge">
+    OVER / UNDER
+  </div>
 
-<button id="connectDeriv" class="connect">
-Connect Deriv
-</button>
+  <div class="row">
+
+    <div class="metric">
+      <label>Over 5 — digits 6–9</label>
+      <b id="over5">—</b>
+    </div>
+
+    <div class="metric">
+      <label>Under 5 — digits 0–4</label>
+      <b id="under5">—</b>
+    </div>
+
+  </div>
+
 </div>
-</div>
+
 
 <div class="card">
-<div class="note">
-<b>DollarTicks</b> reads public Deriv tick data and calculates
-last-digit frequencies locally.
 
-<br><br>
+  <div class="latestBadge">
+    ACCOUNT CONNECTION
+  </div>
 
-🟢 Green half-circle = most occurring digit.
+  <div class="metric">
 
-<br>
-🔴 Red half-circle = least occurring digit.
+    <label>Deriv account</label>
 
-<br>
-🟣 Purple pointer = current moving tick.
+    <b id="accountStatus">
+      Checking…
+    </b>
 
-<br><br>
+    <button id="connectDeriv" class="connect" type="button">
+      Connect Deriv
+    </button>
 
-Percentages are based on recent ticks and are
-<b>not guaranteed predictions</b> of the next tick.
+  </div>
 
-<br><br>
-
-Trading uses the connected Deriv account.
 </div>
+
+
+<div class="card">
+
+  <div class="note">
+
+    <b>DollarTicks</b>
+    reads public Deriv tick data and calculates
+    last-digit frequencies locally.
+
+    <br><br>
+
+    🟢 Green half-circle = most occurring digit.
+
+    <br>
+
+    🔴 Red half-circle = least occurring digit.
+
+    <br>
+
+    🟣 Purple pointer = current moving tick.
+
+    <br><br>
+
+    Percentages are based on recent ticks and are
+    <b>not guaranteed predictions</b> of the next tick.
+
+  </div>
+
 </div>
+
 
 <div class="footer">
-DollarTicks • Market data powered by Deriv
+  DollarTicks • Market data powered by Deriv
 </div>
 
 </div>
+
 
 <script>
 
 /* =====================================================
-   LIVE PUBLIC MARKET DATA
-   ===================================================== */
+   DERIV PUBLIC OPTIONS WEBSOCKET
+===================================================== */
 
 const WS_URL =
-  "wss://ws.derivws.com/websockets/v3";
+  "wss://api.derivws.com/trading/v1/options/ws/public";
 
 const MAX_TICKS = 100;
 
 const marketNames = {
-  "1HZ100V":"Volatility 100 (1s)",
-  "1HZ75V":"Volatility 75 (1s)",
-  "1HZ50V":"Volatility 50 (1s)",
-  "1HZ25V":"Volatility 25 (1s)",
-  "1HZ10V":"Volatility 10 (1s)"
+
+  "1HZ100V":
+    "Volatility 100 (1s)",
+
+  "1HZ75V":
+    "Volatility 75 (1s)",
+
+  "1HZ50V":
+    "Volatility 50 (1s)",
+
+  "1HZ25V":
+    "Volatility 25 (1s)",
+
+  "1HZ10V":
+    "Volatility 10 (1s)"
+
 };
 
 let ws = null;
+let reconnectTimer = null;
+let manuallyClosed = false;
+
 let history = [];
 let latestDigit = null;
 let currentProposal = null;
 let currentAccountType = "demo";
-let reconnectTimer = null;
 
 const $ = id => document.getElementById(id);
 
-function setStatus(text,live=false){
-  $("status").textContent=text;
-  $("status").className="status"+(live?" live":"");
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(text, live=false){
+
+  $("status").textContent = text;
+
+  $("status").className =
+    "status" +
+    (live ? " live" : "");
+
 }
 
+
+/* =====================================================
+   MARKET
+===================================================== */
+
 function getSelectedMarket(){
-  const market=$("market").value;
-  return marketNames[market] ? market : "1HZ100V";
+
+  const value =
+    $("market").value;
+
+  return marketNames[value]
+    ? value
+    : "1HZ100V";
+
 }
+
 
 /* =====================================================
    LAST DIGIT
-   ===================================================== */
+===================================================== */
 
 function getLastDigit(quote,pipSize){
 
-  const n=Number(quote);
+  const number =
+    Number(quote);
 
-  if(!Number.isFinite(n)) return null;
+  if(!Number.isFinite(number))
+    return null;
 
-  if(Number.isFinite(Number(pipSize))){
-    const factor=10**Number(pipSize);
-    return Math.abs(Math.round(n*factor))%10;
+  const precision =
+    Number(pipSize);
+
+  if(Number.isFinite(precision)){
+
+    const factor =
+      10 ** precision;
+
+    return Math.abs(
+      Math.round(number * factor)
+    ) % 10;
+
   }
 
-  const text=String(quote);
+  const text =
+    String(quote);
 
-  const decimal=text.includes(".")
-    ? text.split(".")[1]
-    : text;
+  const match =
+    text.match(/[0-9](?!.*[0-9])/);
 
-  if(!decimal) return null;
+  return match
+    ? Number(match[0])
+    : null;
 
-  return Number(decimal.charAt(decimal.length-1));
 }
 
-/* =====================================================
-   RENDER
-   ===================================================== */
-
-function render(){
-
-  const counts=Array(10).fill(0);
-
-  history.forEach(d=>counts[d]++);
-
-  $("countLabel").textContent=history.length;
-
-  let mostDigit=0;
-  let leastDigit=0;
-
-  for(let i=1;i<10;i++){
-
-    if(counts[i]>counts[mostDigit])
-      mostDigit=i;
-
-    if(counts[i]<counts[leastDigit])
-      leastDigit=i;
-  }
-
-  $("digits").innerHTML=counts.map((count,digit)=>{
-
-    const percentage=history.length
-      ? count/history.length*100
-      : 0;
-
-    return `
-      <div class="digit
-        ${history.length&&digit===mostDigit&&counts[mostDigit]>0?"most":""}
-        ${history.length&&digit===leastDigit?"least":""}
-        ${digit===latestDigit?"latest":""}">
-
-        ${digit===latestDigit
-          ? '<div class="pointer"></div>'
-          : ""}
-
-        <strong>${digit}</strong>
-
-        <small>
-          ${count} • ${percentage.toFixed(1)}%
-        </small>
-
-      </div>
-    `;
-  }).join("");
-
-  $("ticks").innerHTML=history.slice().reverse().map(
-    (digit,index)=>`
-      <div class="tick ${index===0?"new":""}">
-        ${digit}
-      </div>
-    `
-  ).join("");
-
-  if(history.length){
-
-    $("most").textContent=
-      `${mostDigit} (${(counts[mostDigit]/history.length*100).toFixed(1)}%)`;
-
-    $("least").textContent=
-      `${leastDigit} (${(counts[leastDigit]/history.length*100).toFixed(1)}%)`;
-
-    const over=
-      counts[6]+counts[7]+counts[8]+counts[9];
-
-    const under=
-      counts[0]+counts[1]+counts[2]+counts[3]+counts[4];
-
-    $("over5").textContent=
-      (over/history.length*100).toFixed(1)+"%";
-
-    $("under5").textContent=
-      (under/history.length*100).toFixed(1)+"%";
-  }
-}
 
 /* =====================================================
-   ADD TICK
-   ===================================================== */
+   ADD DIGIT
+===================================================== */
 
-function addTick(tick){
+function addDigit(digit,quote,epoch){
 
-  if(!tick) return;
+  if(
+    digit === null ||
+    digit < 0 ||
+    digit > 9
+  )
+    return;
 
-  const digit=getLastDigit(
-    tick.quote,
-    tick.pip_size
-  );
-
-  if(digit===null) return;
-
-  latestDigit=digit;
+  latestDigit = digit;
 
   history.push(digit);
 
-  if(history.length>MAX_TICKS)
+  if(history.length > MAX_TICKS)
     history.shift();
 
-  $("quote").textContent=
-    `${tick.quote} • ${new Date(
-      tick.epoch*1000
-    ).toLocaleTimeString()}`;
+  $("quote").textContent =
+    `${quote} • ${
+      new Date(epoch * 1000)
+        .toLocaleTimeString()
+    }`;
 
   render();
+
 }
+
+
+/* =====================================================
+   RENDER
+===================================================== */
+
+function render(){
+
+  const counts =
+    Array(10).fill(0);
+
+  history.forEach(
+    digit => counts[digit]++
+  );
+
+  $("countLabel").textContent =
+    history.length;
+
+  let mostDigit = 0;
+  let leastDigit = 0;
+
+  for(let i=1;i<10;i++){
+
+    if(counts[i] > counts[mostDigit])
+      mostDigit = i;
+
+    if(counts[i] < counts[leastDigit])
+      leastDigit = i;
+
+  }
+
+  $("digits").innerHTML =
+    counts.map((count,digit)=>{
+
+      const percentage =
+        history.length
+          ? count / history.length * 100
+          : 0;
+
+      const isMost =
+        history.length > 0 &&
+        digit === mostDigit &&
+        counts[mostDigit] > 0;
+
+      const isLeast =
+        history.length > 0 &&
+        digit === leastDigit;
+
+      const isLatest =
+        digit === latestDigit;
+
+      return `
+        <div class="digit
+          ${isMost ? "most" : ""}
+          ${isLeast ? "least" : ""}
+          ${isLatest ? "latest" : ""}
+        ">
+
+          ${
+            isLatest
+              ? '<div class="pointer"></div>'
+              : ""
+          }
+
+          <strong>${digit}</strong>
+
+          <small>
+            ${count} •
+            ${percentage.toFixed(1)}%
+          </small>
+
+        </div>
+      `;
+
+    }).join("");
+
+
+  $("ticks").innerHTML =
+    history
+      .slice()
+      .reverse()
+      .map((digit,index)=>`
+
+        <div class="tick ${
+          index === 0 ? "new" : ""
+        }">
+          ${digit}
+        </div>
+
+      `)
+      .join("");
+
+
+  if(!history.length)
+    return;
+
+
+  $("most").textContent =
+    `${mostDigit} (${
+      (
+        counts[mostDigit] /
+        history.length *
+        100
+      ).toFixed(1)
+    }%)`;
+
+
+  $("least").textContent =
+    `${leastDigit} (${
+      (
+        counts[leastDigit] /
+        history.length *
+        100
+      ).toFixed(1)
+    }%)`;
+
+
+  const over =
+    counts[6] +
+    counts[7] +
+    counts[8] +
+    counts[9];
+
+
+  const under =
+    counts[0] +
+    counts[1] +
+    counts[2] +
+    counts[3] +
+    counts[4];
+
+
+  $("over5").textContent =
+    (
+      over / history.length * 100
+    ).toFixed(1) + "%";
+
+
+  $("under5").textContent =
+    (
+      under / history.length * 100
+    ).toFixed(1) + "%";
+
+}
+
 
 /* =====================================================
    CONNECT PUBLIC MARKET
-   ===================================================== */
+===================================================== */
 
 function connectMarket(){
 
+  manuallyClosed = false;
+
   if(reconnectTimer){
-    clearTimeout(reconnectTimer);
-    reconnectTimer=null;
+
+    clearTimeout(
+      reconnectTimer
+    );
+
+    reconnectTimer = null;
+
   }
 
   if(ws){
-    try{ws.close()}catch(e){}
+
+    try{
+      ws.close();
+    }catch(e){}
+
+    ws = null;
+
   }
 
-  history=[];
-  latestDigit=null;
+  history = [];
+  latestDigit = null;
+
   render();
 
-  const symbol=getSelectedMarket();
+  const symbol =
+    getSelectedMarket();
 
-  $("marketName").textContent=
+  $("marketName").textContent =
     marketNames[symbol];
+
+  $("quote").textContent =
+    "Connecting to Deriv market data…";
 
   setStatus("Connecting…");
 
-  ws=new WebSocket(WS_URL);
+  try{
 
-  ws.onopen=function(){
+    ws =
+      new WebSocket(WS_URL);
 
-    setStatus("LIVE",true);
+  }catch(error){
 
-    /* Request history */
-    ws.send(JSON.stringify({
-      ticks_history:symbol,
-      count:MAX_TICKS,
-      end:"latest",
-      style:"ticks",
-      req_id:1
-    }));
+    console.error(
+      "WebSocket creation error:",
+      error
+    );
 
-    /* Subscribe to live ticks */
-    ws.send(JSON.stringify({
-      ticks:symbol,
-      subscribe:1,
-      req_id:2
-    }));
+    setStatus(
+      "Connection error"
+    );
+
+    scheduleReconnect();
+
+    return;
+
+  }
+
+
+  ws.onopen = function(){
+
+    console.log(
+      "DollarTicks → Deriv public WebSocket connected"
+    );
+
+    setStatus(
+      "LIVE",
+      true
+    );
+
+
+    /*
+     * Subscribe directly to the live tick stream.
+     */
+
+    ws.send(
+      JSON.stringify({
+
+        ticks:
+          symbol,
+
+        subscribe:
+          1,
+
+        req_id:
+          1
+
+      })
+    );
+
+
+    /*
+     * Request the latest 100 ticks separately.
+     */
+
+    ws.send(
+      JSON.stringify({
+
+        ticks_history:
+          symbol,
+
+        count:
+          MAX_TICKS,
+
+        end:
+          "latest",
+
+        style:
+          "ticks",
+
+        req_id:
+          2
+
+      })
+    );
+
   };
 
-  ws.onmessage=function(event){
+
+  ws.onmessage = function(event){
 
     try{
 
-      const data=JSON.parse(event.data);
+      const data =
+        JSON.parse(event.data);
+
+      console.log(
+        "DollarTicks ← Deriv:",
+        data
+      );
+
 
       if(data.error){
 
@@ -466,190 +992,345 @@ function connectMarket(){
           data.error
         );
 
-        setStatus("API error");
-
-        $("debug").textContent=
+        $("quote").textContent =
           data.error.message ||
-          JSON.stringify(data.error);
+          "Deriv market error.";
 
-        $("debug").classList.remove("hidden");
+        setStatus(
+          "API error"
+        );
 
         return;
+
       }
 
-      if(data.msg_type==="history"){
 
-        const prices=data.history?.prices||[];
-        const times=data.history?.times||[];
+      /* =========================================
+         HISTORICAL TICKS
+      ========================================= */
 
-        history=[];
+      if(
+        data.msg_type === "history"
+      ){
 
-        for(let i=0;i<prices.length;i++){
+        const prices =
+          data.history?.prices || [];
 
-          const digit=getLastDigit(
-            prices[i],
-            data.pip_size
-          );
+        const times =
+          data.history?.times || [];
 
-          if(digit!==null)
+        const pipSize =
+          data.pip_size;
+
+
+        history = [];
+
+
+        for(
+          let i=0;
+          i<prices.length;
+          i++
+        ){
+
+          const digit =
+            getLastDigit(
+              prices[i],
+              pipSize
+            );
+
+          if(digit !== null)
             history.push(digit);
+
         }
 
-        if(history.length>MAX_TICKS)
-          history=history.slice(-MAX_TICKS);
 
-        if(history.length)
-          latestDigit=history[history.length-1];
+        if(history.length > MAX_TICKS){
+
+          history =
+            history.slice(-MAX_TICKS);
+
+        }
+
+
+        if(history.length){
+
+          latestDigit =
+            history[
+              history.length - 1
+            ];
+
+        }
+
 
         if(prices.length){
 
-          const p=prices[prices.length-1];
-          const t=times[times.length-1];
+          const lastPrice =
+            prices[
+              prices.length - 1
+            ];
 
-          $("quote").textContent=
-            `${p} • ${new Date(
-              t*1000
-            ).toLocaleTimeString()}`;
+          const lastTime =
+            times[
+              times.length - 1
+            ];
+
+          $("quote").textContent =
+            `${lastPrice} • ${
+              new Date(
+                lastTime * 1000
+              ).toLocaleTimeString()
+            }`;
+
         }
 
+
         render();
+
         return;
+
       }
 
-      if(data.msg_type==="tick"){
-        addTick(data.tick);
+
+      /* =========================================
+         LIVE TICK
+      ========================================= */
+
+      if(
+        data.msg_type === "tick"
+      ){
+
+        if(!data.tick)
+          return;
+
+        const tick =
+          data.tick;
+
+        const digit =
+          getLastDigit(
+            tick.quote,
+            tick.pip_size
+          );
+
+        addDigit(
+          digit,
+          tick.quote,
+          tick.epoch
+        );
+
+        setStatus(
+          "LIVE",
+          true
+        );
+
       }
 
     }catch(error){
 
-      console.error(error);
-
-      setStatus("Data error");
+      console.error(
+        "Tick processing error:",
+        error
+      );
 
     }
+
   };
 
-  ws.onerror=function(){
 
-    setStatus("Connection error");
+  ws.onerror = function(error){
 
-    $("debug").textContent=
-      "Unable to connect to Deriv public market data.";
+    console.error(
+      "DollarTicks WebSocket error:",
+      error
+    );
 
-    $("debug").classList.remove("hidden");
+    setStatus(
+      "Connection error"
+    );
+
   };
 
-  ws.onclose=function(){
 
-    setStatus("Disconnected");
+  ws.onclose = function(){
 
-    reconnectTimer=setTimeout(
-      connectMarket,
+    console.log(
+      "DollarTicks WebSocket closed"
+    );
+
+    if(
+      manuallyClosed
+    )
+      return;
+
+    setStatus(
+      "Disconnected"
+    );
+
+    scheduleReconnect();
+
+  };
+
+}
+
+
+/* =====================================================
+   RECONNECT
+===================================================== */
+
+function scheduleReconnect(){
+
+  if(reconnectTimer)
+    return;
+
+  reconnectTimer =
+    setTimeout(
+      function(){
+
+        reconnectTimer = null;
+
+        connectMarket();
+
+      },
       3000
     );
-  };
+
 }
+
 
 /* =====================================================
    MARKET CHANGE
-   ===================================================== */
+===================================================== */
 
 $("market").addEventListener(
   "change",
-  connectMarket
+  function(){
+
+    connectMarket();
+
+  }
 );
+
 
 /* =====================================================
    ACCOUNT
-   ===================================================== */
+===================================================== */
 
 async function checkAccount(){
 
   try{
 
-    const response=await fetch(
-      "/trading",
-      {
-        method:"GET",
-        credentials:"same-origin",
-        cache:"no-store"
-      }
-    );
+    const response =
+      await fetch(
+        "/trading",
+        {
+          method:"GET",
+          credentials:"same-origin",
+          cache:"no-store"
+        }
+      );
 
-    const data=await response.json();
+    const data =
+      await response.json();
 
-    if(data.ok&&data.connected){
 
-      const account=data.selected_account;
+    if(
+      data.ok &&
+      data.connected
+    ){
 
-      currentAccountType=
+      const account =
+        data.selected_account;
+
+      currentAccountType =
         String(
-          account?.account_type||"demo"
+          account?.account_type ||
+          "demo"
         ).toLowerCase();
 
-      $("accountStatus").textContent=
+      $("accountStatus").textContent =
         `${currentAccountType.toUpperCase()} Connected ✓`;
 
-      $("accountStatus").className="connectionOk";
+      $("accountStatus").className =
+        "connectionOk";
 
-      $("connectDeriv").textContent=
+      $("connectDeriv").textContent =
         "Deriv Connected ✓";
 
-      $("connectDeriv").disabled=true;
+      $("connectDeriv").disabled =
+        true;
 
     }else{
 
-      $("accountStatus").textContent=
+      $("accountStatus").textContent =
         "Not connected";
 
-      $("accountStatus").className=
+      $("accountStatus").className =
         "connectionBad";
 
-      $("connectDeriv").disabled=false;
+      $("connectDeriv").textContent =
+        "Connect Deriv";
+
+      $("connectDeriv").disabled =
+        false;
+
     }
 
   }catch(error){
 
-    $("accountStatus").textContent=
+    console.error(
+      error
+    );
+
+    $("accountStatus").textContent =
       "Not connected";
 
-    $("accountStatus").className=
+    $("accountStatus").className =
       "connectionBad";
 
-    $("connectDeriv").disabled=false;
+    $("connectDeriv").disabled =
+      false;
+
   }
+
 }
+
 
 /* =====================================================
    CONNECT DERIV
-   ===================================================== */
+===================================================== */
 
 $("connectDeriv").addEventListener(
   "click",
-  ()=>{
-    window.location.href="/auth";
+  function(){
+
+    window.location.href =
+      "/auth";
+
   }
 );
 
+
 /* =====================================================
    CONTRACT UI
-   ===================================================== */
+===================================================== */
 
 function updateContractUI(){
 
-  const type=$("contractType").value;
+  const type =
+    $("contractType").value;
 
-  const digitContracts=[
+  const digitContracts = [
     "DIGITOVER",
     "DIGITUNDER",
     "DIGITMATCH",
     "DIGITDIFF"
   ];
 
-  $("digitControl").classList.toggle(
-    "hidden",
-    !digitContracts.includes(type)
-  );
+  $("digitControl")
+    .classList.toggle(
+      "hidden",
+      !digitContracts.includes(type)
+    );
+
 }
 
 $("contractType").addEventListener(
@@ -659,361 +1340,422 @@ $("contractType").addEventListener(
 
 updateContractUI();
 
+
 /* =====================================================
-   TRADE PAYLOAD
-   ===================================================== */
+   BUILD TRADE PAYLOAD
+===================================================== */
 
 function buildTradePayload(){
 
+  const market =
+    getSelectedMarket();
+
   return {
 
-    action:"proposal",
+    account_type:
+      "demo",
 
-    account_type:"demo",
+    market:
+      market,
 
-    market:getSelectedMarket(),
+    symbol:
+      market,
 
-    symbol:getSelectedMarket(),
+    underlying_symbol:
+      market,
 
-    underlying_symbol:getSelectedMarket(),
+    contract_type:
+      $("contractType").value,
 
-    contract_type:$("contractType").value,
+    barrier:
+      $("barrier").value,
 
-    barrier:$("barrier").value,
+    stake:
+      Number(
+        $("stake").value
+      ),
 
-    stake:Number($("stake").value),
+    duration:
+      Number(
+        $("duration").value
+      ),
 
-    duration:Number($("duration").value),
+    duration_unit:
+      "t"
 
-    duration_unit:"t"
   };
+
 }
 
+
 /* =====================================================
-   PROPOSAL
-   ===================================================== */
+   REQUEST PROPOSAL
+===================================================== */
 
 async function requestFreshProposal(){
 
-  const response=await fetch(
-    "/trading",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      credentials:"same-origin",
-      cache:"no-store",
-      body:JSON.stringify(
-        buildTradePayload()
-      )
-    }
-  );
+  const payload = {
 
-  const data=await response.json();
+    action:
+      "proposal",
 
-  if(!response.ok||!data.ok)
-    throw new Error(
-      data.error||"Proposal request failed."
+    ...buildTradePayload()
+
+  };
+
+
+  const response =
+    await fetch(
+      "/trading",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        credentials:
+          "same-origin",
+
+        cache:
+          "no-store",
+
+        body:
+          JSON.stringify(payload)
+
+      }
     );
 
-  if(!data.proposal?.id)
+
+  const data =
+    await response.json();
+
+
+  if(
+    !response.ok ||
+    !data.ok
+  ){
+
+    throw new Error(
+      data.error ||
+      "Proposal request failed."
+    );
+
+  }
+
+
+  if(
+    !data.proposal ||
+    !data.proposal.id
+  ){
+
     throw new Error(
       "Deriv returned an incomplete proposal."
     );
 
+  }
+
+
   return data.proposal;
+
 }
+
 
 /* =====================================================
    GET PROPOSAL
-   ===================================================== */
+===================================================== */
 
 $("getProposal").addEventListener(
   "click",
   async function(){
 
-    const button=$("getProposal");
+    const button =
+      $("getProposal");
 
-    button.disabled=true;
+    const status =
+      $("tradeStatus");
 
-    $("buyContract").classList.add("hidden");
+    const info =
+      $("proposalInfo");
 
-    $("tradeStatus").className=
+    button.disabled = true;
+
+    $("buyContract")
+      .classList.add("hidden");
+
+    currentProposal = null;
+
+    status.className =
       "tradeStatus";
 
-    $("tradeStatus").textContent=
+    status.textContent =
       "Requesting fresh proposal…";
+
+    info.textContent =
+      "Waiting for Deriv…";
+
 
     try{
 
-      const proposal=
+      const proposal =
         await requestFreshProposal();
 
-      currentProposal=proposal;
+      currentProposal =
+        proposal;
 
-      $("proposalInfo").innerHTML=`
+
+      info.innerHTML = `
+
         Proposal ID:
         <b>${proposal.id}</b>
+
         <br>
-        Purchase Price:
-        <b>${proposal.ask_price??"—"}</b>
+
+        Ask price:
+        <b>${proposal.ask_price ?? "—"}</b>
+
         <br>
+
         Payout:
-        <b>${proposal.payout??"—"}</b>
+        <b>${proposal.payout ?? "—"}</b>
+
         <br>
+
         Spot:
-        <b>${proposal.spot??"—"}</b>
+        <b>${proposal.spot ?? "—"}</b>
+
       `;
 
-      $("tradeStatus").className=
+
+      status.className =
         "tradeStatus success";
 
-      $("tradeStatus").textContent=
+      status.textContent =
         "✓ Fresh proposal received.";
 
-      $("buyContract").classList.remove(
-        "hidden"
-      );
+
+      $("buyContract")
+        .classList.remove("hidden");
+
 
     }catch(error){
 
-      $("tradeStatus").className=
+      console.error(error);
+
+      status.className =
         "tradeStatus error";
 
-      $("tradeStatus").textContent=
+      status.textContent =
         error.message;
+
+      info.textContent =
+        "No valid proposal.";
 
     }finally{
 
-      button.disabled=false;
+      button.disabled = false;
+
     }
+
   }
 );
 
+
 /* =====================================================
-   BUY DEMO
-   ===================================================== */
+   BUY DEMO CONTRACT
+===================================================== */
 
 $("buyContract").addEventListener(
   "click",
   async function(){
 
-    if(currentAccountType!=="demo"){
+    const button =
+      $("buyContract");
 
-      $("tradeStatus").className=
+    const status =
+      $("tradeStatus");
+
+
+    if(
+      currentAccountType !== "demo"
+    ){
+
+      status.className =
         "tradeStatus error";
 
-      $("tradeStatus").textContent=
+      status.textContent =
         "Please connect the DEMO Deriv account first.";
 
       return;
+
     }
 
-    const button=$("buyContract");
 
-    button.disabled=true;
+    button.disabled = true;
 
-    $("getProposal").disabled=true;
+    $("getProposal").disabled = true;
 
-    $("tradeStatus").className=
+    status.className =
       "tradeStatus";
 
-    $("tradeStatus").textContent=
+    status.textContent =
       "Getting fresh proposal and purchasing…";
+
 
     try{
 
-      const proposal=
+      const freshProposal =
         await requestFreshProposal();
 
-      currentProposal=proposal;
 
-      const response=await fetch(
-        "/trading",
-        {
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json"
-          },
-          credentials:"same-origin",
-          cache:"no-store",
-          body:JSON.stringify({
+      const buyPayload = {
 
-            action:"buy",
+        action:
+          "buy",
 
-            account_type:"demo",
+        account_type:
+          "demo",
 
-            market:getSelectedMarket(),
+        market:
+          getSelectedMarket(),
 
-            proposal_id:String(proposal.id),
+        proposal_id:
+          String(
+            freshProposal.id
+          ),
 
-            price:Number(proposal.ask_price)
-          })
-        }
-      );
+        price:
+          Number(
+            freshProposal.ask_price
+          )
 
-      const data=await response.json();
+      };
 
-      if(!response.ok||!data.ok)
-        throw new Error(
-          data.error||"Demo purchase failed."
+
+      const buyResponse =
+        await fetch(
+          "/trading",
+          {
+
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            credentials:
+              "same-origin",
+
+            cache:
+              "no-store",
+
+            body:
+              JSON.stringify(
+                buyPayload
+              )
+
+          }
         );
 
-      const contractId=
-        data.contract?.contract_id;
 
-      $("tradeStatus").className=
+      const data =
+        await buyResponse.json();
+
+
+      if(
+        !buyResponse.ok ||
+        !data.ok
+      ){
+
+        throw new Error(
+          data.error ||
+          "Demo purchase failed."
+        );
+
+      }
+
+
+      status.className =
         "tradeStatus success";
 
-      $("tradeStatus").textContent=
+      status.textContent =
         `✓ DEMO contract purchased successfully.
-         Contract ID: ${contractId||"—"}`;
+         Contract ID:
+         ${data.contract?.contract_id || "—"}`;
 
-      $("proposalInfo").innerHTML=`
+
+      $("proposalInfo").innerHTML = `
+
         Proposal ID:
-        <b>${proposal.id}</b>
+        <b>${freshProposal.id}</b>
+
         <br>
+
         Purchase Price:
-        <b>${data.contract?.buy_price??proposal.ask_price}</b>
+        <b>${
+          data.contract?.buy_price ??
+          freshProposal.ask_price
+        }</b>
+
         <br>
+
         Payout:
-        <b>${data.contract?.payout??proposal.payout??"—"}</b>
+        <b>${
+          data.contract?.payout ??
+          freshProposal.payout ??
+          "—"
+        }</b>
+
       `;
 
-      $("buyContract").classList.add(
-        "hidden"
-      );
 
-      /* Automatically monitor the purchased contract */
-      if(contractId){
-        monitorContract(contractId);
-      }
+      currentProposal = null;
+
+      $("buyContract")
+        .classList.add("hidden");
+
 
     }catch(error){
 
-      $("tradeStatus").className=
+      console.error(error);
+
+      status.className =
         "tradeStatus error";
 
-      $("tradeStatus").textContent=
+      status.textContent =
         error.message;
 
     }finally{
 
-      button.disabled=false;
-      $("getProposal").disabled=false;
+      button.disabled = false;
+
+      $("getProposal").disabled = false;
+
     }
+
   }
 );
 
-/* =====================================================
-   CONTRACT STATUS
-   ===================================================== */
-
-async function monitorContract(contractId){
-
-  $("contractStatus").innerHTML=
-    `CONTRACT STATUS<br>
-     Status: <b>CHECKING…</b><br>
-     Contract ID: ${contractId}`;
-
-  try{
-
-    const response=await fetch(
-      "/trading",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        credentials:"same-origin",
-        cache:"no-store",
-        body:JSON.stringify({
-
-          action:"contract_status",
-
-          contract_id:String(contractId)
-        })
-      }
-    );
-
-    const data=await response.json();
-
-    if(!response.ok||!data.ok){
-
-      $("contractStatus").innerHTML=
-        `CONTRACT STATUS<br>
-         <span class="error">
-         ${data.error||"Could not get contract status."}
-         </span>`;
-
-      return;
-    }
-
-    const c=data.contract;
-
-    let statusClass="";
-
-    if(c.status==="WON")
-      statusClass="success";
-
-    if(c.status==="LOST")
-      statusClass="error";
-
-    $("contractStatus").innerHTML=`
-      CONTRACT STATUS<br>
-      Status:
-      <b class="${statusClass}">
-        ${c.status||"OPEN"}
-      </b>
-      <br>
-      Contract ID:
-      ${c.contract_id||contractId}
-      <br>
-      Profit/Loss:
-      ${c.profit??"—"}
-      <br>
-      Buy Price:
-      ${c.buy_price??"—"}
-      <br>
-      Payout:
-      ${c.payout??"—"}
-      <br>
-      Current Spot:
-      ${c.current_spot??"—"}
-    `;
-
-    if(c.status==="OPEN"){
-
-      setTimeout(
-        ()=>monitorContract(contractId),
-        1500
-      );
-    }
-
-  }catch(error){
-
-    $("contractStatus").innerHTML=
-      `CONTRACT STATUS<br>
-       <span class="error">
-       ${error.message}
-       </span>`;
-
-    setTimeout(
-      ()=>monitorContract(contractId),
-      3000
-    );
-  }
-}
 
 /* =====================================================
    START
-   ===================================================== */
+===================================================== */
 
 render();
+
+$("marketName").textContent =
+  marketNames[
+    getSelectedMarket()
+  ];
+
 connectMarket();
+
 checkAccount();
 
 </script>
+
 </body>
-  </html>
+   </html>
