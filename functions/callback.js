@@ -3,10 +3,17 @@ const REDIRECT_URI = "https://dollarticks.pages.dev/callback";
 const DERIV_API = "https://api.derivws.com";
 
 export async function onRequest(context) {
+
   const request = context.request;
   const url = new URL(request.url);
 
+
+  /* =====================================================
+     HTML RESPONSE
+  ===================================================== */
+
   function html(message, status = 400) {
+
     return new Response(
       `<!DOCTYPE html>
 <html>
@@ -14,42 +21,65 @@ export async function onRequest(context) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DollarTicks</title>
 </head>
+
 <body style="
 font-family:system-ui;
 background:#080b10;
 color:white;
 padding:30px;
 ">
+
 <h2>DollarTicks</h2>
+
 <p>${message}</p>
+
 <p>
-<a href="https://dollarticks.pages.dev/"
-style="color:#18c6d8">
+<a
+href="https://dollarticks.pages.dev/"
+style="color:#18c6d8"
+>
 Return to DollarTicks
 </a>
 </p>
+
 </body>
 </html>`,
       {
         status,
+
         headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Cache-Control": "no-store"
+          "Content-Type":
+            "text/html; charset=utf-8",
+
+          "Cache-Control":
+            "no-store"
         }
       }
     );
+
   }
 
+
+  /* =====================================================
+     COOKIE READER
+  ===================================================== */
+
   function getCookie(name) {
+
     const cookieHeader =
       request.headers.get("Cookie") || "";
 
-    for (const part of cookieHeader.split(";")) {
-      const index = part.indexOf("=");
+    for (
+      const part of cookieHeader.split(";")
+    ) {
+
+      const index =
+        part.indexOf("=");
 
       if (index === -1) continue;
 
-      const key = part.slice(0, index).trim();
+      const key =
+        part.slice(0, index).trim();
 
       if (key !== name) continue;
 
@@ -57,20 +87,25 @@ Return to DollarTicks
         part.slice(index + 1).trim();
 
       try {
+
         return decodeURIComponent(value);
+
       } catch {
+
         return value;
+
       }
+
     }
 
     return null;
+
   }
 
-  /*
-   * ==========================================
-   * OAUTH RESPONSE
-   * ==========================================
-   */
+
+  /* =====================================================
+     OAUTH RESPONSE
+  ===================================================== */
 
   const code =
     url.searchParams.get("code");
@@ -84,31 +119,39 @@ Return to DollarTicks
   const oauthErrorDescription =
     url.searchParams.get("error_description");
 
+
   if (oauthError) {
+
     return html(
-      `Deriv authorization failed.<br><br>
+      `Authorization failed.<br><br>
        Error: ${oauthError}<br>
        ${oauthErrorDescription || ""}`
     );
+
   }
+
 
   if (!code) {
+
     return html(
-      "No authorization code was returned by Deriv."
+      "No authorization code was returned."
     );
+
   }
+
 
   if (!returnedState) {
+
     return html(
-      "No OAuth state was returned by Deriv."
+      "No OAuth state was returned."
     );
+
   }
 
-  /*
-   * ==========================================
-   * READ PKCE COOKIES
-   * ==========================================
-   */
+
+  /* =====================================================
+     READ PKCE COOKIES
+  ===================================================== */
 
   const savedState =
     getCookie("dt_oauth_state");
@@ -116,320 +159,505 @@ Return to DollarTicks
   const codeVerifier =
     getCookie("dt_pkce_verifier");
 
+
   if (!savedState) {
+
     return html(
-      "OAuth state cookie is missing. Please tap Connect Deriv again."
+      "OAuth session expired. Please start the connection again."
     );
+
   }
+
 
   if (!codeVerifier) {
+
     return html(
-      "PKCE verifier cookie is missing. Please tap Connect Deriv again."
+      "OAuth verification data is missing. Please start the connection again."
     );
+
   }
 
-  /*
-   * ==========================================
-   * VERIFY STATE
-   * ==========================================
-   */
 
-  if (returnedState !== savedState) {
+  /* =====================================================
+     VERIFY STATE
+  ===================================================== */
+
+  if (
+    returnedState !== savedState
+  ) {
+
     return html(
-      "OAuth state verification failed. Please connect Deriv again."
+      "OAuth verification failed. Please try again."
     );
+
   }
 
-  /*
-   * ==========================================
-   * EXCHANGE CODE FOR TOKEN
-   * ==========================================
-   */
+
+  /* =====================================================
+     EXCHANGE CODE FOR TOKEN
+  ===================================================== */
 
   let tokenResponse;
 
+
   try {
-    tokenResponse = await fetch(
-      "https://auth.deriv.com/oauth2/token",
-      {
-        method: "POST",
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded",
-          "Accept":
-            "application/json"
-        },
+    tokenResponse =
+      await fetch(
+        "https://auth.deriv.com/oauth2/token",
+        {
+          method: "POST",
 
-        body: new URLSearchParams({
-          grant_type:
-            "authorization_code",
+          headers: {
+            "Content-Type":
+              "application/x-www-form-urlencoded",
 
-          client_id:
-            CLIENT_ID,
+            "Accept":
+              "application/json"
+          },
 
-          code:
-            code,
+          body:
+            new URLSearchParams({
 
-          code_verifier:
-            codeVerifier,
+              grant_type:
+                "authorization_code",
 
-          redirect_uri:
-            REDIRECT_URI
-        })
-      }
-    );
+              client_id:
+                CLIENT_ID,
+
+              code:
+                code,
+
+              code_verifier:
+                codeVerifier,
+
+              redirect_uri:
+                REDIRECT_URI
+
+            })
+        }
+      );
+
   } catch (error) {
+
     console.error(
       "DollarTicks token request failed:",
       error
     );
 
     return html(
-      "Could not contact Deriv's OAuth token service."
+      "Could not contact the authorization service."
     );
+
   }
+
+
+  /* =====================================================
+     READ TOKEN RESPONSE
+  ===================================================== */
 
   let tokenData;
 
+
   try {
+
     tokenData =
       await tokenResponse.json();
+
   } catch {
+
     return html(
-      "Deriv returned an invalid OAuth response."
+      "Authorization service returned an invalid response."
     );
+
   }
+
 
   console.log(
     "DollarTicks OAuth token response:",
     {
-      ok: tokenResponse.ok,
+      ok:
+        tokenResponse.ok,
+
       hasAccessToken:
-        Boolean(tokenData?.access_token),
+        Boolean(
+          tokenData?.access_token
+        ),
+
       error:
         tokenData?.error || null
     }
   );
 
+
   if (
     !tokenResponse.ok ||
     !tokenData?.access_token
   ) {
+
     return html(
-      `Deriv did not issue an access token.<br><br>
+      `Authorization did not issue an access token.<br><br>
        ${tokenData?.error || ""}<br>
        ${tokenData?.error_description || ""}`
     );
+
   }
+
 
   const accessToken =
     tokenData.access_token;
 
-  /*
-   * ==========================================
-   * VERIFY TOKEN WITH OPTIONS API
-   * ==========================================
-   */
+
+  /* =====================================================
+     VERIFY TOKEN WITH OPTIONS API
+  ===================================================== */
 
   let accountResponse;
 
+
   try {
-    accountResponse = await fetch(
-      `${DERIV_API}/trading/v1/options/accounts`,
-      {
-        method: "GET",
 
-        headers: {
-          "Authorization":
-            `Bearer ${accessToken}`,
+    accountResponse =
+      await fetch(
+        `${DERIV_API}/trading/v1/options/accounts`,
+        {
+          method: "GET",
 
-          "Deriv-App-ID":
-            CLIENT_ID,
+          headers: {
 
-          "Accept":
-            "application/json"
-        },
+            "Authorization":
+              `Bearer ${accessToken}`,
 
-        cache: "no-store"
-      }
-    );
+            "Deriv-App-ID":
+              CLIENT_ID,
+
+            "Accept":
+              "application/json"
+
+          },
+
+          cache:
+            "no-store"
+        }
+      );
+
   } catch (error) {
+
     console.error(
       "DollarTicks Options account request failed:",
       error
     );
 
     return html(
-      "OAuth succeeded, but DollarTicks could not contact Deriv Options."
+      "Authorization succeeded, but the trading account could not be loaded."
     );
+
   }
+
+
+  /* =====================================================
+     READ ACCOUNT RESPONSE
+  ===================================================== */
 
   let accountData;
 
+
   try {
+
     accountData =
       await accountResponse.json();
+
   } catch {
+
     return html(
-      "Deriv returned an invalid Options account response."
+      "The trading account service returned an invalid response."
     );
+
   }
+
 
   console.log(
     "DollarTicks Options account response:",
     accountData
   );
 
+
   if (!accountResponse.ok) {
+
     const message =
       accountData?.errors?.[0]?.message ||
       accountData?.error?.message ||
-      "Deriv rejected the authenticated Options request.";
+      "The authenticated account request was rejected.";
 
     return html(
-      `Login succeeded, but Deriv rejected the Options account request.<br><br>
+      `Account authorization failed.<br><br>
        <b>${message}</b>`
     );
+
   }
 
-  /*
-   * ==========================================
-   * MAKE SURE AN OPTIONS ACCOUNT EXISTS
-   * ==========================================
-   */
+
+  /* =====================================================
+     FIND OPTIONS ACCOUNTS
+  ===================================================== */
 
   function findAccounts(value) {
+
     const result = [];
 
+
     function scan(item) {
+
       if (!item) return;
 
+
       if (Array.isArray(item)) {
-        for (const child of item) {
+
+        for (
+          const child of item
+        ) {
+
           scan(child);
+
         }
+
         return;
+
       }
+
 
       if (
         typeof item !== "object"
       ) {
+
         return;
+
       }
+
 
       if (
         item.account_id ||
         item.loginid ||
         item.id
       ) {
+
         result.push(item);
+
       }
+
 
       for (
         const child of Object.values(item)
       ) {
+
         if (
           child &&
           typeof child === "object"
         ) {
+
           scan(child);
+
         }
+
       }
+
     }
+
 
     scan(value);
 
-    const seen = new Set();
 
-    return result.filter(account => {
-      const id =
-        account.account_id ||
-        account.loginid ||
-        account.id;
+    const seen =
+      new Set();
 
-      if (!id) return false;
 
-      const key = String(id);
+    return result.filter(
+      account => {
 
-      if (seen.has(key)) {
-        return false;
+        const id =
+          account.account_id ||
+          account.loginid ||
+          account.id;
+
+
+        if (!id) {
+
+          return false;
+
+        }
+
+
+        const key =
+          String(id);
+
+
+        if (
+          seen.has(key)
+        ) {
+
+          return false;
+
+        }
+
+
+        seen.add(key);
+
+        return true;
+
       }
+    );
 
-      seen.add(key);
-
-      return true;
-    });
   }
+
 
   const accounts =
     findAccounts(accountData);
 
+
   if (!accounts.length) {
+
     return html(
-      "Deriv login succeeded, but no Options account was returned."
+      "Authorization succeeded, but no trading account was returned."
     );
+
   }
+
 
   console.log(
     "DollarTicks authenticated accounts:",
-    accounts.map(account => ({
-      account_id:
-        account.account_id ||
-        account.loginid ||
-        account.id ||
-        null,
+    accounts.map(
+      account => ({
 
-      account_type:
-        account.account_type ||
-        null,
+        account_id:
+          account.account_id ||
+          account.loginid ||
+          account.id ||
+          null,
 
-      currency:
-        account.currency ||
-        null
-    }))
+        account_type:
+          account.account_type ||
+          null,
+
+        currency:
+          account.currency ||
+          null
+
+      })
+    )
   );
 
+
+  /* =====================================================
+     SAVE ACCESS TOKEN
+  ===================================================== */
+
   /*
-   * ==========================================
-   * SAVE ACCESS TOKEN
+   * IMPORTANT:
    *
-   * THIS IS THE IMPORTANT PART
-   * ==========================================
+   * This cookie is what /trading reads.
+   *
+   * HttpOnly:
+   * Browser JavaScript cannot read the token.
+   *
+   * Secure:
+   * Cookie is sent only over HTTPS.
+   *
+   * SameSite=Lax:
+   * Allows the OAuth redirect back to DollarTicks.
+   *
+   * Path=/:
+   * Makes the token available to /trading.
+   *
+   * Domain:
+   * Makes the cookie explicitly belong to
+   * dollarticks.pages.dev.
    */
 
   const tokenCookie =
-    "dt_access_token=" +
-    encodeURIComponent(accessToken) +
-    "; Path=/; Max-Age=3500; Secure; HttpOnly; SameSite=Lax";
+    [
+      "dt_access_token=" +
+        encodeURIComponent(
+          accessToken
+        ),
 
-  /*
-   * Remove OAuth cookies after successful login.
-   */
+      "Path=/",
+
+      "Domain=dollarticks.pages.dev",
+
+      "Max-Age=3500",
+
+      "Secure",
+
+      "HttpOnly",
+
+      "SameSite=Lax"
+    ].join("; ");
+
+
+  /* =====================================================
+     DELETE OLD OAUTH COOKIES
+  ===================================================== */
 
   const expiredStateCookie =
-    "dt_oauth_state=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
+    [
+      "dt_oauth_state=",
+
+      "Path=/",
+
+      "Domain=dollarticks.pages.dev",
+
+      "Max-Age=0",
+
+      "Secure",
+
+      "HttpOnly",
+
+      "SameSite=Lax"
+    ].join("; ");
+
 
   const expiredVerifierCookie =
-    "dt_pkce_verifier=; Path=/; Max-Age=0; Secure; HttpOnly; SameSite=Lax";
+    [
+      "dt_pkce_verifier=",
+
+      "Path=/",
+
+      "Domain=dollarticks.pages.dev",
+
+      "Max-Age=0",
+
+      "Secure",
+
+      "HttpOnly",
+
+      "SameSite=Lax"
+    ].join("; ");
+
+
+  /* =====================================================
+     REDIRECT
+  ===================================================== */
 
   const headers =
     new Headers();
+
 
   headers.set(
     "Location",
     "https://dollarticks.pages.dev/"
   );
 
+
   headers.set(
     "Cache-Control",
     "no-store, no-cache, must-revalidate"
   );
 
+
   /*
    * IMPORTANT:
-   * append() is used so all three
-   * Set-Cookie headers are preserved.
+   *
+   * append() preserves all Set-Cookie headers.
    */
 
   headers.append(
@@ -437,24 +665,29 @@ Return to DollarTicks
     tokenCookie
   );
 
+
   headers.append(
     "Set-Cookie",
     expiredStateCookie
   );
+
 
   headers.append(
     "Set-Cookie",
     expiredVerifierCookie
   );
 
-  /*
-   * ==========================================
-   * SUCCESS
-   * ==========================================
-   */
 
-  return new Response(null, {
-    status: 303,
-    headers
-  });
-}
+  /* =====================================================
+     SUCCESS
+  ===================================================== */
+
+  return new Response(
+    null,
+    {
+      status: 303,
+      headers
+    }
+  );
+
+      }
