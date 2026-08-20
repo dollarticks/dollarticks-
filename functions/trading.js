@@ -157,18 +157,23 @@ async function getSelectedAccount(
     );
   }
 
+  const wantedType = String(
+    requestedType || "demo"
+  ).toLowerCase();
+
   const account = findAccount(
     accounts,
-    requestedType
+    wantedType
   );
 
   if (!account) {
     throw new Error(
-      `No ${String(requestedType).toUpperCase()} trading account is available.`
+      `No ${wantedType.toUpperCase()} trading account is available.`
     );
   }
 
-  const accountId = getAccountId(account);
+  const accountId =
+    getAccountId(account);
 
   if (!accountId) {
     throw new Error(
@@ -179,9 +184,12 @@ async function getSelectedAccount(
   return {
     account,
     accountId,
-    accountType: getAccountType(account),
-    balance: getAccountBalance(account),
-    currency: account.currency || "USD"
+    accountType:
+      getAccountType(account),
+    balance:
+      getAccountBalance(account),
+    currency:
+      account.currency || "USD"
   };
 }
 
@@ -189,7 +197,10 @@ async function getSelectedAccount(
    GET AUTHENTICATED WEBSOCKET URL
 ===================================================== */
 
-async function getOTP(token, accountId) {
+async function getOTP(
+  token,
+  accountId
+) {
   const response = await fetch(
     `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(accountId)}/otp`,
     {
@@ -203,7 +214,8 @@ async function getOTP(token, accountId) {
     }
   );
 
-  const raw = await response.text();
+  const raw =
+    await response.text();
 
   let data;
 
@@ -239,7 +251,11 @@ async function getOTP(token, accountId) {
     );
   }
 
-  if (!String(wsUrl).startsWith("wss://")) {
+  if (
+    !String(wsUrl).startsWith(
+      "wss://"
+    )
+  ) {
     throw new Error(
       "Trading service returned an invalid WebSocket URL."
     );
@@ -253,59 +269,74 @@ async function getOTP(token, accountId) {
 ===================================================== */
 
 function openWebSocket(wsUrl) {
-  return new Promise((resolve, reject) => {
-    let ws;
+  return new Promise(
+    (resolve, reject) => {
 
-    const timeout = setTimeout(() => {
+      let ws;
+
+      const timeout =
+        setTimeout(() => {
+
+          try {
+            ws?.close();
+          } catch {}
+
+          reject(
+            new Error(
+              "Trading connection timed out."
+            )
+          );
+
+        }, 20000);
+
       try {
-        ws?.close();
-      } catch {}
+        ws =
+          new WebSocket(wsUrl);
+      } catch {
+        clearTimeout(timeout);
 
-      reject(
-        new Error(
-          "Trading connection timed out."
-        )
+        reject(
+          new Error(
+            "Could not open the trading connection."
+          )
+        );
+
+        return;
+      }
+
+      ws.addEventListener(
+        "open",
+        () => {
+
+          clearTimeout(timeout);
+
+          console.log(
+            "DollarTicks WebSocket connected."
+          );
+
+          resolve(ws);
+        }
       );
-    }, 20000);
 
-    try {
-      ws = new WebSocket(wsUrl);
-    } catch {
-      clearTimeout(timeout);
+      ws.addEventListener(
+        "error",
+        () => {
 
-      reject(
-        new Error(
-          "Could not open the trading connection."
-        )
+          clearTimeout(timeout);
+
+          try {
+            ws?.close();
+          } catch {}
+
+          reject(
+            new Error(
+              "Trading connection failed."
+            )
+          );
+        }
       );
-
-      return;
     }
-
-    ws.addEventListener("open", () => {
-      clearTimeout(timeout);
-
-      console.log(
-        "DollarTicks WebSocket connected."
-      );
-
-      resolve(ws);
-    });
-
-    ws.addEventListener("error", () => {
-      clearTimeout(timeout);
-
-      try {
-        ws?.close();
-      } catch {}
-
-      reject(
-        new Error(
-          "Trading connection failed."
-        )
-      );
-    });
-  });
+  );
 }
 
 /* =====================================================
@@ -317,132 +348,162 @@ function sendRequest(
   payload,
   wantedMsgType
 ) {
-  return new Promise((resolve, reject) => {
-    let finished = false;
+  return new Promise(
+    (resolve, reject) => {
 
-    const timeout = setTimeout(() => {
-      if (finished) return;
+      let finished =
+        false;
 
-      finished = true;
+      const timeout =
+        setTimeout(() => {
 
-      cleanup();
+          if (finished)
+            return;
 
-      reject(
-        new Error(
-          "Trading service timed out."
-        )
-      );
-    }, 20000);
+          finished = true;
 
-    function cleanup() {
-      clearTimeout(timeout);
+          cleanup();
 
-      ws.removeEventListener(
-        "message",
-        onMessage
-      );
+          reject(
+            new Error(
+              "Trading service timed out."
+            )
+          );
 
-      ws.removeEventListener(
-        "error",
-        onError
-      );
+        }, 20000);
 
-      ws.removeEventListener(
-        "close",
-        onClose
-      );
-    }
+      function cleanup() {
 
-    function finishError(message) {
-      if (finished) return;
-
-      finished = true;
-
-      cleanup();
-
-      reject(
-        new Error(message)
-      );
-    }
-
-    function onMessage(event) {
-      let data;
-
-      try {
-        data = JSON.parse(event.data);
-      } catch {
-        return;
-      }
-
-      console.log(
-        "DollarTicks WebSocket response:",
-        data
-      );
-
-      if (data.error) {
-        finishError(
-          data.error.message ||
-          "Deriv rejected the trading request."
+        clearTimeout(
+          timeout
         );
 
-        return;
+        ws.removeEventListener(
+          "message",
+          onMessage
+        );
+
+        ws.removeEventListener(
+          "error",
+          onError
+        );
+
+        ws.removeEventListener(
+          "close",
+          onClose
+        );
       }
 
-      if (
-        data.msg_type === wantedMsgType
+      function finishError(
+        message
       ) {
-        if (finished) return;
+
+        if (finished)
+          return;
 
         finished = true;
 
         cleanup();
 
-        resolve(data);
+        reject(
+          new Error(message)
+        );
+      }
+
+      function onMessage(event) {
+
+        let data;
+
+        try {
+          data =
+            JSON.parse(
+              event.data
+            );
+        } catch {
+          return;
+        }
+
+        console.log(
+          "DollarTicks WebSocket response:",
+          data
+        );
+
+        if (data.error) {
+
+          finishError(
+            data.error.message ||
+            "Deriv rejected the trading request."
+          );
+
+          return;
+        }
+
+        if (
+          data.msg_type ===
+          wantedMsgType
+        ) {
+
+          if (finished)
+            return;
+
+          finished = true;
+
+          cleanup();
+
+          resolve(data);
+        }
+      }
+
+      function onError() {
+
+        finishError(
+          "Trading connection failed."
+        );
+      }
+
+      function onClose() {
+
+        finishError(
+          "Trading connection closed unexpectedly."
+        );
+      }
+
+      ws.addEventListener(
+        "message",
+        onMessage
+      );
+
+      ws.addEventListener(
+        "error",
+        onError
+      );
+
+      ws.addEventListener(
+        "close",
+        onClose
+      );
+
+      try {
+
+        ws.send(
+          JSON.stringify(
+            payload
+          )
+        );
+
+        console.log(
+          "DollarTicks request sent:",
+          payload
+        );
+
+      } catch {
+
+        finishError(
+          "Could not send the trading request."
+        );
       }
     }
-
-    function onError() {
-      finishError(
-        "Trading connection failed."
-      );
-    }
-
-    function onClose() {
-      finishError(
-        "Trading connection closed unexpectedly."
-      );
-    }
-
-    ws.addEventListener(
-      "message",
-      onMessage
-    );
-
-    ws.addEventListener(
-      "error",
-      onError
-    );
-
-    ws.addEventListener(
-      "close",
-      onClose
-    );
-
-    try {
-      ws.send(
-        JSON.stringify(payload)
-      );
-
-      console.log(
-        "DollarTicks request sent:",
-        payload
-      );
-    } catch {
-      finishError(
-        "Could not send the trading request."
-      );
-    }
-  });
+  );
 }
 
 /* =====================================================
@@ -450,141 +511,98 @@ function sendRequest(
 ===================================================== */
 
 function closeWebSocket(ws) {
+
   try {
+
     if (
       ws &&
       (
-        ws.readyState === WebSocket.OPEN ||
-        ws.readyState === WebSocket.CONNECTING
+        ws.readyState ===
+        WebSocket.OPEN ||
+        ws.readyState ===
+        WebSocket.CONNECTING
       )
     ) {
+
       ws.close();
     }
+
   } catch {}
 }
 
 /* =====================================================
-   CONTRACT STATUS
+   GET FRESH BALANCE FROM DERIV
 ===================================================== */
 
-function normalizeContract(contract) {
-  if (!contract) {
-    return null;
-  }
+async function getFreshBalance(
+  token,
+  accountId
+) {
 
-  const profit = Number(
-    contract.profit ??
-    0
-  );
+  let ws;
 
-  const payout = Number(
-    contract.payout ??
-    0
-  );
+  try {
 
-  const buyPrice = Number(
-    contract.buy_price ??
-    contract.buy_price_value ??
-    0
-  );
+    const wsUrl =
+      await getOTP(
+        token,
+        accountId
+      );
 
-  let status =
-    String(
-      contract.status ||
-      ""
-    ).toUpperCase();
+    ws =
+      await openWebSocket(
+        wsUrl
+      );
 
-  if (
-    contract.is_sold ||
-    contract.is_expired ||
-    contract.is_valid_to_sell === false
-  ) {
-    if (
-      profit > 0
-    ) {
-      status = "WON";
-    } else if (
-      profit < 0
-    ) {
-      status = "LOST";
+    const response =
+      await sendRequest(
+        ws,
+        {
+          balance: 1,
+          req_id: 101
+        },
+        "balance"
+      );
+
+    const balanceData =
+      response?.balance;
+
+    if (!balanceData) {
+      throw new Error(
+        "Deriv did not return balance information."
+      );
     }
-  }
 
-  if (
-    status === "WIN"
-  ) {
-    status = "WON";
-  }
-
-  if (
-    status === "LOSS"
-  ) {
-    status = "LOST";
-  }
-
-  if (
-    !status
-  ) {
-    status = "OPEN";
-  }
-
-  return {
-    contract_id:
-      contract.contract_id ||
-      contract.id ||
-      null,
-
-    status,
-
-    buy_price:
-      Number.isFinite(buyPrice)
-        ? buyPrice
-        : 0,
-
-    payout:
-      Number.isFinite(payout)
-        ? payout
-        : 0,
-
-    profit:
-      Number.isFinite(profit)
-        ? profit
-        : 0,
-
-    sell_price:
+    const balance =
       Number(
-        contract.sell_price ??
-        0
-      ),
+        balanceData.balance
+      );
 
-    entry_tick:
-      contract.entry_tick ??
-      null,
+    if (
+      !Number.isFinite(
+        balance
+      )
+    ) {
+      throw new Error(
+        "Deriv returned an invalid balance."
+      );
+    }
 
-    exit_tick:
-      contract.exit_tick ??
-      null,
+    return {
+      balance,
+      currency:
+        balanceData.currency ||
+        "USD"
+    };
 
-    entry_spot:
-      contract.entry_spot ??
-      null,
+  } finally {
 
-    exit_spot:
-      contract.exit_spot ??
-      null,
-
-    expiry_time:
-      contract.expiry_time ??
-      null,
-
-    current_spot:
-      contract.current_spot ??
-      null
-  };
+    closeWebSocket(ws);
+  }
 }
 
 /* =====================================================
-   GET CONTRACT
+   GET CONTRACT STATUS
 ===================================================== */
 
 async function getContractStatus(
@@ -592,21 +610,17 @@ async function getContractStatus(
   accountId,
   contractId
 ) {
-  if (!contractId) {
-    throw new Error(
-      "No contract ID was supplied."
-    );
-  }
-
-  const wsUrl =
-    await getOTP(
-      token,
-      accountId
-    );
 
   let ws;
 
   try {
+
+    const wsUrl =
+      await getOTP(
+        token,
+        accountId
+      );
+
     ws =
       await openWebSocket(
         wsUrl
@@ -620,15 +634,13 @@ async function getContractStatus(
           contract_id:
             Number(contractId),
           subscribe: 0,
-          req_id: 20
+          req_id: 202
         },
         "proposal_open_contract"
       );
 
     const contract =
-      normalizeContract(
-        response?.proposal_open_contract
-      );
+      response?.proposal_open_contract;
 
     if (!contract) {
       throw new Error(
@@ -636,9 +648,89 @@ async function getContractStatus(
       );
     }
 
-    return contract;
+    const status =
+      String(
+        contract.status ||
+        "open"
+      ).toUpperCase();
+
+    const isFinished =
+      Boolean(
+        contract.is_sold ||
+        status === "WON" ||
+        status === "LOST" ||
+        status === "SOLD" ||
+        status === "EXPIRED"
+      );
+
+    let finalStatus =
+      status;
+
+    if (
+      isFinished &&
+      Number(contract.profit) > 0
+    ) {
+      finalStatus =
+        "WON";
+    } else if (
+      isFinished &&
+      Number(contract.profit) <= 0
+    ) {
+      finalStatus =
+        "LOST";
+    } else {
+      finalStatus =
+        "OPEN";
+    }
+
+    return {
+      contract_id:
+        contract.contract_id ||
+        contractId,
+
+      status:
+        finalStatus,
+
+      buy_price:
+        Number(
+          contract.buy_price ??
+          contract.buy_price ??
+          0
+        ),
+
+      payout:
+        Number(
+          contract.payout ??
+          0
+        ),
+
+      profit:
+        Number(
+          contract.profit ??
+          0
+        ),
+
+      exit_spot:
+        contract.exit_tick ??
+        contract.exit_spot ??
+        contract.exit_tick_display_value ??
+        null,
+
+      entry_spot:
+        contract.entry_tick ??
+        null,
+
+      is_sold:
+        Boolean(
+          contract.is_sold
+        ),
+
+      finished:
+        isFinished
+    };
 
   } finally {
+
     closeWebSocket(ws);
   }
 }
@@ -647,7 +739,10 @@ async function getContractStatus(
    MAIN
 ===================================================== */
 
-export async function onRequest(context) {
+export async function onRequest(
+  context
+) {
+
   const request =
     context.request;
 
@@ -655,6 +750,7 @@ export async function onRequest(context) {
     request.method !== "GET" &&
     request.method !== "POST"
   ) {
+
     return json(
       {
         ok: false,
@@ -672,6 +768,7 @@ export async function onRequest(context) {
     );
 
   if (!token) {
+
     return json(
       {
         ok: false,
@@ -688,10 +785,14 @@ export async function onRequest(context) {
   if (
     request.method === "POST"
   ) {
+
     try {
+
       body =
         await request.json();
+
     } catch {
+
       return json(
         {
           ok: false,
@@ -703,10 +804,15 @@ export async function onRequest(context) {
     }
   }
 
+  /* ===================================================
+     ACCOUNT TYPE
+  =================================================== */
+
   let requestedType =
     "demo";
 
   try {
+
     const url =
       new URL(
         request.url
@@ -721,6 +827,7 @@ export async function onRequest(context) {
       queryType === "demo" ||
       queryType === "real"
     ) {
+
       requestedType =
         queryType;
     }
@@ -728,16 +835,24 @@ export async function onRequest(context) {
   } catch {}
 
   if (
-    body.account_type === "demo" ||
-    body.account_type === "real"
+    body.account_type ===
+      "demo" ||
+    body.account_type ===
+      "real"
   ) {
+
     requestedType =
       body.account_type;
   }
 
+  /* ===================================================
+     GET ACCOUNT
+  =================================================== */
+
   let selected;
 
   try {
+
     selected =
       await getSelectedAccount(
         token,
@@ -767,7 +882,7 @@ export async function onRequest(context) {
   } = selected;
 
   /* ===================================================
-     GET ACCOUNT
+     GET
   =================================================== */
 
   if (
@@ -776,7 +891,9 @@ export async function onRequest(context) {
 
     return json({
       ok: true,
+
       connected: true,
+
       account: {
         account_id:
           accountId,
@@ -795,7 +912,82 @@ export async function onRequest(context) {
           "active"
       }
     });
+  }
 
+  /* ===================================================
+     SELECT ACCOUNT
+  =================================================== */
+
+  if (
+    body.action ===
+    "select_account"
+  ) {
+
+    const type =
+      body.account_type;
+
+    if (
+      type !== "demo" &&
+      type !== "real"
+    ) {
+
+      return json(
+        {
+          ok: false,
+          error:
+            "Invalid account type."
+        },
+        400
+      );
+    }
+
+    try {
+
+      const selectedAccount =
+        await getSelectedAccount(
+          token,
+          type
+        );
+
+      return json({
+        ok: true,
+
+        connected: true,
+
+        message:
+          `${type.toUpperCase()} account selected.`,
+
+        account: {
+          account_id:
+            selectedAccount.accountId,
+
+          account_type:
+            selectedAccount.accountType,
+
+          balance:
+            selectedAccount.balance,
+
+          currency:
+            selectedAccount.currency,
+
+          status:
+            selectedAccount.account.status ||
+            "active"
+        }
+      });
+
+    } catch (error) {
+
+      return json(
+        {
+          ok: false,
+          error:
+            error.message ||
+            "Could not switch account."
+        },
+        400
+      );
+    }
   }
 
   /* ===================================================
@@ -803,27 +995,48 @@ export async function onRequest(context) {
   =================================================== */
 
   if (
-    body.action === "balance"
+    body.action ===
+    "balance"
   ) {
 
-    return json({
-      ok: true,
+    try {
 
-      balance:
-        balance,
+      const fresh =
+        await getFreshBalance(
+          token,
+          accountId
+        );
 
-      currency:
-        currency,
+      return json({
+        ok: true,
 
-      account: {
-        account_id:
-          accountId,
+        balance:
+          fresh.balance,
 
-        account_type:
-          accountType
-      }
-    });
+        currency:
+          fresh.currency,
 
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            accountType
+        }
+      });
+
+    } catch (error) {
+
+      return json(
+        {
+          ok: false,
+          error:
+            error.message ||
+            "Could not retrieve fresh balance."
+        },
+        502
+      );
+    }
   }
 
   /* ===================================================
@@ -831,8 +1044,10 @@ export async function onRequest(context) {
   =================================================== */
 
   if (
-    body.action === "session" ||
-    body.action === "trading_session"
+    body.action ===
+      "session" ||
+    body.action ===
+      "trading_session"
   ) {
 
     let ws;
@@ -862,8 +1077,11 @@ export async function onRequest(context) {
 
       return json({
         ok: true,
+
         connected: true,
-        trading_ready: true,
+
+        trading_ready:
+          true,
 
         balance:
           test?.balance?.balance ??
@@ -892,8 +1110,12 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
+
           connected: true,
-          trading_ready: false,
+
+          trading_ready:
+            false,
+
           error:
             error.message ||
             "Trading session could not be established."
@@ -904,9 +1126,7 @@ export async function onRequest(context) {
     } finally {
 
       closeWebSocket(ws);
-
     }
-
   }
 
   /* ===================================================
@@ -914,21 +1134,32 @@ export async function onRequest(context) {
   =================================================== */
 
   if (
-    body.action === "contract_status"
+    body.action ===
+    "contract_status"
   ) {
 
+    const contractId =
+      Number(
+        body.contract_id
+      );
+
+    if (
+      !Number.isFinite(
+        contractId
+      )
+    ) {
+
+      return json(
+        {
+          ok: false,
+          error:
+            "Invalid contract ID."
+        },
+        400
+      );
+    }
+
     try {
-
-      const contractId =
-        body.contract_id;
-
-      if (
-        !contractId
-      ) {
-        throw new Error(
-          "No contract ID was supplied."
-        );
-      }
 
       const contract =
         await getContractStatus(
@@ -937,19 +1168,54 @@ export async function onRequest(context) {
           contractId
         );
 
+      let freshBalance =
+        null;
+
+      /*
+       * Only refresh the account balance
+       * when the contract is actually finished.
+       */
+
+      if (
+        contract.finished
+      ) {
+
+        try {
+
+          freshBalance =
+            await getFreshBalance(
+              token,
+              accountId
+            );
+
+        } catch (
+          balanceError
+        ) {
+
+          console.error(
+            "Fresh balance error:",
+            balanceError
+          );
+        }
+      }
+
       return json({
         ok: true,
-        connected: true,
 
-        account: {
-          account_id:
-            accountId,
+        contract,
 
-          account_type:
-            accountType
-        },
+        balance:
+          freshBalance?.balance ??
+          null,
 
-        contract
+        currency:
+          freshBalance?.currency ??
+          currency,
+
+        balance_updated:
+          Boolean(
+            freshBalance
+          )
       });
 
     } catch (error) {
@@ -962,16 +1228,13 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
-          connected: true,
           error:
             error.message ||
-            "Could not retrieve contract status."
+            "Could not check contract status."
         },
-        400
+        502
       );
-
     }
-
   }
 
   /* ===================================================
@@ -979,7 +1242,8 @@ export async function onRequest(context) {
   =================================================== */
 
   if (
-    body.action === "buy"
+    body.action ===
+    "buy"
   ) {
 
     let ws;
@@ -994,9 +1258,8 @@ export async function onRequest(context) {
           ""
         ).trim();
 
-      if (
-        !market
-      ) {
+      if (!market) {
+
         throw new Error(
           "No trading market was selected."
         );
@@ -1008,9 +1271,8 @@ export async function onRequest(context) {
           ""
         ).trim();
 
-      if (
-        !contractType
-      ) {
+      if (!contractType) {
+
         throw new Error(
           "No contract type was selected."
         );
@@ -1022,9 +1284,12 @@ export async function onRequest(context) {
         );
 
       if (
-        !Number.isFinite(stake) ||
+        !Number.isFinite(
+          stake
+        ) ||
         stake <= 0
       ) {
+
         throw new Error(
           "Enter a valid stake."
         );
@@ -1032,14 +1297,16 @@ export async function onRequest(context) {
 
       const duration =
         Number(
-          body.duration ||
-          1
+          body.duration || 1
         );
 
       if (
-        !Number.isFinite(duration) ||
+        !Number.isFinite(
+          duration
+        ) ||
         duration < 1
       ) {
+
         throw new Error(
           "Enter a valid duration."
         );
@@ -1050,6 +1317,10 @@ export async function onRequest(context) {
           body.duration_unit ||
           "t"
         );
+
+      /* -----------------------------------------------
+         GET FRESH WEBSOCKET
+      ----------------------------------------------- */
 
       const wsUrl =
         await getOTP(
@@ -1063,10 +1334,11 @@ export async function onRequest(context) {
         );
 
       /* -----------------------------------------------
-         PROPOSAL
+         CREATE PROPOSAL
       ----------------------------------------------- */
 
       const proposalPayload = {
+
         proposal: 1,
 
         amount:
@@ -1112,7 +1384,6 @@ export async function onRequest(context) {
             body.barrier ??
             "5"
           );
-
       }
 
       const proposalResponse =
@@ -1128,6 +1399,7 @@ export async function onRequest(context) {
       if (
         !proposal?.id
       ) {
+
         throw new Error(
           "Deriv did not return a valid proposal."
         );
@@ -1141,16 +1413,19 @@ export async function onRequest(context) {
         );
 
       if (
-        !Number.isFinite(askPrice) ||
+        !Number.isFinite(
+          askPrice
+        ) ||
         askPrice <= 0
       ) {
+
         throw new Error(
           "Deriv returned an invalid contract price."
         );
       }
 
       /* -----------------------------------------------
-         BUY
+         BUY ON SAME WEBSOCKET
       ----------------------------------------------- */
 
       const buyResponse =
@@ -1177,6 +1452,7 @@ export async function onRequest(context) {
       if (
         !buy?.contract_id
       ) {
+
         throw new Error(
           "Deriv did not return a contract ID."
         );
@@ -1189,6 +1465,7 @@ export async function onRequest(context) {
           "Contract purchased successfully.",
 
         contract: {
+
           contract_id:
             buy.contract_id,
 
@@ -1233,7 +1510,6 @@ export async function onRequest(context) {
             body.barrier ??
             null
         }
-
       });
 
     } catch (error) {
@@ -1246,7 +1522,9 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
+
           connected: true,
+
           error:
             error.message ||
             "Purchase failed."
@@ -1257,9 +1535,7 @@ export async function onRequest(context) {
     } finally {
 
       closeWebSocket(ws);
-
     }
-
   }
 
   /* ===================================================
@@ -1278,4 +1554,4 @@ export async function onRequest(context) {
     },
     400
   );
-         }
+      }
