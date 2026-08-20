@@ -96,6 +96,18 @@ button.clear{
   color:#cbd3df
 }
 
+button.money{
+  background:#151b24;
+  border-color:#303a49;
+  color:#fff
+}
+
+button.money.deposit{
+  background:#13aebf;
+  border-color:#13aebf;
+  color:#061014
+}
+
 button:disabled{
   opacity:.5;
   cursor:not-allowed
@@ -280,6 +292,96 @@ button:disabled{
 }
 
 /* ================================
+   ACCOUNT PANEL
+================================ */
+
+.accountHeader{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px
+}
+
+.accountMode{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
+  border-radius:20px;
+  background:#0d1219;
+  color:#62e6a7;
+  font-size:12px;
+  font-weight:800
+}
+
+.accountDot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#62e6a7
+}
+
+.balanceBox{
+  background:#0d1219;
+  border-radius:14px;
+  padding:15px;
+  margin-bottom:10px
+}
+
+.balanceLabel{
+  color:#8f9aab;
+  font-size:12px;
+  margin-bottom:4px
+}
+
+.balanceValue{
+  font-size:29px;
+  font-weight:850;
+  letter-spacing:.2px
+}
+
+.balanceCurrency{
+  color:#8f9aab;
+  font-size:12px
+}
+
+.accountSwitch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  padding:5px;
+  background:#0d1219;
+  border-radius:12px;
+  margin-bottom:10px
+}
+
+.accountSwitch button{
+  border:0;
+  background:transparent;
+  color:#8995a6;
+  padding:10px
+}
+
+.accountSwitch button.active{
+  background:#18c6d8;
+  color:#061014;
+  border-radius:9px
+}
+
+.moneyRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px
+}
+
+.accountInfo{
+  color:#8995a6;
+  font-size:11px;
+  margin-top:9px
+}
+
+/* ================================
    TRADE HISTORY
 ================================ */
 
@@ -357,9 +459,9 @@ button:disabled{
 
   .digit small{font-size:10px}
 
-  .summary{
-    gap:5px
-  }
+  .summary{gap:5px}
+
+  .balanceValue{font-size:26px}
 
 }
 </style>
@@ -379,6 +481,105 @@ button:disabled{
 
   <div id="status" class="status">
     Connecting…
+  </div>
+
+</div>
+
+
+<!-- ACCOUNT -->
+
+<div class="card">
+
+  <div class="accountHeader">
+
+    <div class="latestBadge" style="margin:0">
+      ACCOUNT
+    </div>
+
+    <div class="accountMode">
+      <span class="accountDot"></span>
+      <span id="accountModeText">DEMO</span>
+    </div>
+
+  </div>
+
+
+  <div class="balanceBox">
+
+    <div class="balanceLabel">
+      Balance
+    </div>
+
+    <div class="balanceValue">
+      <span id="balanceValue">—</span>
+    </div>
+
+    <div class="balanceCurrency">
+      <span id="balanceCurrency">USD</span>
+    </div>
+
+  </div>
+
+
+  <div class="accountSwitch">
+
+    <button
+      id="demoMode"
+      class="active"
+      type="button">
+
+      DEMO
+
+    </button>
+
+    <button
+      id="realMode"
+      type="button">
+
+      REAL
+
+    </button>
+
+  </div>
+
+
+  <div class="moneyRow">
+
+    <button
+      id="depositButton"
+      class="money deposit"
+      type="button">
+
+      Deposit
+
+    </button>
+
+    <button
+      id="withdrawButton"
+      class="money"
+      type="button">
+
+      Withdraw
+
+    </button>
+
+  </div>
+
+
+  <div
+    id="moneyStatus"
+    class="accountInfo">
+
+    Demo account selected.
+
+  </div>
+
+
+  <div class="accountInfo">
+
+    Account:
+    <b id="accountId">—</b>
+
   </div>
 
 </div>
@@ -680,36 +881,6 @@ Under 5 — digits 0–4
 </div>
 
 
-<!-- ACCOUNT -->
-
-<div class="card">
-
-<div class="latestBadge">
-ACCOUNT CONNECTION
-</div>
-
-<div class="metric">
-
-<label>Deriv account</label>
-
-<b id="accountStatus">
-Checking…
-</b>
-
-<button
-id="connectDeriv"
-class="connect"
-type="button">
-
-Connect Deriv
-
-</button>
-
-</div>
-
-</div>
-
-
 <!-- NOTE -->
 
 <div class="card">
@@ -789,19 +960,14 @@ const marketNames = {
 };
 
 let ws = null;
-
 let history = [];
-
 let latestDigit = null;
-
 let currentProposal = null;
-
 let currentContractId = null;
-
 let currentAccountType = "demo";
-
+let currentBalance = null;
+let currentCurrency = "USD";
 let contractTimer = null;
-
 let currentTradeRecorded = false;
 
 const $ =
@@ -939,7 +1105,6 @@ $("countLabel").textContent =
 history.length;
 
 let mostDigit = 0;
-
 let leastDigit = 0;
 
 for(
@@ -1101,7 +1266,6 @@ ws = null;
 }
 
 history = [];
-
 latestDigit = null;
 
 render();
@@ -1112,22 +1276,15 @@ getSelectedMarket();
 $("marketName").textContent =
 marketNames[symbol];
 
-setStatus(
-"Connecting…"
-);
+setStatus("Connecting…");
 
 ws =
-new WebSocket(
-WS_URL
-);
+new WebSocket(WS_URL);
 
 ws.onopen =
 function(){
 
-setStatus(
-"LIVE",
-true
-);
+setStatus("LIVE",true);
 
 ws.send(
 JSON.stringify({
@@ -1161,36 +1318,27 @@ function(event){
 try{
 
 const data =
-JSON.parse(
-event.data
-);
+JSON.parse(event.data);
 
 if(data.error){
 
-console.error(
-data.error
-);
+console.error(data.error);
 
-setStatus(
-"API error"
-);
+setStatus("API error");
 
 return;
 
 }
 
 if(
-data.msg_type ===
-"history"
+data.msg_type === "history"
 ){
 
 const prices =
-data.history?.prices ||
-[];
+data.history?.prices || [];
 
 const times =
-data.history?.times ||
-[];
+data.history?.times || [];
 
 const pipSize =
 data.pip_size;
@@ -1209,46 +1357,33 @@ prices[i],
 pipSize
 );
 
-if(
-digit !== null
-){
+if(digit !== null){
 history.push(digit);
 }
 
 }
 
-if(
-history.length >
-MAX_TICKS
-){
+if(history.length > MAX_TICKS){
 
 history =
-history.slice(
--MAX_TICKS
-);
+history.slice(-MAX_TICKS);
 
 }
 
 if(history.length){
 
 latestDigit =
-history[
-history.length - 1
-];
+history[history.length - 1];
 
 }
 
 if(prices.length){
 
 const lastPrice =
-prices[
-prices.length - 1
-];
+prices[prices.length - 1];
 
 const lastTime =
-times[
-times.length - 1
-];
+times[times.length - 1];
 
 $("quote").textContent =
 `${lastPrice} • ${
@@ -1266,15 +1401,13 @@ return;
 }
 
 if(
-data.msg_type ===
-"tick"
+data.msg_type === "tick"
 ){
 
 if(!data.tick)
 return;
 
-const tick =
-data.tick;
+const tick = data.tick;
 
 const digit =
 getLastDigit(
@@ -1304,18 +1437,14 @@ error
 ws.onerror =
 function(){
 
-setStatus(
-"Connection error"
-);
+setStatus("Connection error");
 
 };
 
 ws.onclose =
 function(){
 
-setStatus(
-"Disconnected"
-);
+setStatus("Disconnected");
 
 setTimeout(
 connectMarket,
@@ -1328,18 +1457,60 @@ connectMarket,
 
 
 /* =====================================================
-MARKET CHANGE
+ACCOUNT DISPLAY
 ===================================================== */
 
-$("market").addEventListener(
-"change",
-connectMarket
+function updateAccountDisplay(){
+
+const type =
+String(
+currentAccountType || "demo"
+).toLowerCase();
+
+$("accountModeText").textContent =
+type.toUpperCase();
+
+$("accountId").textContent =
+currentAccountId || "—";
+
+$("balanceCurrency").textContent =
+currentCurrency || "USD";
+
+if(
+currentBalance !== null &&
+Number.isFinite(
+Number(currentBalance)
+)
+){
+
+$("balanceValue").textContent =
+Number(currentBalance).toFixed(2);
+
+}else{
+
+$("balanceValue").textContent =
+"—";
+
+}
+
+$("demoMode").classList.toggle(
+"active",
+type === "demo"
 );
+
+$("realMode").classList.toggle(
+"active",
+type === "real"
+);
+
+}
 
 
 /* =====================================================
 ACCOUNT
 ===================================================== */
+
+let currentAccountId = null;
 
 async function checkAccount(){
 
@@ -1364,54 +1535,82 @@ data.connected
 ){
 
 const account =
-data.selected_account;
+data.selected_account || {};
 
 currentAccountType =
 String(
-account?.account_type ||
-"demo"
+account.account_type || "demo"
 ).toLowerCase();
 
-$("accountStatus").textContent =
-`${currentAccountType.toUpperCase()} Connected ✓`;
+currentAccountId =
+account.account_id || null;
 
-$("accountStatus").className =
-"connectionOk";
+currentCurrency =
+account.currency || "USD";
 
-$("connectDeriv").textContent =
-"Deriv Connected ✓";
+/*
+ * Balance will be supplied by the
+ * updated trading backend.
+ */
 
-$("connectDeriv").disabled =
-true;
+if(
+account.balance !== undefined &&
+account.balance !== null
+){
+
+currentBalance =
+Number(account.balance);
+
+}
+
+updateAccountDisplay();
+
+$("moneyStatus").textContent =
+currentAccountType === "demo"
+? "Demo account selected."
+: "Real account selected.";
+
+$("moneyStatus").className =
+"accountInfo";
+
+$("accountStatusFallback");
+
+$("status").textContent =
+"LIVE";
 
 }else{
 
-$("accountStatus").textContent =
-"Not connected";
+currentAccountType = "demo";
 
-$("accountStatus").className =
-"connectionBad";
+currentAccountId = null;
 
-$("connectDeriv").textContent =
-"Connect Deriv";
+currentBalance = null;
 
-$("connectDeriv").disabled =
-false;
+updateAccountDisplay();
+
+$("moneyStatus").textContent =
+"Connect your Deriv account to view your balance.";
+
+$("accountModeText").textContent =
+"DEMO";
 
 }
 
 }catch(error){
 
-console.error(error);
+console.error(
+"Account check error:",
+error
+);
 
-$("accountStatus").textContent =
-"Not connected";
+currentAccountType = "demo";
 
-$("accountStatus").className =
-"connectionBad";
+currentBalance = null;
 
-$("connectDeriv").disabled =
-false;
+updateAccountDisplay();
+
+$("moneyStatus").textContent =
+"Unable to load account information.";
 
 }
 
@@ -1419,15 +1618,91 @@ false;
 
 
 /* =====================================================
-CONNECT DERIV
+ACCOUNT MODE BUTTONS
 ===================================================== */
 
-$("connectDeriv").addEventListener(
+$("demoMode").addEventListener(
+"click",
+async function(){
+
+currentAccountType = "demo";
+
+updateAccountDisplay();
+
+$("moneyStatus").textContent =
+"DEMO selected. Updating account…";
+
+await checkAccount();
+
+}
+);
+
+
+$("realMode").addEventListener(
+"click",
+async function(){
+
+/*
+ * Real trading is intentionally not enabled
+ * by this UI until the backend supports safe
+ * real-account selection.
+ */
+
+$("moneyStatus").textContent =
+"REAL account switching will be enabled after the real-account backend is connected.";
+
+}
+
+);
+
+
+/* =====================================================
+DEPOSIT
+===================================================== */
+
+$("depositButton").addEventListener(
 "click",
 function(){
 
+$("moneyStatus").textContent =
+"Deposit is not connected yet. We will connect the official Deriv payment flow next.";
+
+}
+);
+
+
+/* =====================================================
+WITHDRAW
+===================================================== */
+
+$("withdrawButton").addEventListener(
+"click",
+function(){
+
+$("moneyStatus").textContent =
+"Withdraw is not connected yet. We will connect the official Deriv withdrawal flow next.";
+
+}
+);
+
+
+/* =====================================================
+CONNECT DERIV
+===================================================== */
+
+document.addEventListener(
+"click",
+function(event){
+
+if(
+event.target &&
+event.target.id === "connectDeriv"
+){
+
 window.location.href =
 "/auth";
+
+}
 
 }
 );
@@ -1443,12 +1718,10 @@ const type =
 $("contractType").value;
 
 const digitContracts = [
-
 "DIGITOVER",
 "DIGITUNDER",
 "DIGITMATCH",
 "DIGITDIFF"
-
 ];
 
 $("digitControl")
@@ -1534,8 +1807,7 @@ await fetch(
 "/trading",
 {
 
-method:
-"POST",
+method:"POST",
 
 headers:{
 "Content-Type":
@@ -1552,9 +1824,7 @@ cache:
 "no-store",
 
 body:
-JSON.stringify(
-payload
-)
+JSON.stringify(payload)
 
 }
 );
@@ -1610,20 +1880,14 @@ $("proposalInfo");
 const debug =
 $("debug");
 
-button.disabled =
-true;
+button.disabled = true;
 
 $("buyContract")
-.classList.add(
-"hidden"
-);
+.classList.add("hidden");
 
-currentProposal =
-null;
+currentProposal = null;
 
-debug.classList.add(
-"hidden"
-);
+debug.classList.add("hidden");
 
 status.className =
 "tradeStatus";
@@ -1671,9 +1935,7 @@ status.textContent =
 "✓ Fresh proposal received.";
 
 $("buyContract")
-.classList.remove(
-"hidden"
-);
+.classList.remove("hidden");
 
 }catch(error){
 
@@ -1692,14 +1954,11 @@ debug.textContent =
 "Market sent: " +
 getSelectedMarket();
 
-debug.classList.remove(
-"hidden"
-);
+debug.classList.remove("hidden");
 
 }finally{
 
-button.disabled =
-false;
+button.disabled = false;
 
 }
 
@@ -1722,25 +1981,22 @@ const status =
 $("tradeStatus");
 
 if(
-currentAccountType !==
-"demo"
+currentAccountType !== "demo"
 ){
 
 status.className =
 "tradeStatus error";
 
 status.textContent =
-"Please connect the DEMO Deriv account first.";
+"Please select the DEMO account first.";
 
 return;
 
 }
 
-button.disabled =
-true;
+button.disabled = true;
 
-$("getProposal").disabled =
-true;
+$("getProposal").disabled = true;
 
 status.className =
 "tradeStatus";
@@ -1758,22 +2014,17 @@ freshProposal;
 
 const buyPayload = {
 
-action:
-"buy",
+action:"buy",
 
-account_type:
-"demo",
+account_type:"demo",
 
-market:
-getSelectedMarket(),
+market:getSelectedMarket(),
 
-proposal_id:
-String(
+proposal_id:String(
 freshProposal.id
 ),
 
-price:
-Number(
+price:Number(
 freshProposal.ask_price
 )
 
@@ -1784,8 +2035,7 @@ await fetch(
 "/trading",
 {
 
-method:
-"POST",
+method:"POST",
 
 headers:{
 "Content-Type":
@@ -1802,9 +2052,7 @@ cache:
 "no-store",
 
 body:
-JSON.stringify(
-buyPayload
-)
+JSON.stringify(buyPayload)
 
 }
 );
@@ -1832,8 +2080,7 @@ contractId
 ? String(contractId)
 : null;
 
-currentTradeRecorded =
-false;
+currentTradeRecorded = false;
 
 status.className =
 "tradeStatus success";
@@ -1867,9 +2114,7 @@ freshProposal.payout ??
 `;
 
 $("buyContract")
-.classList.add(
-"hidden"
-);
+.classList.add("hidden");
 
 if(currentContractId){
 
@@ -1891,11 +2136,9 @@ error.message;
 
 }finally{
 
-button.disabled =
-false;
+button.disabled = false;
 
-$("getProposal").disabled =
-false;
+$("getProposal").disabled = false;
 
 }
 
@@ -1984,9 +2227,8 @@ getTradeHistory();
 if(
 existing.some(
 trade =>
-String(
-trade.contract_id
-) === contractId
+String(trade.contract_id) ===
+contractId
 )
 ){
 
@@ -2071,16 +2313,12 @@ for(
 const trade of list
 ){
 
-if(
-trade.status === "WON"
-){
+if(trade.status === "WON"){
 wins++;
 }
 
 totalProfit +=
-Number(
-trade.profit || 0
-);
+Number(trade.profit || 0);
 
 }
 
@@ -2254,8 +2492,7 @@ await fetch(
 "/trading",
 {
 
-method:
-"POST",
+method:"POST",
 
 headers:{
 "Content-Type":
@@ -2274,8 +2511,7 @@ cache:
 body:
 JSON.stringify({
 
-action:
-"contract_status",
+action:"contract_status",
 
 contract_id:
 String(contractId)
@@ -2308,18 +2544,13 @@ String(
 contract.status || "OPEN"
 ).toUpperCase();
 
-let statusClass =
-"open";
+let statusClass = "open";
 
-if(
-statusValue === "WON"
-){
+if(statusValue === "WON"){
 statusClass = "win";
 }
 
-if(
-statusValue === "LOST"
-){
+if(statusValue === "LOST"){
 statusClass = "loss";
 }
 
@@ -2380,26 +2611,15 @@ statusValue === "LOST"
 
 if(contractTimer){
 
-clearInterval(
-contractTimer
-);
+clearInterval(contractTimer);
 
 contractTimer = null;
 
 }
 
+if(!currentTradeRecorded){
 
-/*
- * Save only after the contract
- * has finished.
- */
-
-if(
-!currentTradeRecorded
-){
-
-addTradeToHistory(
-{
+addTradeToHistory({
 
 contract_id:
 contract.contract_id ??
@@ -2417,12 +2637,20 @@ contract.buy_price ?? 0,
 payout:
 contract.payout ?? 0
 
-}
-);
+});
 
 currentTradeRecorded = true;
 
 }
+
+/*
+ * Refresh balance after completed trade.
+ */
+
+setTimeout(
+checkAccount,
+500
+);
 
 }
 
@@ -2465,16 +2693,13 @@ contractId
 
 if(contractTimer){
 
-clearInterval(
-contractTimer
-);
+clearInterval(contractTimer);
 
 contractTimer = null;
 
 }
 
-currentTradeRecorded =
-false;
+currentTradeRecorded = false;
 
 $("contractStatus").innerHTML = `
 
@@ -2493,17 +2718,13 @@ Waiting for contract result…
 
 `;
 
-checkContractStatus(
-contractId
-);
+checkContractStatus(contractId);
 
 contractTimer =
 setInterval(
 function(){
 
-checkContractStatus(
-contractId
-);
+checkContractStatus(contractId);
 
 },
 2000
