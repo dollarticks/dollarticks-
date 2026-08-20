@@ -94,7 +94,7 @@ async function getAccounts(token) {
   } catch {
 
     throw new Error(
-      "Deriv returned an invalid account response."
+      "Trading service returned an invalid account response."
     );
 
   }
@@ -111,7 +111,7 @@ async function getAccounts(token) {
     throw new Error(
       data?.errors?.[0]?.message ||
       data?.error?.message ||
-      "Could not retrieve Deriv Options accounts."
+      "Trading service could not retrieve the account."
     );
 
   }
@@ -226,7 +226,7 @@ async function getSelectedAccount(
   if (!accounts.length) {
 
     throw new Error(
-      "No Deriv Options account found."
+      "No trading account is available."
     );
 
   }
@@ -242,7 +242,7 @@ async function getSelectedAccount(
   if (!account) {
 
     throw new Error(
-      `No ${String(requestedType).toUpperCase()} Options account found.`
+      `No ${String(requestedType).toUpperCase()} trading account is available.`
     );
 
   }
@@ -255,7 +255,7 @@ async function getSelectedAccount(
   if (!accountId) {
 
     throw new Error(
-      "Deriv returned an account without an account ID."
+      "Trading account information is incomplete."
     );
 
   }
@@ -282,7 +282,7 @@ async function getSelectedAccount(
 
 
 /* =====================================================
-   CREATE TEMPORARY DERIV WEBSOCKET SESSION
+   CREATE TEMPORARY TRADING WEBSOCKET SESSION
 ===================================================== */
 
 async function getOTP(
@@ -324,7 +324,7 @@ async function getOTP(
   } catch {
 
     throw new Error(
-      "Deriv returned an invalid trading-session response."
+      "Trading service returned an invalid session response."
     );
 
   }
@@ -341,7 +341,7 @@ async function getOTP(
     throw new Error(
       data?.errors?.[0]?.message ||
       data?.error?.message ||
-      "Could not create Deriv trading session."
+      "Could not create trading session."
     );
 
   }
@@ -354,17 +354,11 @@ async function getOTP(
   if (!wsUrl) {
 
     throw new Error(
-      "Deriv did not return a trading WebSocket URL."
+      "Trading session could not be created."
     );
 
   }
 
-
-  /*
-   * This is a temporary authenticated URL.
-   * It is returned to the browser so the browser
-   * can connect directly to Deriv's WebSocket.
-   */
 
   return wsUrl;
 
@@ -393,6 +387,7 @@ export async function onRequest(context) {
     return json(
       {
         ok: false,
+
         error:
           "Method not allowed."
       },
@@ -413,6 +408,12 @@ export async function onRequest(context) {
     );
 
 
+  /*
+   * Keep authentication working internally,
+   * but don't expose the old "Connect Deriv"
+   * wording to the user.
+   */
+
   if (!token) {
 
     return json(
@@ -422,7 +423,7 @@ export async function onRequest(context) {
         connected: false,
 
         error:
-          "Deriv account not connected. Please connect Deriv first."
+          "Trading is currently unavailable. Please try again."
       },
       401
     );
@@ -453,7 +454,7 @@ export async function onRequest(context) {
           ok: false,
 
           error:
-            "Invalid JSON request."
+            "Invalid trading request."
         },
         400
       );
@@ -694,15 +695,6 @@ export async function onRequest(context) {
 
   /* ===================================================
      CREATE TRADING WEBSOCKET SESSION
-     
-     THIS IS THE IMPORTANT PART.
-
-     The Worker does NOT create the WebSocket.
-
-     It only asks Deriv for the temporary
-     authenticated WebSocket URL.
-
-     The browser will connect to that URL.
 ===================================================== */
 
   if (
@@ -794,4 +786,4 @@ export async function onRequest(context) {
     400
   );
 
-    }
+     }
