@@ -1,3 +1,5 @@
+trading.js
+
 const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const DERIV_API = "https://api.derivws.com";
 
@@ -493,6 +495,95 @@ async function getFreshBalance(
 }
 
 /* =====================================================
+   NORMALIZE CONTRACT
+===================================================== */
+
+function normalizeContract(
+  source,
+  fallbackContractId
+) {
+  const rawStatus =
+    String(
+      source?.status ||
+      source?.contract_status ||
+      ""
+    ).toUpperCase();
+
+  const isSold =
+    source?.is_sold === true;
+
+  const profit =
+    Number(
+      source?.profit ?? 0
+    );
+
+  let status =
+    rawStatus;
+
+  if (
+    isSold &&
+    status !== "WON" &&
+    status !== "LOST"
+  ) {
+    if (Number.isFinite(profit)) {
+      status =
+        profit > 0
+          ? "WON"
+          : "LOST";
+    } else {
+      status = "SOLD";
+    }
+  }
+
+  if (!status) {
+    status =
+      isSold
+        ? (
+          Number.isFinite(profit) &&
+          profit > 0
+            ? "WON"
+            : "LOST"
+        )
+        : "OPEN";
+  }
+
+  return {
+    contract_id:
+      Number(
+        source?.contract_id ??
+        fallbackContractId
+      ),
+
+    status,
+
+    is_sold: isSold,
+
+    buy_price:
+      Number(
+        source?.buy_price ??
+        source?.buy_price_amount ??
+        0
+      ),
+
+    payout:
+      Number(
+        source?.payout ??
+        0
+      ),
+
+    profit:
+      Number.isFinite(profit)
+        ? profit
+        : 0,
+
+    exit_spot:
+      source?.exit_tick ??
+      source?.exit_spot ??
+      null
+  };
+}
+
+/* =====================================================
    CONTRACT STATUS
 ===================================================== */
 
@@ -912,64 +1003,15 @@ export async function onRequest(context) {
           contractId
         );
 
-      const source =
-        result.contract;
-
-      const status =
-        String(
-          source.status ||
-          source.contract_status ||
-          (
-            source.is_sold
-              ? "SOLD"
-              : "OPEN"
-          )
-        ).toUpperCase();
-
-      const profit =
-        Number(
-          source.profit ??
-          source.sell_price ??
-          0
+      const contract =
+        normalizeContract(
+          result.contract,
+          contractId
         );
 
       return json({
         ok: true,
-        contract: {
-          contract_id:
-            Number(
-              source.contract_id ??
-              contractId
-            ),
-
-          status:
-            status,
-
-          buy_price:
-            Number(
-              source.buy_price ??
-              source.buy_price_amount ??
-              0
-            ),
-
-          payout:
-            Number(
-              source.payout ??
-              0
-            ),
-
-          profit:
-            Number.isFinite(
-              profit
-            )
-              ? profit
-              : 0,
-
-          exit_spot:
-            source.exit_tick ??
-            source.exit_spot ??
-            null
-        },
+        contract,
 
         balance:
           result.balance?.balance ??
@@ -1197,6 +1239,52 @@ export async function onRequest(context) {
         );
       }
 
+      /* -----------------------------------------------
+         FRESH BALANCE
+         Uses the same already-open WebSocket.
+         This avoids creating another connection.
+      ----------------------------------------------- */
+
+      let updatedBalance =
+        balance;
+
+      let updatedCurrency =
+        currency;
+
+      try {
+
+        const balanceResponse =
+          await sendRequest(
+            ws,
+            {
+              balance: 1,
+              req_id: 3
+            },
+            "balance"
+          );
+
+        const fresh =
+          Number(
+            balanceResponse?.balance?.balance
+          );
+
+        if (
+          Number.isFinite(
+            fresh
+          )
+        ) {
+          updatedBalance =
+            fresh;
+        }
+
+        updatedCurrency =
+          balanceResponse?.balance?.currency ||
+          updatedCurrency;
+
+      } catch {
+        /* Keep the existing balance fallback. */
+      }
+
       return json({
         ok: true,
 
@@ -1255,9 +1343,9 @@ export async function onRequest(context) {
           account_type:
             accountType,
           balance:
-            balance,
+            updatedBalance,
           currency:
-            currency
+            updatedCurrency
         }
       });
 
@@ -1297,4 +1385,4 @@ export async function onRequest(context) {
     },
     400
   );
-  }
+}
