@@ -504,38 +504,14 @@ button.money.deposit{
 }
 
 @media(max-width:430px){
-
-  .wrap{
-    padding:9px
-  }
-
-  .grid{
-    gap:7px
-  }
-
-  .digit{
-    border-width:3px
-  }
-
-  .digit strong{
-    font-size:19px
-  }
-
-  .digit small{
-    font-size:10px
-  }
-
-  .summary{
-    gap:5px
-  }
-
-  .balanceValue{
-    font-size:26px
-  }
-
-  .historyMeta{
-    font-size:11px
-  }
+  .wrap{padding:9px}
+  .grid{gap:7px}
+  .digit{border-width:3px}
+  .digit strong{font-size:19px}
+  .digit small{font-size:10px}
+  .summary{gap:5px}
+  .balanceValue{font-size:26px}
+  .historyMeta{font-size:11px}
 }
 </style>
 </head>
@@ -543,7 +519,6 @@ button.money.deposit{
 <body>
 
 <div id="loginScreen">
-
   <div class="loginBox">
 
     <div class="loginLogo">
@@ -574,7 +549,6 @@ button.money.deposit{
     </div>
 
   </div>
-
 </div>
 
 
@@ -755,16 +729,10 @@ TRADE ENTRY
 BUY
 </button>
 
-<!--
-  IMPORTANT:
-  This status box stays hidden while a trade is being
-  purchased or waiting for the contract result.
-  It is only displayed after WON or LOST is confirmed.
--->
+<!-- Intentionally hidden:
+     DollarTicks only shows WON or LOST after settlement. -->
 <div id="tradeStatus" class="tradeStatus hidden"></div>
-
 <div id="proposalInfo" class="tradeStatus hidden"></div>
-
 <div id="debug" class="debug hidden"></div>
 
 </div>
@@ -815,17 +783,13 @@ Clear Trade History
 <div class="row">
 
 <div class="metric">
-
 <label>Most frequent</label>
 <b id="most">—</b>
-
 </div>
 
 <div class="metric">
-
 <label>Least frequent</label>
 <b id="least">—</b>
-
 </div>
 
 </div>
@@ -845,17 +809,13 @@ OVER / UNDER
 <div class="row">
 
 <div class="metric">
-
 <label>Over 5 — digits 6–9</label>
 <b id="over5">—</b>
-
 </div>
 
 <div class="metric">
-
 <label>Under 5 — digits 0–4</label>
 <b id="under5">—</b>
-
 </div>
 
 </div>
@@ -936,7 +896,7 @@ const $ = id => document.getElementById(id);
 
 
 /* =====================================================
-   LOGIN / SIGNUP
+   LOGIN
 ===================================================== */
 
 const loginButton = $("loginButton");
@@ -990,7 +950,6 @@ let currentAccountId = null;
 let currentBalance = null;
 let currentCurrency = "USD";
 
-
 function updateAccountDisplay(){
 
   const type =
@@ -1036,7 +995,7 @@ function updateAccountDisplay(){
 
 
 /* =====================================================
-   FAST ACCOUNT CHECK
+   ACCOUNT CHECK
 ===================================================== */
 
 async function checkAccount(){
@@ -1101,7 +1060,7 @@ async function checkAccount(){
 
 
 /* =====================================================
-   FAST BALANCE REFRESH
+   FAST BALANCE
 ===================================================== */
 
 let balanceRefreshing = false;
@@ -1138,9 +1097,7 @@ async function refreshBalanceFast(){
     if(
       data &&
       data.ok &&
-      Number.isFinite(
-        Number(data.balance)
-      )
+      Number.isFinite(Number(data.balance))
     ){
 
       currentBalance =
@@ -1156,7 +1113,7 @@ async function refreshBalanceFast(){
   }catch(error){
 
     console.error(
-      "Fast balance refresh error:",
+      "Balance refresh error:",
       error
     );
 
@@ -1168,16 +1125,21 @@ async function refreshBalanceFast(){
 
 
 /* =====================================================
-   MARKET
+   MARKET DATA
+   FIX:
+   - Use documented public WebSocket.
+   - Ask Deriv for active_symbols.
+   - Validate selected symbols.
+   - Use active symbol pip_size.
+   - Prevent stale sockets from reconnecting.
 ===================================================== */
 
 const WS_URL =
-  "wss://api.derivws.com/trading/v1/options/ws/public";
+  "wss://ws.binaryws.com/websockets/v3";
 
 const MAX_TICKS = 100;
 
 const marketNames = {
-
   "1HZ100V":"Volatility 100 (1s)",
   "1HZ75V":"Volatility 75 (1s)",
   "1HZ50V":"Volatility 50 (1s)",
@@ -1189,6 +1151,15 @@ let ws = null;
 let history = [];
 let latestDigit = null;
 
+let activeSymbols = {};
+let marketConnectionNumber = 0;
+let reconnectTimer = null;
+let manuallyChangingMarket = false;
+
+
+/* =====================================================
+   MARKET HELPERS
+===================================================== */
 
 function getSelectedMarket(){
 
@@ -1208,22 +1179,32 @@ function getLastDigit(
 
   const n = Number(quote);
 
-  if(
-    !Number.isFinite(n)
-  )
+  if(!Number.isFinite(n))
     return null;
+
+  /*
+   * Deriv may provide pip_size as the number
+   * of decimal places for the tick.
+   */
 
   if(
     Number.isFinite(Number(pipSize))
   ){
 
+    const decimals =
+      Number(pipSize);
+
     const factor =
-      10 ** Number(pipSize);
+      10 ** decimals;
 
     return Math.abs(
       Math.round(n * factor)
     ) % 10;
   }
+
+  /*
+   * Fallback if pip_size isn't supplied.
+   */
 
   const text =
     String(quote);
@@ -1263,6 +1244,7 @@ function addDigit(
   if(
     history.length > MAX_TICKS
   ){
+
     history.shift();
   }
 
@@ -1277,6 +1259,10 @@ function addDigit(
 }
 
 
+/* =====================================================
+   RENDER DIGITS
+===================================================== */
+
 function render(){
 
   const counts =
@@ -1285,7 +1271,15 @@ function render(){
   for(
     const digit of history
   ){
-    counts[digit]++;
+
+    if(
+      Number.isInteger(digit) &&
+      digit >= 0 &&
+      digit <= 9
+    ){
+
+      counts[digit]++;
+    }
   }
 
   $("countLabel").textContent =
@@ -1304,6 +1298,7 @@ function render(){
       counts[i] >
       counts[mostDigit]
     ){
+
       mostDigit = i;
     }
 
@@ -1311,6 +1306,7 @@ function render(){
       counts[i] <
       counts[leastDigit]
     ){
+
       leastDigit = i;
     }
   }
@@ -1321,7 +1317,9 @@ function render(){
 
         const percentage =
           history.length
-            ? count / history.length * 100
+            ? count /
+              history.length *
+              100
             : 0;
 
         const isMost =
@@ -1337,7 +1335,6 @@ function render(){
           digit === latestDigit;
 
         return `
-
 <div class="digit
 ${isMost ? "most" : ""}
 ${isLeast ? "least" : ""}
@@ -1354,8 +1351,7 @@ ${count} •
 ${percentage.toFixed(1)}%
 </small>
 
-</div>
-`;
+</div>`;
       }
     ).join("");
 
@@ -1405,9 +1401,20 @@ ${percentage.toFixed(1)}%
         history.length *
         100
       ).toFixed(1) + "%";
+
+  }else{
+
+    $("most").textContent = "—";
+    $("least").textContent = "—";
+    $("over5").textContent = "—";
+    $("under5").textContent = "—";
   }
 }
 
+
+/* =====================================================
+   STATUS
+===================================================== */
 
 function setStatus(
   text,
@@ -1422,74 +1429,281 @@ function setStatus(
 }
 
 
-function connectMarket(){
+/* =====================================================
+   CLEAR OLD MARKET CONNECTION
+===================================================== */
+
+function closeMarketSocket(){
 
   if(ws){
 
     try{
+
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onerror = null;
+      ws.onclose = null;
       ws.close();
-    }catch(e){}
+
+    }catch(error){
+
+      console.error(
+        "Socket close error:",
+        error
+      );
+    }
 
     ws = null;
   }
+
+  if(reconnectTimer){
+
+    clearTimeout(
+      reconnectTimer
+    );
+
+    reconnectTimer = null;
+  }
+}
+
+
+/* =====================================================
+   GET ACTIVE SYMBOLS
+===================================================== */
+
+function requestActiveSymbols(){
+
+  if(
+    !ws ||
+    ws.readyState !== WebSocket.OPEN
+  )
+    return;
+
+  ws.send(
+    JSON.stringify({
+      active_symbols:"brief",
+      req_id:1
+    })
+  );
+}
+
+
+/* =====================================================
+   CONNECT MARKET
+===================================================== */
+
+function connectMarket(){
+
+  manuallyChangingMarket = true;
+
+  marketConnectionNumber++;
+
+  const connectionId =
+    marketConnectionNumber;
+
+  closeMarketSocket();
 
   history = [];
   latestDigit = null;
 
   render();
 
-  const symbol =
+  const requestedSymbol =
     getSelectedMarket();
 
   $("marketName").textContent =
-    marketNames[symbol];
+    marketNames[requestedSymbol];
+
+  $("quote").textContent =
+    "Checking market…";
 
   setStatus("Connecting…");
 
-  ws =
+  /*
+   * Use the documented public market-data
+   * WebSocket. No account authentication
+   * is required for ticks.
+   */
+
+  const socket =
     new WebSocket(WS_URL);
 
-  ws.onopen =
+  ws = socket;
+
+  socket.onopen =
     function(){
 
+      /*
+       * If this is an old socket, ignore it.
+       */
+
+      if(
+        connectionId !==
+        marketConnectionNumber
+      ){
+
+        try{
+          socket.close();
+        }catch(e){}
+
+        return;
+      }
+
       setStatus(
-        "LIVE",
-        true
+        "Checking market…"
       );
 
-      ws.send(
-        JSON.stringify({
-
-          ticks_history:symbol,
-          count:MAX_TICKS,
-          end:"latest",
-          style:"ticks",
-          subscribe:1,
-          req_id:1
-
-        })
-      );
+      requestActiveSymbols();
     };
 
-  ws.onmessage =
+
+  socket.onmessage =
     function(event){
+
+      if(
+        connectionId !==
+        marketConnectionNumber
+      )
+        return;
 
       try{
 
         const data =
           JSON.parse(event.data);
 
+        /* -----------------------------------------
+           API ERROR
+        ----------------------------------------- */
+
         if(data.error){
 
           console.error(
+            "Deriv market error:",
             data.error
+          );
+
+          $("quote").textContent =
+            data.error.message ||
+            "Market unavailable.";
+
+          setStatus(
+            "Market unavailable"
           );
 
           return;
         }
 
+
+        /* -----------------------------------------
+           ACTIVE SYMBOLS
+        ----------------------------------------- */
+
         if(
-          data.msg_type === "history"
+          data.msg_type ===
+          "active_symbols"
+        ){
+
+          activeSymbols = {};
+
+          const symbols =
+            Array.isArray(
+              data.active_symbols
+            )
+              ? data.active_symbols
+              : [];
+
+          for(
+            const item of symbols
+          ){
+
+            const symbol =
+              item.underlying_symbol ||
+              item.symbol;
+
+            if(!symbol)
+              continue;
+
+            activeSymbols[symbol] = {
+
+              symbol:symbol,
+
+              name:
+                item.underlying_symbol_name ||
+                item.display_name ||
+                symbol,
+
+              pip_size:
+                item.pip_size ??
+                item.pip ??
+                null,
+
+              exchange_is_open:
+                item.exchange_is_open,
+
+              is_trading_suspended:
+                item.is_trading_suspended
+            };
+          }
+
+          const selected =
+            getSelectedMarket();
+
+          const market =
+            activeSymbols[selected];
+
+          /*
+           * Don't subscribe to a symbol Deriv
+           * says isn't active.
+           */
+
+          if(!market){
+
+            $("quote").textContent =
+              "This market is currently unavailable.";
+
+            setStatus(
+              "Unavailable"
+            );
+
+            manuallyChangingMarket = false;
+
+            return;
+          }
+
+          /*
+           * Subscribe to historical ticks.
+           * This also starts the live stream.
+           */
+
+          socket.send(
+            JSON.stringify({
+
+              ticks_history:selected,
+
+              count:MAX_TICKS,
+
+              end:"latest",
+
+              style:"ticks",
+
+              subscribe:1,
+
+              req_id:2
+
+            })
+          );
+
+          return;
+        }
+
+
+        /* -----------------------------------------
+           HISTORY
+        ----------------------------------------- */
+
+        if(
+          data.msg_type ===
+          "history"
         ){
 
           const prices =
@@ -1498,7 +1712,15 @@ function connectMarket(){
           const times =
             data.history?.times || [];
 
-          history = [];
+          const symbol =
+            getSelectedMarket();
+
+          const pipSize =
+            data.pip_size ??
+            activeSymbols[symbol]?.pip_size ??
+            null;
+
+          const newHistory = [];
 
           for(
             let i = 0;
@@ -1509,21 +1731,24 @@ function connectMarket(){
             const digit =
               getLastDigit(
                 prices[i],
-                data.pip_size
+                pipSize
               );
 
-            if(digit !== null)
-              history.push(digit);
+            if(digit !== null){
+
+              newHistory.push(
+                digit
+              );
+            }
           }
 
-          if(
-            history.length > MAX_TICKS
-          ){
-            history =
-              history.slice(-MAX_TICKS);
-          }
+          history =
+            newHistory.slice(
+              -MAX_TICKS
+            );
 
           if(history.length){
+
             latestDigit =
               history[
                 history.length - 1
@@ -1542,33 +1767,79 @@ function connectMarket(){
                 times.length - 1
               ];
 
-            $("quote").textContent =
-              `${lastPrice} • ${
-                new Date(
-                  lastTime * 1000
-                ).toLocaleTimeString()
-              }`;
+            if(
+              Number.isFinite(
+                Number(lastTime)
+              )
+            ){
+
+              $("quote").textContent =
+                `${lastPrice} • ${
+                  new Date(
+                    Number(lastTime) * 1000
+                  ).toLocaleTimeString()
+                }`;
+
+            }else{
+
+              $("quote").textContent =
+                String(lastPrice);
+            }
           }
 
           render();
 
+          setStatus(
+            "LIVE",
+            true
+          );
+
+          manuallyChangingMarket = false;
+
           return;
         }
 
-        if(
-          data.msg_type === "tick"
-        ){
 
-          if(!data.tick)
-            return;
+        /* -----------------------------------------
+           LIVE TICK
+        ----------------------------------------- */
+
+        if(
+          data.msg_type ===
+          "tick"
+        ){
 
           const tick =
             data.tick;
 
+          if(!tick)
+            return;
+
+          /*
+           * Make sure the tick belongs to the
+           * currently selected market.
+           */
+
+          const selected =
+            getSelectedMarket();
+
+          if(
+            tick.symbol &&
+            tick.symbol !== selected
+          ){
+
+            return;
+          }
+
+          const pipSize =
+            tick.pip_size ??
+            activeSymbols[selected]?.pip_size ??
+            null;
+
           const digit =
             getLastDigit(
               tick.quote,
-              tick.pip_size
+              pipSize
             );
 
           addDigit(
@@ -1576,38 +1847,114 @@ function connectMarket(){
             tick.quote,
             tick.epoch
           );
+
+          setStatus(
+            "LIVE",
+            true
+          );
+
+          return;
         }
 
       }catch(error){
 
         console.error(
-          "Tick error:",
+          "Market message error:",
           error
         );
       }
     };
 
-  ws.onerror =
-    function(){
-      setStatus("Connection error");
+
+  socket.onerror =
+    function(error){
+
+      if(
+        connectionId !==
+        marketConnectionNumber
+      )
+        return;
+
+      console.error(
+        "Market WebSocket error:",
+        error
+      );
+
+      setStatus(
+        "Connection error"
+      );
     };
 
-  ws.onclose =
+
+  socket.onclose =
     function(){
 
-      setStatus("Disconnected");
+      /*
+       * Ignore close events from old sockets.
+       * This is important when switching markets.
+       */
 
-      setTimeout(
-        connectMarket,
-        3000
+      if(
+        connectionId !==
+        marketConnectionNumber
+      )
+        return;
+
+      ws = null;
+
+      if(
+        manuallyChangingMarket
+      ){
+
+        manuallyChangingMarket =
+          false;
+
+        return;
+      }
+
+      setStatus(
+        "Disconnected"
       );
+
+      /*
+       * Wait before reconnecting.
+       * Do not create a reconnect storm.
+       */
+
+      reconnectTimer =
+        setTimeout(
+          function(){
+
+            if(
+              connectionId ===
+              marketConnectionNumber
+            ){
+
+              connectMarket();
+            }
+
+          },
+          5000
+        );
     };
 }
 
 
+/* =====================================================
+   MARKET SELECTOR
+===================================================== */
+
 $("market").addEventListener(
   "change",
-  connectMarket
+  function(){
+
+    /*
+     * Always create a fresh connection
+     * for the newly selected market.
+     */
+
+    connectMarket();
+  }
 );
 
 
@@ -1659,7 +2006,8 @@ async function selectAccount(type){
   const account =
     data.account || {};
 
-  currentAccountType = type;
+  currentAccountType =
+    type;
 
   currentAccountId =
     account.account_id ||
@@ -1686,8 +2034,13 @@ $("demoMode").addEventListener(
   async function(){
 
     try{
-      await selectAccount("demo");
+
+      await selectAccount(
+        "demo"
+      );
+
     }catch(error){
+
       $("moneyStatus").textContent =
         error.message;
     }
@@ -1700,8 +2053,13 @@ $("realMode").addEventListener(
   async function(){
 
     try{
-      await selectAccount("real");
+
+      await selectAccount(
+        "real"
+      );
+
     }catch(error){
+
       $("moneyStatus").textContent =
         error.message;
     }
@@ -1816,7 +2174,9 @@ function saveTradeToHistory(
     getTradeHistory();
 
   const id =
-    String(contract.contract_id);
+    String(
+      contract.contract_id
+    );
 
   const existingIndex =
     list.findIndex(
@@ -2110,7 +2470,7 @@ $("clearHistory").addEventListener(
 
 
 /* =====================================================
-   FAST CONTRACT STATUS
+   CONTRACT STATUS
 ===================================================== */
 
 async function checkContract(){
@@ -2191,15 +2551,11 @@ async function checkContract(){
         "OPEN"
       ).toUpperCase();
 
-
     /*
-     * IMPORTANT:
+     * Nothing is displayed while the trade
+     * is open.
      *
-     * Nothing is displayed while the contract
-     * is still OPEN.
-     *
-     * Only when Deriv confirms WON or LOST
-     * do we show the result.
+     * Only WON or LOST is saved/displayed.
      */
 
     if(
@@ -2207,68 +2563,13 @@ async function checkContract(){
       status === "LOST"
     ){
 
-      /*
-       * Save the completed trade immediately.
-       */
-
       saveTradeToHistory(
         activeContract
       );
 
-
-      /*
-       * Show ONLY the final result.
-       */
-
-      const tradeStatus =
-        $("tradeStatus");
-
-      tradeStatus.classList.remove(
-        "hidden",
-        "success",
-        "error",
-        "warning"
-      );
-
-
-      if(status === "WON"){
-
-        tradeStatus.classList.add(
-          "success"
-        );
-
-        tradeStatus.textContent =
-          "TRADE WON";
-
-      }else{
-
-        tradeStatus.classList.add(
-          "error"
-        );
-
-        tradeStatus.textContent =
-          "TRADE LOST";
-      }
-
-
-      /*
-       * Stop checking immediately.
-       */
-
       stopContractChecking();
 
-
-      /*
-       * Refresh balance without delaying
-       * the result/history display.
-       */
-
       refreshBalanceFast();
-
-
-      /*
-       * Clear active contract.
-       */
 
       activeContract = null;
 
@@ -2276,12 +2577,6 @@ async function checkContract(){
     }
 
   }catch(error){
-
-    /*
-     * Do NOT show errors as trade status.
-     * Keep the interface clean while the trade
-     * is being checked.
-     */
 
     console.error(
       "Contract check error:",
@@ -2294,13 +2589,6 @@ async function checkContract(){
   }
 }
 
-
-/*
- * Faster polling.
- *
- * The contract is checked frequently so the
- * final WON/LOST result appears quickly.
- */
 
 function startContractChecking(){
 
@@ -2343,16 +2631,16 @@ $("buyButton").addEventListener(
     const debug =
       $("debug");
 
+    button.disabled = true;
+
     /*
-     * Hide any previous result when a new
-     * trade is started.
+     * Keep status panels hidden.
+     * User only wants WON/LOST.
      */
 
     $("tradeStatus")
       .classList
       .add("hidden");
-
-    $("tradeStatus").textContent = "";
 
     $("proposalInfo")
       .classList
@@ -2361,8 +2649,6 @@ $("buyButton").addEventListener(
     debug.classList.add(
       "hidden"
     );
-
-    button.disabled = true;
 
     try{
 
@@ -2405,6 +2691,20 @@ $("buyButton").addEventListener(
         );
       }
 
+      /*
+       * Make sure selected market is currently
+       * available before sending the trade.
+       */
+
+      if(
+        !activeSymbols[market]
+      ){
+
+        throw new Error(
+          "Selected market is currently unavailable."
+        );
+      }
+
       const payload = {
 
         action:"buy",
@@ -2428,7 +2728,6 @@ $("buyButton").addEventListener(
         duration:duration,
 
         duration_unit:"t"
-
       };
 
       const response =
@@ -2485,6 +2784,7 @@ $("buyButton").addEventListener(
 
         market:
           contract.market ||
+          contract.underlying_symbol ||
           market,
 
         contract_type:
@@ -2506,19 +2806,19 @@ $("buyButton").addEventListener(
 
         account_type:
           currentAccountType
-
       };
 
-
       /*
-       * BUY already gives us the new balance.
-       * Display it immediately.
+       * Update balance immediately if the BUY
+       * response already contains it.
        */
 
       if(
         data.account &&
         Number.isFinite(
-          Number(data.account.balance)
+          Number(
+            data.account.balance
+          )
         )
       ){
 
@@ -2536,16 +2836,9 @@ $("buyButton").addEventListener(
         updateAccountDisplay();
       }
 
-
       /*
-       * Do NOT display:
-       *
-       * "Sending trade"
-       * "Trade opened"
-       * "Waiting for result"
-       *
-       * The screen remains clean until
-       * WON or LOST is confirmed.
+       * No "trade opened" message.
+       * Just watch for WON/LOST.
        */
 
       startContractChecking();
@@ -2556,11 +2849,6 @@ $("buyButton").addEventListener(
         "BUY ERROR:",
         error
       );
-
-      /*
-       * Real errors are shown in the debug
-       * area, not as fake trade-status messages.
-       */
 
       debug.textContent =
         error.message;
@@ -2583,6 +2871,8 @@ $("buyButton").addEventListener(
 
 async function start(){
 
+  renderTradeHistory();
+
   const connected =
     await checkAccount();
 
@@ -2590,9 +2880,12 @@ async function start(){
 
     showDashboard();
 
-    connectMarket();
+    /*
+     * Start the market connection only after
+     * the account/dashboard is ready.
+     */
 
-    renderTradeHistory();
+    connectMarket();
 
     return;
   }
