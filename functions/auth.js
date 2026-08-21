@@ -2,162 +2,177 @@ const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const REDIRECT_URI = "https://dollarticks.pages.dev/callback";
 
 export async function onRequest(context) {
-  const request = context.request;
-  const url = new URL(request.url);
+  try {
+    const url = new URL(context.request.url);
 
-  /* =====================================================
-     LOGIN / SIGNUP
-  ===================================================== */
+    /* =====================================================
+       LOGIN / SIGNUP
+    ===================================================== */
 
-  const mode = url.searchParams.get("mode");
-  const isSignup = mode === "signup";
+    const mode = url.searchParams.get("mode");
+    const isSignup = mode === "signup";
 
-  /* =====================================================
-     CREATE PKCE VERIFIER
-  ===================================================== */
+    /* =====================================================
+       PKCE VERIFIER
+    ===================================================== */
 
-  const randomBytes = crypto.getRandomValues(
-    new Uint8Array(64)
-  );
+    const randomBytes = crypto.getRandomValues(
+      new Uint8Array(64)
+    );
 
-  const alphabet =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+    const alphabet =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
-  const codeVerifier = Array.from(randomBytes)
-    .map(byte => alphabet[byte % alphabet.length])
-    .join("");
+    const codeVerifier = Array.from(randomBytes)
+      .map(byte => alphabet[byte % alphabet.length])
+      .join("");
 
-  /* =====================================================
-     CREATE CODE CHALLENGE
-  ===================================================== */
+    /* =====================================================
+       PKCE CHALLENGE
+    ===================================================== */
 
-  const hash = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(codeVerifier)
-  );
+    const hash = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(codeVerifier)
+    );
 
-  const codeChallenge = btoa(
-    String.fromCharCode(...new Uint8Array(hash))
-  )
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
-
-  /* =====================================================
-     CREATE OAUTH STATE
-  ===================================================== */
-
-  const stateBytes = crypto.getRandomValues(
-    new Uint8Array(32)
-  );
-
-  const state = Array.from(stateBytes)
-    .map(byte =>
-      byte.toString(16).padStart(2, "0")
+    const codeChallenge = btoa(
+      String.fromCharCode(...new Uint8Array(hash))
     )
-    .join("");
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
 
-  /* =====================================================
-     DERIV OAUTH URL
-  ===================================================== */
+    /* =====================================================
+       OAUTH STATE
+    ===================================================== */
 
-  const authUrl = new URL(
-    "https://auth.deriv.com/oauth2/auth"
-  );
+    const stateBytes = crypto.getRandomValues(
+      new Uint8Array(32)
+    );
 
-  authUrl.searchParams.set(
-    "response_type",
-    "code"
-  );
+    const state = Array.from(stateBytes)
+      .map(byte =>
+        byte.toString(16).padStart(2, "0")
+      )
+      .join("");
 
-  authUrl.searchParams.set(
-    "client_id",
-    CLIENT_ID
-  );
+    /* =====================================================
+       DERIV OAUTH URL
+    ===================================================== */
 
-  authUrl.searchParams.set(
-    "redirect_uri",
-    REDIRECT_URI
-  );
+    const authUrl = new URL(
+      "https://auth.deriv.com/oauth2/auth"
+    );
 
-  authUrl.searchParams.set(
-    "scope",
-    "trade"
-  );
-
-  authUrl.searchParams.set(
-    "state",
-    state
-  );
-
-  authUrl.searchParams.set(
-    "code_challenge",
-    codeChallenge
-  );
-
-  authUrl.searchParams.set(
-    "code_challenge_method",
-    "S256"
-  );
-
-  /* =====================================================
-     SIGNUP MODE
-  ===================================================== */
-
-  if (isSignup) {
     authUrl.searchParams.set(
-      "prompt",
-      "registration"
+      "response_type",
+      "code"
+    );
+
+    authUrl.searchParams.set(
+      "client_id",
+      CLIENT_ID
+    );
+
+    authUrl.searchParams.set(
+      "redirect_uri",
+      REDIRECT_URI
+    );
+
+    /*
+     * DollarTicks needs trading/account access.
+     */
+    authUrl.searchParams.set(
+      "scope",
+      "trade account_manage"
+    );
+
+    authUrl.searchParams.set(
+      "state",
+      state
+    );
+
+    authUrl.searchParams.set(
+      "code_challenge",
+      codeChallenge
+    );
+
+    authUrl.searchParams.set(
+      "code_challenge_method",
+      "S256"
+    );
+
+    /* =====================================================
+       SIGNUP
+    ===================================================== */
+
+    if (isSignup) {
+      authUrl.searchParams.set(
+        "prompt",
+        "registration"
+      );
+    }
+
+    /* =====================================================
+       COOKIES
+    ===================================================== */
+
+    const cookieOptions =
+      "Path=/; Max-Age=600; Secure; HttpOnly; SameSite=Lax";
+
+    const headers = new Headers();
+
+    headers.set(
+      "Location",
+      authUrl.toString()
+    );
+
+    headers.set(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate"
+    );
+
+    headers.append(
+      "Set-Cookie",
+      `dt_pkce_verifier=${encodeURIComponent(
+        codeVerifier
+      )}; ${cookieOptions}`
+    );
+
+    headers.append(
+      "Set-Cookie",
+      `dt_oauth_state=${encodeURIComponent(
+        state
+      )}; ${cookieOptions}`
+    );
+
+    /* =====================================================
+       REDIRECT TO DERIV
+    ===================================================== */
+
+    return new Response(null, {
+      status: 302,
+      headers
+    });
+
+  } catch (error) {
+
+    console.error(
+      "DollarTicks OAuth error:",
+      error
+    );
+
+    return new Response(
+      "DollarTicks authentication error: " +
+      (error?.message || "Unknown error"),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "text/plain",
+          "Cache-Control": "no-store"
+        }
+      }
     );
   }
-
-  /* =====================================================
-     OAUTH COOKIES
-  ===================================================== */
-
-  const cookieOptions =
-    "Path=/; Max-Age=600; Secure; HttpOnly; SameSite=Lax";
-
-  const headers = new Headers();
-
-  headers.set(
-    "Location",
-    authUrl.toString()
-  );
-
-  headers.set(
-    "Cache-Control",
-    "no-store, no-cache, must-revalidate"
-  );
-
-  /* =====================================================
-     SAVE PKCE VERIFIER
-  ===================================================== */
-
-  headers.append(
-    "Set-Cookie",
-    `dt_pkce_verifier=${encodeURIComponent(
-      codeVerifier
-    )}; ${cookieOptions}`
-  );
-
-  /* =====================================================
-     SAVE OAUTH STATE
-  ===================================================== */
-
-  headers.append(
-    "Set-Cookie",
-    `dt_oauth_state=${encodeURIComponent(
-      state
-    )}; ${cookieOptions}`
-  );
-
-  /* =====================================================
-     REDIRECT
-  ===================================================== */
-
-  return new Response(null, {
-    status: 302,
-    headers
-  });
 }
