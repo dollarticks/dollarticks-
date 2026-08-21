@@ -5,15 +5,11 @@ export async function onRequest(context) {
   try {
     const url = new URL(context.request.url);
 
-    /* =====================================================
-       LOGIN / SIGNUP
-    ===================================================== */
-
     const mode = url.searchParams.get("mode");
     const isSignup = mode === "signup";
 
     /* =====================================================
-       PKCE VERIFIER
+       PKCE
     ===================================================== */
 
     const randomBytes = crypto.getRandomValues(
@@ -27,24 +23,22 @@ export async function onRequest(context) {
       .map(byte => alphabet[byte % alphabet.length])
       .join("");
 
-    /* =====================================================
-       PKCE CHALLENGE
-    ===================================================== */
-
     const hash = await crypto.subtle.digest(
       "SHA-256",
       new TextEncoder().encode(codeVerifier)
     );
 
     const codeChallenge = btoa(
-      String.fromCharCode(...new Uint8Array(hash))
+      String.fromCharCode(
+        ...new Uint8Array(hash)
+      )
     )
       .replace(/\+/g, "-")
       .replace(/\//g, "_")
       .replace(/=+$/, "");
 
     /* =====================================================
-       OAUTH STATE
+       STATE
     ===================================================== */
 
     const stateBytes = crypto.getRandomValues(
@@ -58,7 +52,7 @@ export async function onRequest(context) {
       .join("");
 
     /* =====================================================
-       DERIV OAUTH URL
+       DERIV OAUTH
     ===================================================== */
 
     const authUrl = new URL(
@@ -81,11 +75,20 @@ export async function onRequest(context) {
     );
 
     /*
-     * DollarTicks needs trading/account access.
+     * IMPORTANT:
+     *
+     * Only request trade here.
+     *
+     * GET trading accounts and the trading OTP
+     * require the trade scope.
+     *
+     * account_manage is for account creation/
+     * management and your OAuth client currently
+     * isn't allowed to request it.
      */
     authUrl.searchParams.set(
       "scope",
-      "trade account_manage"
+      "trade"
     );
 
     authUrl.searchParams.set(
@@ -104,7 +107,7 @@ export async function onRequest(context) {
     );
 
     /* =====================================================
-       SIGNUP
+       SIGN UP
     ===================================================== */
 
     if (isSignup) {
@@ -146,10 +149,6 @@ export async function onRequest(context) {
         state
       )}; ${cookieOptions}`
     );
-
-    /* =====================================================
-       REDIRECT TO DERIV
-    ===================================================== */
 
     return new Response(null, {
       status: 302,
