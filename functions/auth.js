@@ -75,20 +75,18 @@ export async function onRequest(context) {
     );
 
     /*
-     * IMPORTANT:
+     * DollarTicks permissions:
      *
-     * Only request trade here.
+     * trade   = trading operations
+     * payment = wallet/payment operations
      *
-     * GET trading accounts and the trading OTP
-     * require the trade scope.
-     *
-     * account_manage is for account creation/
-     * management and your OAuth client currently
-     * isn't allowed to request it.
+     * The payment scope is required for
+     * authenticated payment functionality.
      */
+
     authUrl.searchParams.set(
       "scope",
-      "trade"
+      "trade payment"
     );
 
     authUrl.searchParams.set(
