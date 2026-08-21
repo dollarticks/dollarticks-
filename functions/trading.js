@@ -185,7 +185,7 @@ async function getSelectedAccount(
 }
 
 /* =====================================================
-   OTP / AUTHENTICATED WEBSOCKET
+   OTP
 ===================================================== */
 
 async function getOTP(
@@ -256,6 +256,10 @@ async function getOTP(
   return wsUrl;
 }
 
+/* =====================================================
+   WEBSOCKET
+===================================================== */
+
 function openWebSocket(wsUrl) {
   return new Promise(
     (resolve, reject) => {
@@ -275,7 +279,7 @@ function openWebSocket(wsUrl) {
             )
           );
 
-        }, 8000);
+        }, 10000);
 
       try {
         ws =
@@ -284,9 +288,7 @@ function openWebSocket(wsUrl) {
           );
       } catch {
 
-        clearTimeout(
-          timeout
-        );
+        clearTimeout(timeout);
 
         reject(
           new Error(
@@ -333,20 +335,19 @@ function openWebSocket(wsUrl) {
 }
 
 /* =====================================================
-   NORMAL REQUEST
+   REQUEST
 ===================================================== */
 
 function sendRequest(
   ws,
   payload,
   wantedMsgType,
-  timeoutMs = 8000
+  timeoutMs = 10000
 ) {
   return new Promise(
     (resolve, reject) => {
 
-      let finished =
-        false;
+      let finished = false;
 
       const timeout =
         setTimeout(() => {
@@ -354,8 +355,7 @@ function sendRequest(
           if (finished)
             return;
 
-          finished =
-            true;
+          finished = true;
 
           cleanup();
 
@@ -394,8 +394,7 @@ function sendRequest(
         if (finished)
           return;
 
-        finished =
-          true;
+        finished = true;
 
         cleanup();
 
@@ -436,8 +435,7 @@ function sendRequest(
           if (finished)
             return;
 
-          finished =
-            true;
+          finished = true;
 
           cleanup();
 
@@ -446,14 +444,12 @@ function sendRequest(
       }
 
       function onError() {
-
         fail(
           "Trading connection failed."
         );
       }
 
       function onClose() {
-
         fail(
           "Trading connection closed."
         );
@@ -492,10 +488,6 @@ function sendRequest(
   );
 }
 
-/* =====================================================
-   CLOSE WEBSOCKET
-===================================================== */
-
 function closeWebSocket(ws) {
   try {
 
@@ -515,22 +507,38 @@ function closeWebSocket(ws) {
 }
 
 /* =====================================================
-   BALANCE FROM EXISTING WS
+   BALANCE
 ===================================================== */
 
-async function getBalanceFromWS(ws) {
+async function getFreshBalance(
+  token,
+  accountId
+) {
+
+  let ws;
 
   try {
+
+    const wsUrl =
+      await getOTP(
+        token,
+        accountId
+      );
+
+    ws =
+      await openWebSocket(
+        wsUrl
+      );
 
     const response =
       await sendRequest(
         ws,
         {
           balance: 1,
-          req_id: 9001
+          req_id: 1001
         },
         "balance",
-        5000
+        8000
       );
 
     return {
@@ -545,9 +553,9 @@ async function getBalanceFromWS(ws) {
         "USD"
     };
 
-  } catch {
+  } finally {
 
-    return null;
+    closeWebSocket(ws);
   }
 }
 
@@ -569,9 +577,7 @@ function normalizeContract(
 
   const isSold =
     source?.is_sold === true ||
-    source?.is_sold === 1 ||
-    rawStatus === "WON" ||
-    rawStatus === "LOST";
+    source?.is_sold === 1;
 
   const profit =
     Number(
@@ -645,32 +651,33 @@ function normalizeContract(
     entry_spot:
       source?.entry_tick ??
       source?.entry_spot ??
-      null
+      null,
+
+    sell_price:
+      Number(
+        source?.sell_price ??
+        0
+      )
   };
 }
 
 /* =====================================================
-   FAST CONTRACT SETTLEMENT
-   =====================================================
-
+   FAST CONTRACT RESULT
+   -----------------------------------------------------
    IMPORTANT:
+   Instead of:
+     OTP -> WS -> check -> close
+     OTP -> WS -> check -> close
+     OTP -> WS -> check -> close
 
-   The old version opened a NEW WebSocket every time
-   the frontend checked the contract.
-
-   This version opens ONE authenticated connection,
-   subscribes to the contract, and waits for the
-   settlement update.
-
-   This removes the repeated:
-
-   OTP -> WebSocket -> contract request -> close
-
-   cycle.
-
+   We now:
+     OTP -> ONE WS -> SUBSCRIBE -> WAIT FOR RESULT
+     
+   When the contract finishes, the same connection
+   is used to request the fresh balance.
 ===================================================== */
 
-async function waitForContractSettlement(
+async function getContractResultFast(
   token,
   accountId,
   contractId
@@ -678,189 +685,292 @@ async function waitForContractSettlement(
 
   let ws;
 
-  try {
+  return new Promise(
+    async (resolve, reject) => {
 
-    const wsUrl =
-      await getOTP(
-        token,
-        accountId
-      );
+      let finished = false;
 
-    ws =
-      await openWebSocket(
-        wsUrl
-      );
+      let timeout = null;
 
-    return await new Promise(
-      (resolve, reject) => {
+      try {
 
-        let finished =
-          false;
-
-        const timeout =
-          setTimeout(
-            () => {
-
-              if (finished)
-                return;
-
-              finished =
-                true;
-
-              cleanup();
-
-              reject(
-                new Error(
-                  "Contract settlement check timed out."
-                )
-              );
-
-            },
-            12000
+        const wsUrl =
+          await getOTP(
+            token,
+            accountId
           );
 
-        function cleanup() {
-
-          clearTimeout(
-            timeout
+        ws =
+          await openWebSocket(
+            wsUrl
           );
 
-          ws.removeEventListener(
-            "message",
-            onMessage
-          );
-
-          ws.removeEventListener(
-            "error",
-            onError
-          );
-
-          ws.removeEventListener(
-            "close",
-            onClose
-          );
-        }
-
-        function finish(
-          contract
-        ) {
+        const finish = result => {
 
           if (finished)
             return;
 
-          finished =
-            true;
+          finished = true;
 
-          cleanup();
-
-          resolve(
-            contract
-          );
-        }
-
-        function fail(
-          message
-        ) {
-
-          if (finished)
-            return;
-
-          finished =
-            true;
-
-          cleanup();
-
-          reject(
-            new Error(
-              message
-            )
-          );
-        }
-
-        function onMessage(
-          event
-        ) {
-
-          let data;
+          if (timeout)
+            clearTimeout(timeout);
 
           try {
 
-            data =
-              JSON.parse(
-                event.data
+            ws.removeEventListener(
+              "message",
+              onMessage
+            );
+
+            ws.removeEventListener(
+              "error",
+              onError
+            );
+
+            ws.removeEventListener(
+              "close",
+              onClose
+            );
+
+          } catch {}
+
+          closeWebSocket(ws);
+
+          resolve(result);
+        };
+
+        const fail = error => {
+
+          if (finished)
+            return;
+
+          finished = true;
+
+          if (timeout)
+            clearTimeout(timeout);
+
+          try {
+
+            ws.removeEventListener(
+              "message",
+              onMessage
+            );
+
+            ws.removeEventListener(
+              "error",
+              onError
+            );
+
+            ws.removeEventListener(
+              "close",
+              onClose
+            );
+
+          } catch {}
+
+          closeWebSocket(ws);
+
+          reject(
+            error instanceof Error
+              ? error
+              : new Error(
+                  String(error)
+                )
+          );
+        };
+
+        const onMessage =
+          async event => {
+
+            let data;
+
+            try {
+
+              data =
+                JSON.parse(
+                  event.data
+                );
+
+            } catch {
+
+              return;
+            }
+
+            if(data.error){
+
+              fail(
+                new Error(
+                  data.error.message ||
+                  data.error?.detail?.message ||
+                  "Deriv rejected the request."
+                )
               );
 
-          } catch {
+              return;
+            }
 
-            return;
-          }
+            /* -----------------------------------------
+               CONTRACT UPDATE
+            ----------------------------------------- */
 
-          if (
-            data.error
-          ) {
+            if(
+              data.msg_type ===
+              "proposal_open_contract"
+            ){
+
+              const raw =
+                data.proposal_open_contract;
+
+              if(!raw)
+                return;
+
+              const contract =
+                normalizeContract(
+                  raw,
+                  contractId
+                );
+
+              const sold =
+                contract.is_sold === true ||
+                contract.status === "WON" ||
+                contract.status === "LOST";
+
+              if(!sold)
+                return;
+
+              /*
+               * Contract is finished.
+               *
+               * Immediately request balance using
+               * the SAME WebSocket connection.
+               */
+
+              try {
+
+                ws.send(
+                  JSON.stringify({
+
+                    balance: 1,
+
+                    req_id:
+                      9002
+                  })
+                );
+
+              } catch {
+
+                finish({
+                  contract
+                });
+
+                return;
+              }
+
+              /*
+               * Wait briefly for balance response.
+               * Do not create another connection.
+               */
+
+              const balanceTimeout =
+                setTimeout(() => {
+
+                  finish({
+                    contract
+                  });
+
+                }, 2500);
+
+              const oldMessage =
+                ws.onmessage;
+
+              const balanceListener =
+                event2 => {
+
+                  let balanceData;
+
+                  try {
+
+                    balanceData =
+                      JSON.parse(
+                        event2.data
+                      );
+
+                  } catch {
+
+                    return;
+                  }
+
+                  if(
+                    balanceData.msg_type ===
+                    "balance"
+                  ){
+
+                    clearTimeout(
+                      balanceTimeout
+                    );
+
+                    const freshBalance =
+                      Number(
+                        balanceData?.balance?.balance
+                      );
+
+                    const currency =
+                      balanceData?.balance?.currency ||
+                      "USD";
+
+                    finish({
+
+                      contract,
+
+                      balance:
+                        Number.isFinite(
+                          freshBalance
+                        )
+                          ? freshBalance
+                          : null,
+
+                      currency
+                    });
+
+                  }
+
+                };
+
+              ws.addEventListener(
+                "message",
+                balanceListener
+              );
+
+              return;
+            }
+
+          };
+
+        const onError =
+          () => {
 
             fail(
-              data.error.message ||
-              data.error?.detail?.message ||
-              "Deriv rejected the contract request."
+              new Error(
+                "Trading connection failed."
+              )
             );
 
-            return;
-          }
+          };
 
-          if (
-            data.msg_type !==
-            "proposal_open_contract"
-          ) {
+        const onClose =
+          () => {
 
-            return;
-          }
+            if(!finished){
 
-          const source =
-            data.proposal_open_contract;
+              fail(
+                new Error(
+                  "Trading connection closed."
+                )
+              );
 
-          if (!source)
-            return;
+            }
 
-          const contract =
-            normalizeContract(
-              source,
-              contractId
-            );
-
-          /*
-           * If the contract is already finished,
-           * return immediately.
-           */
-
-          if (
-            contract.status === "WON" ||
-            contract.status === "LOST" ||
-            contract.is_sold === true
-          ) {
-
-            finish(
-              contract
-            );
-          }
-        }
-
-        function onError() {
-
-          fail(
-            "Trading connection failed while checking the contract."
-          );
-        }
-
-        function onClose() {
-
-          if (!finished) {
-
-            fail(
-              "Trading connection closed while checking the contract."
-            );
-          }
-        }
+          };
 
         ws.addEventListener(
           "message",
@@ -877,40 +987,63 @@ async function waitForContractSettlement(
           onClose
         );
 
-        try {
+        /*
+         * Subscribe to contract updates.
+         */
 
-          ws.send(
-            JSON.stringify({
+        ws.send(
+          JSON.stringify({
 
-              proposal_open_contract:
-                1,
+            proposal_open_contract: 1,
 
-              contract_id:
-                Number(
-                  contractId
-                ),
+            contract_id:
+              Number(contractId),
 
-              subscribe:
-                1,
+            subscribe: 1,
 
-              req_id:
-                5001
-            })
-          );
+            req_id:
+              9001
+          })
+        );
 
-        } catch {
+        /*
+         * Safety timeout.
+         *
+         * The frontend can call again if the contract
+         * has not finished yet.
+         */
 
-          fail(
-            "Could not subscribe to the contract."
-          );
-        }
+        timeout =
+          setTimeout(() => {
+
+            finish({
+              contract: {
+                contract_id:
+                  Number(contractId),
+
+                status:
+                  "OPEN",
+
+                is_sold:
+                  false,
+
+                profit:
+                  0
+              }
+            });
+
+          }, 12000);
+
+      } catch(error) {
+
+        closeWebSocket(ws);
+
+        reject(
+          error
+        );
       }
-    );
-
-  } finally {
-
-    closeWebSocket(ws);
-  }
+    }
+  );
 }
 
 /* =====================================================
@@ -1122,55 +1255,20 @@ export async function onRequest(
 
   /* ===================================================
      BALANCE
-===================================================== */
+  =================================================== */
 
   if (
     body.action ===
     "balance"
   ) {
 
-    let ws;
-
     try {
 
-      const wsUrl =
-        await getOTP(
+      const fresh =
+        await getFreshBalance(
           token,
           accountId
         );
-
-      ws =
-        await openWebSocket(
-          wsUrl
-        );
-
-      const fresh =
-        await getBalanceFromWS(
-          ws
-        );
-
-      if (fresh) {
-
-        return json({
-
-          ok: true,
-
-          account: {
-
-            account_id:
-              accountId,
-
-            account_type:
-              accountType
-          },
-
-          balance:
-            fresh.balance,
-
-          currency:
-            fresh.currency
-        });
-      }
 
       return json({
 
@@ -1186,10 +1284,10 @@ export async function onRequest(
         },
 
         balance:
-          balance,
+          fresh.balance,
 
         currency:
-          currency
+          fresh.currency
       });
 
     } catch {
@@ -1213,16 +1311,12 @@ export async function onRequest(
         currency:
           currency
       });
-
-    } finally {
-
-      closeWebSocket(ws);
     }
   }
 
   /* ===================================================
      SESSION
-===================================================== */
+  =================================================== */
 
   if (
     body.action ===
@@ -1254,7 +1348,7 @@ export async function onRequest(
             req_id: 3001
           },
           "balance",
-          6000
+          8000
         );
 
       return json({
@@ -1304,9 +1398,8 @@ export async function onRequest(
   }
 
   /* ===================================================
-     CONTRACT STATUS
-     FAST SUBSCRIPTION VERSION
-===================================================== */
+     FAST CONTRACT STATUS
+  =================================================== */
 
   if (
     body.action ===
@@ -1337,57 +1430,26 @@ export async function onRequest(
 
     try {
 
-      /*
-       * ONE connection.
-       *
-       * Subscribe to the contract and wait for
-       * the settlement message instead of repeatedly
-       * opening new connections.
-       */
-
-      const contract =
-        await waitForContractSettlement(
+      const result =
+        await getContractResultFast(
           token,
           accountId,
           contractId
         );
 
-      /*
-       * Once settled, obtain the balance immediately.
-       */
+      const contract =
+        result?.contract || null;
 
-      let freshBalance =
-        null;
+      if(!contract){
 
-      let balanceWs;
-
-      try {
-
-        const balanceWsUrl =
-          await getOTP(
-            token,
-            accountId
-          );
-
-        balanceWs =
-          await openWebSocket(
-            balanceWsUrl
-          );
-
-        freshBalance =
-          await getBalanceFromWS(
-            balanceWs
-          );
-
-      } catch {
-
-        freshBalance =
-          null;
-
-      } finally {
-
-        closeWebSocket(
-          balanceWs
+        return json(
+          {
+            ok: false,
+            connected: true,
+            error:
+              "No contract data was returned."
+          },
+          502
         );
       }
 
@@ -1395,19 +1457,21 @@ export async function onRequest(
 
         ok: true,
 
-        settled:
-          contract.status === "WON" ||
-          contract.status === "LOST" ||
-          contract.is_sold === true,
-
         contract,
 
         balance:
-          freshBalance?.balance ??
-          null,
+          Number.isFinite(
+            Number(
+              result?.balance
+            )
+          )
+            ? Number(
+                result.balance
+              )
+            : null,
 
         currency:
-          freshBalance?.currency ??
+          result?.currency ||
           currency,
 
         account: {
@@ -1437,7 +1501,7 @@ export async function onRequest(
 
   /* ===================================================
      BUY
-===================================================== */
+  =================================================== */
 
   if (
     body.action ===
@@ -1463,27 +1527,20 @@ export async function onRequest(
         );
       }
 
-      /* -----------------------------------------------
-         ALL SUPPORTED DIGIT CONTRACTS
-      ----------------------------------------------- */
-
       const allowedContracts = [
-
         "DIGITOVER",
         "DIGITUNDER",
         "DIGITMATCH",
         "DIGITDIFF",
         "DIGITEVEN",
         "DIGITODD"
-
       ];
 
       const contractType =
         String(
           body.contract_type ||
           ""
-        )
-        .trim()
+        ).trim()
         .toUpperCase();
 
       if (
@@ -1496,11 +1553,6 @@ export async function onRequest(
           "Invalid digit contract type."
         );
       }
-
-      /* -----------------------------------------------
-         STAKE
-         NO ARTIFICIAL LIMIT
-      ----------------------------------------------- */
 
       const stake =
         Number(
@@ -1520,17 +1572,9 @@ export async function onRequest(
       }
 
       /*
-       * IMPORTANT:
-       *
-       * There is deliberately NO $1 maximum here.
-       *
-       * Deriv decides whether the selected stake is
-       * valid for the selected market/account.
+       * NO ARTIFICIAL $1 LIMIT.
+       * Deriv decides the valid stake.
        */
-
-      /* -----------------------------------------------
-         DURATION
-      ----------------------------------------------- */
 
       const duration =
         Number(
@@ -1555,10 +1599,6 @@ export async function onRequest(
           "t"
         );
 
-      /* -----------------------------------------------
-         BARRIER
-      ----------------------------------------------- */
-
       const barrier =
         String(
           body.barrier ??
@@ -1566,18 +1606,11 @@ export async function onRequest(
         );
 
       const digitContracts = [
-
         "DIGITOVER",
         "DIGITUNDER",
         "DIGITMATCH",
         "DIGITDIFF"
-
       ];
-
-      /*
-       * Over, Under, Matches and Differs can use
-       * ANY digit from 0 through 9.
-       */
 
       if (
         digitContracts.includes(
@@ -1586,9 +1619,7 @@ export async function onRequest(
       ) {
 
         const digit =
-          Number(
-            barrier
-          );
+          Number(barrier);
 
         if (
           !Number.isInteger(
@@ -1625,8 +1656,7 @@ export async function onRequest(
 
       const proposalPayload = {
 
-        proposal:
-          1,
+        proposal: 1,
 
         amount:
           stake,
@@ -1653,13 +1683,6 @@ export async function onRequest(
           4001
       };
 
-      /*
-       * Only barrier-based digit contracts receive
-       * a barrier.
-       *
-       * Even/Odd do NOT receive one.
-       */
-
       if (
         digitContracts.includes(
           contractType
@@ -1675,7 +1698,7 @@ export async function onRequest(
           ws,
           proposalPayload,
           "proposal",
-          8000
+          10000
         );
 
       const proposal =
@@ -1726,11 +1749,10 @@ export async function onRequest(
 
             req_id:
               4002
-
           },
 
           "buy",
-          8000
+          10000
         );
 
       const buy =
@@ -1745,18 +1767,15 @@ export async function onRequest(
         );
       }
 
-      /* -----------------------------------------------
-         IMMEDIATE BALANCE
-      ----------------------------------------------- */
+      /*
+       * BUY normally provides the immediate
+       * post-purchase balance.
+       */
 
       const balanceAfter =
         Number(
           buy.balance_after
         );
-
-      /* -----------------------------------------------
-         RETURN BUY RESULT
-      ----------------------------------------------- */
 
       return json({
 
@@ -1862,8 +1881,8 @@ export async function onRequest(
   }
 
   /* ===================================================
-     UNKNOWN ACTION
-===================================================== */
+     UNKNOWN
+  =================================================== */
 
   return json(
     {
@@ -1875,4 +1894,4 @@ export async function onRequest(
     },
     400
   );
-}
+     }
