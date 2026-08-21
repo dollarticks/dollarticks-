@@ -1,5 +1,3 @@
-trading.js
-
 const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const DERIV_API = "https://api.derivws.com";
 
@@ -34,9 +32,7 @@ function getCookie(request, name) {
     if (key !== name) continue;
 
     try {
-      return decodeURIComponent(
-        part.slice(i + 1).trim()
-      );
+      return decodeURIComponent(part.slice(i + 1).trim());
     } catch {
       return part.slice(i + 1).trim();
     }
@@ -281,7 +277,6 @@ function openWebSocket(wsUrl) {
 
     ws.addEventListener("open", () => {
       clearTimeout(timeout);
-
       resolve(ws);
     });
 
@@ -447,7 +442,7 @@ function closeWebSocket(ws) {
 }
 
 /* =====================================================
-   FRESH BALANCE FROM AUTHENTICATED WS
+   FRESH BALANCE
 ===================================================== */
 
 async function getFreshBalance(
@@ -525,14 +520,14 @@ function normalizeContract(
     status !== "WON" &&
     status !== "LOST"
   ) {
-    if (Number.isFinite(profit)) {
-      status =
-        profit > 0
-          ? "WON"
-          : "LOST";
-    } else {
-      status = "SOLD";
-    }
+    status =
+      Number.isFinite(profit)
+        ? (
+          profit > 0
+            ? "WON"
+            : "LOST"
+        )
+        : "SOLD";
   }
 
   if (!status) {
@@ -670,6 +665,7 @@ async function getContractStatus(
 ===================================================== */
 
 export async function onRequest(context) {
+
   const request =
     context.request;
 
@@ -729,6 +725,7 @@ export async function onRequest(context) {
     "demo";
 
   try {
+
     const url =
       new URL(
         request.url
@@ -760,6 +757,7 @@ export async function onRequest(context) {
   let selected;
 
   try {
+
     selected =
       await getSelectedAccount(
         token,
@@ -795,18 +793,24 @@ export async function onRequest(context) {
   if (
     request.method === "GET"
   ) {
+
     return json({
       ok: true,
       connected: true,
+
       account: {
         account_id:
           accountId,
+
         account_type:
           accountType,
+
         balance:
           balance,
+
         currency:
           currency,
+
         status:
           account.status ||
           "active"
@@ -826,15 +830,20 @@ export async function onRequest(context) {
     return json({
       ok: true,
       connected: true,
+
       account: {
         account_id:
           accountId,
+
         account_type:
           accountType,
+
         balance:
           balance,
+
         currency:
           currency,
+
         status:
           account.status ||
           "active"
@@ -860,15 +869,20 @@ export async function onRequest(context) {
         );
 
       return json({
+
         ok: true,
+
         account: {
           account_id:
             accountId,
+
           account_type:
             accountType
         },
+
         balance:
           fresh.balance,
+
         currency:
           fresh.currency
       });
@@ -876,15 +890,20 @@ export async function onRequest(context) {
     } catch {
 
       return json({
+
         ok: true,
+
         account: {
           account_id:
             accountId,
+
           account_type:
             accountType
         },
+
         balance:
           balance,
+
         currency:
           currency
       });
@@ -926,18 +945,26 @@ export async function onRequest(context) {
         );
 
       return json({
+
         ok: true,
+
         connected: true,
-        trading_ready: true,
+
+        trading_ready:
+          true,
+
         balance:
           test?.balance?.balance ??
           balance,
+
         currency:
           test?.balance?.currency ??
           currency,
+
         account: {
           account_id:
             accountId,
+
           account_type:
             accountType
         }
@@ -1010,8 +1037,12 @@ export async function onRequest(context) {
         );
 
       return json({
+
         ok: true,
-        contract,
+
+        contract:
+
+          contract,
 
         balance:
           result.balance?.balance ??
@@ -1022,8 +1053,10 @@ export async function onRequest(context) {
           currency,
 
         account: {
+
           account_id:
             accountId,
+
           account_type:
             accountType
         }
@@ -1066,6 +1099,7 @@ export async function onRequest(context) {
         ).trim();
 
       if (!market) {
+
         throw new Error(
           "No trading market was selected."
         );
@@ -1078,6 +1112,7 @@ export async function onRequest(context) {
         ).trim();
 
       if (!contractType) {
+
         throw new Error(
           "No contract type was selected."
         );
@@ -1088,12 +1123,20 @@ export async function onRequest(context) {
           body.stake
         );
 
+      /*
+       * No artificial maximum stake.
+       * Deriv remains responsible for
+       * rejecting an amount outside the
+       * permitted limits for the account.
+       */
+
       if (
         !Number.isFinite(
           stake
         ) ||
         stake <= 0
       ) {
+
         throw new Error(
           "Enter a valid stake."
         );
@@ -1110,6 +1153,7 @@ export async function onRequest(context) {
         ) ||
         duration < 1
       ) {
+
         throw new Error(
           "Enter a valid duration."
         );
@@ -1141,26 +1185,42 @@ export async function onRequest(context) {
       ----------------------------------------------- */
 
       const proposalPayload = {
+
         proposal: 1,
-        amount: stake,
-        basis: "stake",
+
+        amount:
+          stake,
+
+        basis:
+          "stake",
+
         contract_type:
           contractType,
+
         currency:
           currency,
+
         duration:
           duration,
+
         duration_unit:
           durationUnit,
+
         underlying_symbol:
           market,
-        req_id: 1
+
+        req_id:
+          1
       };
 
       const digitTypes = [
+
         "DIGITOVER",
+
         "DIGITUNDER",
+
         "DIGITMATCH",
+
         "DIGITDIFF"
       ];
 
@@ -1188,6 +1248,7 @@ export async function onRequest(context) {
         proposalResponse?.proposal;
 
       if (!proposal?.id) {
+
         throw new Error(
           "Deriv did not return a valid proposal."
         );
@@ -1206,6 +1267,7 @@ export async function onRequest(context) {
         ) ||
         askPrice <= 0
       ) {
+
         throw new Error(
           "Deriv returned an invalid contract price."
         );
@@ -1219,13 +1281,17 @@ export async function onRequest(context) {
         await sendRequest(
           ws,
           {
+
             buy:
               String(
                 proposal.id
               ),
+
             price:
               askPrice,
-            req_id: 2
+
+            req_id:
+              2
           },
           "buy"
         );
@@ -1234,6 +1300,7 @@ export async function onRequest(context) {
         buyResponse?.buy;
 
       if (!buy?.contract_id) {
+
         throw new Error(
           "Deriv did not return a contract ID."
         );
@@ -1241,8 +1308,7 @@ export async function onRequest(context) {
 
       /* -----------------------------------------------
          FRESH BALANCE
-         Uses the same already-open WebSocket.
-         This avoids creating another connection.
+         SAME OPEN WEBSOCKET
       ----------------------------------------------- */
 
       let updatedBalance =
@@ -1273,6 +1339,7 @@ export async function onRequest(context) {
             fresh
           )
         ) {
+
           updatedBalance =
             fresh;
         }
@@ -1282,16 +1349,23 @@ export async function onRequest(context) {
           updatedCurrency;
 
       } catch {
-        /* Keep the existing balance fallback. */
+        /*
+         * Keep the existing balance
+         * if the immediate balance
+         * request fails.
+         */
       }
 
+      /* -----------------------------------------------
+         RETURN BUY RESULT
+      ----------------------------------------------- */
+
       return json({
+
         ok: true,
 
-        message:
-          "Contract purchased successfully.",
-
         contract: {
+
           contract_id:
             buy.contract_id,
 
@@ -1338,12 +1412,16 @@ export async function onRequest(context) {
         },
 
         account: {
+
           account_id:
             accountId,
+
           account_type:
             accountType,
+
           balance:
             updatedBalance,
+
           currency:
             updatedCurrency
         }
@@ -1359,7 +1437,9 @@ export async function onRequest(context) {
       return json(
         {
           ok: false,
+
           connected: true,
+
           error:
             error.message ||
             "Purchase failed."
@@ -1380,9 +1460,10 @@ export async function onRequest(context) {
   return json(
     {
       ok: false,
+
       error:
         `Unknown action: ${body.action || "none"}`
     },
     400
   );
-}
+       }
