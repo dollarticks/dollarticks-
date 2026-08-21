@@ -185,7 +185,7 @@ async function getSelectedAccount(
 }
 
 /* =====================================================
-   OTP / AUTHENTICATED WS
+   OTP / AUTHENTICATED WEBSOCKET
 ===================================================== */
 
 async function getOTP(
@@ -275,7 +275,7 @@ function openWebSocket(wsUrl) {
             )
           );
 
-        }, 12000);
+        }, 8000);
 
       try {
         ws =
@@ -333,14 +333,14 @@ function openWebSocket(wsUrl) {
 }
 
 /* =====================================================
-   REQUEST
+   NORMAL REQUEST
 ===================================================== */
 
 function sendRequest(
   ws,
   payload,
   wantedMsgType,
-  timeoutMs = 12000
+  timeoutMs = 8000
 ) {
   return new Promise(
     (resolve, reject) => {
@@ -492,6 +492,10 @@ function sendRequest(
   );
 }
 
+/* =====================================================
+   CLOSE WEBSOCKET
+===================================================== */
+
 function closeWebSocket(ws) {
   try {
 
@@ -511,37 +515,22 @@ function closeWebSocket(ws) {
 }
 
 /* =====================================================
-   BALANCE
+   BALANCE FROM EXISTING WS
 ===================================================== */
 
-async function getFreshBalance(
-  token,
-  accountId
-) {
-
-  let ws;
+async function getBalanceFromWS(ws) {
 
   try {
-
-    const wsUrl =
-      await getOTP(
-        token,
-        accountId
-      );
-
-    ws =
-      await openWebSocket(
-        wsUrl
-      );
 
     const response =
       await sendRequest(
         ws,
         {
           balance: 1,
-          req_id: 1001
+          req_id: 9001
         },
-        "balance"
+        "balance",
+        5000
       );
 
     return {
@@ -556,9 +545,9 @@ async function getFreshBalance(
         "USD"
     };
 
-  } finally {
+  } catch {
 
-    closeWebSocket(ws);
+    return null;
   }
 }
 
@@ -579,7 +568,10 @@ function normalizeContract(
     ).toUpperCase();
 
   const isSold =
-    source?.is_sold === true;
+    source?.is_sold === true ||
+    source?.is_sold === 1 ||
+    rawStatus === "WON" ||
+    rawStatus === "LOST";
 
   const profit =
     Number(
@@ -658,10 +650,27 @@ function normalizeContract(
 }
 
 /* =====================================================
-   CONTRACT STATUS - ONE CHECK
+   FAST CONTRACT SETTLEMENT
+   =====================================================
+
+   IMPORTANT:
+
+   The old version opened a NEW WebSocket every time
+   the frontend checked the contract.
+
+   This version opens ONE authenticated connection,
+   subscribes to the contract, and waits for the
+   settlement update.
+
+   This removes the repeated:
+
+   OTP -> WebSocket -> contract request -> close
+
+   cycle.
+
 ===================================================== */
 
-async function getContractStatus(
+async function waitForContractSettlement(
   token,
   accountId,
   contractId
@@ -682,32 +691,220 @@ async function getContractStatus(
         wsUrl
       );
 
-    const response =
-      await sendRequest(
-        ws,
-        {
-          proposal_open_contract: 1,
-          contract_id:
-            Number(contractId),
-          req_id:
-            2001
-        },
-        "proposal_open_contract"
-      );
+    return await new Promise(
+      (resolve, reject) => {
 
-    const contract =
-      response?.proposal_open_contract;
+        let finished =
+          false;
 
-    if (!contract) {
+        const timeout =
+          setTimeout(
+            () => {
 
-      throw new Error(
-        "No contract information returned."
-      );
-    }
+              if (finished)
+                return;
 
-    return normalizeContract(
-      contract,
-      contractId
+              finished =
+                true;
+
+              cleanup();
+
+              reject(
+                new Error(
+                  "Contract settlement check timed out."
+                )
+              );
+
+            },
+            12000
+          );
+
+        function cleanup() {
+
+          clearTimeout(
+            timeout
+          );
+
+          ws.removeEventListener(
+            "message",
+            onMessage
+          );
+
+          ws.removeEventListener(
+            "error",
+            onError
+          );
+
+          ws.removeEventListener(
+            "close",
+            onClose
+          );
+        }
+
+        function finish(
+          contract
+        ) {
+
+          if (finished)
+            return;
+
+          finished =
+            true;
+
+          cleanup();
+
+          resolve(
+            contract
+          );
+        }
+
+        function fail(
+          message
+        ) {
+
+          if (finished)
+            return;
+
+          finished =
+            true;
+
+          cleanup();
+
+          reject(
+            new Error(
+              message
+            )
+          );
+        }
+
+        function onMessage(
+          event
+        ) {
+
+          let data;
+
+          try {
+
+            data =
+              JSON.parse(
+                event.data
+              );
+
+          } catch {
+
+            return;
+          }
+
+          if (
+            data.error
+          ) {
+
+            fail(
+              data.error.message ||
+              data.error?.detail?.message ||
+              "Deriv rejected the contract request."
+            );
+
+            return;
+          }
+
+          if (
+            data.msg_type !==
+            "proposal_open_contract"
+          ) {
+
+            return;
+          }
+
+          const source =
+            data.proposal_open_contract;
+
+          if (!source)
+            return;
+
+          const contract =
+            normalizeContract(
+              source,
+              contractId
+            );
+
+          /*
+           * If the contract is already finished,
+           * return immediately.
+           */
+
+          if (
+            contract.status === "WON" ||
+            contract.status === "LOST" ||
+            contract.is_sold === true
+          ) {
+
+            finish(
+              contract
+            );
+          }
+        }
+
+        function onError() {
+
+          fail(
+            "Trading connection failed while checking the contract."
+          );
+        }
+
+        function onClose() {
+
+          if (!finished) {
+
+            fail(
+              "Trading connection closed while checking the contract."
+            );
+          }
+        }
+
+        ws.addEventListener(
+          "message",
+          onMessage
+        );
+
+        ws.addEventListener(
+          "error",
+          onError
+        );
+
+        ws.addEventListener(
+          "close",
+          onClose
+        );
+
+        try {
+
+          ws.send(
+            JSON.stringify({
+
+              proposal_open_contract:
+                1,
+
+              contract_id:
+                Number(
+                  contractId
+                ),
+
+              subscribe:
+                1,
+
+              req_id:
+                5001
+            })
+          );
+
+        } catch {
+
+          fail(
+            "Could not subscribe to the contract."
+          );
+        }
+      }
     );
 
   } finally {
@@ -925,20 +1122,55 @@ export async function onRequest(
 
   /* ===================================================
      BALANCE
-  =================================================== */
+===================================================== */
 
   if (
     body.action ===
     "balance"
   ) {
 
+    let ws;
+
     try {
 
-      const fresh =
-        await getFreshBalance(
+      const wsUrl =
+        await getOTP(
           token,
           accountId
         );
+
+      ws =
+        await openWebSocket(
+          wsUrl
+        );
+
+      const fresh =
+        await getBalanceFromWS(
+          ws
+        );
+
+      if (fresh) {
+
+        return json({
+
+          ok: true,
+
+          account: {
+
+            account_id:
+              accountId,
+
+            account_type:
+              accountType
+          },
+
+          balance:
+            fresh.balance,
+
+          currency:
+            fresh.currency
+        });
+      }
 
       return json({
 
@@ -954,10 +1186,10 @@ export async function onRequest(
         },
 
         balance:
-          fresh.balance,
+          balance,
 
         currency:
-          fresh.currency
+          currency
       });
 
     } catch {
@@ -981,12 +1213,16 @@ export async function onRequest(
         currency:
           currency
       });
+
+    } finally {
+
+      closeWebSocket(ws);
     }
   }
 
   /* ===================================================
      SESSION
-  =================================================== */
+===================================================== */
 
   if (
     body.action ===
@@ -1017,7 +1253,8 @@ export async function onRequest(
             balance: 1,
             req_id: 3001
           },
-          "balance"
+          "balance",
+          6000
         );
 
       return json({
@@ -1068,7 +1305,8 @@ export async function onRequest(
 
   /* ===================================================
      CONTRACT STATUS
-  =================================================== */
+     FAST SUBSCRIPTION VERSION
+===================================================== */
 
   if (
     body.action ===
@@ -1099,18 +1337,78 @@ export async function onRequest(
 
     try {
 
+      /*
+       * ONE connection.
+       *
+       * Subscribe to the contract and wait for
+       * the settlement message instead of repeatedly
+       * opening new connections.
+       */
+
       const contract =
-        await getContractStatus(
+        await waitForContractSettlement(
           token,
           accountId,
           contractId
         );
 
+      /*
+       * Once settled, obtain the balance immediately.
+       */
+
+      let freshBalance =
+        null;
+
+      let balanceWs;
+
+      try {
+
+        const balanceWsUrl =
+          await getOTP(
+            token,
+            accountId
+          );
+
+        balanceWs =
+          await openWebSocket(
+            balanceWsUrl
+          );
+
+        freshBalance =
+          await getBalanceFromWS(
+            balanceWs
+          );
+
+      } catch {
+
+        freshBalance =
+          null;
+
+      } finally {
+
+        closeWebSocket(
+          balanceWs
+        );
+      }
+
       return json({
 
         ok: true,
 
+        settled:
+          contract.status === "WON" ||
+          contract.status === "LOST" ||
+          contract.is_sold === true,
+
         contract,
+
+        balance:
+          freshBalance?.balance ??
+          null,
+
+        currency:
+          freshBalance?.currency ??
+          currency,
 
         account: {
 
@@ -1139,7 +1437,7 @@ export async function onRequest(
 
   /* ===================================================
      BUY
-  =================================================== */
+===================================================== */
 
   if (
     body.action ===
@@ -1165,20 +1463,27 @@ export async function onRequest(
         );
       }
 
+      /* -----------------------------------------------
+         ALL SUPPORTED DIGIT CONTRACTS
+      ----------------------------------------------- */
+
       const allowedContracts = [
+
         "DIGITOVER",
         "DIGITUNDER",
         "DIGITMATCH",
         "DIGITDIFF",
         "DIGITEVEN",
         "DIGITODD"
+
       ];
 
       const contractType =
         String(
           body.contract_type ||
           ""
-        ).trim()
+        )
+        .trim()
         .toUpperCase();
 
       if (
@@ -1191,6 +1496,11 @@ export async function onRequest(
           "Invalid digit contract type."
         );
       }
+
+      /* -----------------------------------------------
+         STAKE
+         NO ARTIFICIAL LIMIT
+      ----------------------------------------------- */
 
       const stake =
         Number(
@@ -1210,10 +1520,17 @@ export async function onRequest(
       }
 
       /*
-       * No artificial $1 maximum.
-       * Deriv itself decides whether the amount
-       * is valid for the selected account/contract.
+       * IMPORTANT:
+       *
+       * There is deliberately NO $1 maximum here.
+       *
+       * Deriv decides whether the selected stake is
+       * valid for the selected market/account.
        */
+
+      /* -----------------------------------------------
+         DURATION
+      ----------------------------------------------- */
 
       const duration =
         Number(
@@ -1238,6 +1555,10 @@ export async function onRequest(
           "t"
         );
 
+      /* -----------------------------------------------
+         BARRIER
+      ----------------------------------------------- */
+
       const barrier =
         String(
           body.barrier ??
@@ -1245,11 +1566,18 @@ export async function onRequest(
         );
 
       const digitContracts = [
+
         "DIGITOVER",
         "DIGITUNDER",
         "DIGITMATCH",
         "DIGITDIFF"
+
       ];
+
+      /*
+       * Over, Under, Matches and Differs can use
+       * ANY digit from 0 through 9.
+       */
 
       if (
         digitContracts.includes(
@@ -1258,7 +1586,9 @@ export async function onRequest(
       ) {
 
         const digit =
-          Number(barrier);
+          Number(
+            barrier
+          );
 
         if (
           !Number.isInteger(
@@ -1295,7 +1625,8 @@ export async function onRequest(
 
       const proposalPayload = {
 
-        proposal: 1,
+        proposal:
+          1,
 
         amount:
           stake,
@@ -1322,6 +1653,13 @@ export async function onRequest(
           4001
       };
 
+      /*
+       * Only barrier-based digit contracts receive
+       * a barrier.
+       *
+       * Even/Odd do NOT receive one.
+       */
+
       if (
         digitContracts.includes(
           contractType
@@ -1336,7 +1674,8 @@ export async function onRequest(
         await sendRequest(
           ws,
           proposalPayload,
-          "proposal"
+          "proposal",
+          8000
         );
 
       const proposal =
@@ -1387,9 +1726,11 @@ export async function onRequest(
 
             req_id:
               4002
+
           },
 
-          "buy"
+          "buy",
+          8000
         );
 
       const buy =
@@ -1404,11 +1745,9 @@ export async function onRequest(
         );
       }
 
-      /*
-       * Use the balance_after returned by BUY
-       * immediately instead of waiting for another
-       * REST balance request.
-       */
+      /* -----------------------------------------------
+         IMMEDIATE BALANCE
+      ----------------------------------------------- */
 
       const balanceAfter =
         Number(
@@ -1523,8 +1862,8 @@ export async function onRequest(
   }
 
   /* ===================================================
-     UNKNOWN
-  =================================================== */
+     UNKNOWN ACTION
+===================================================== */
 
   return json(
     {
@@ -1536,4 +1875,4 @@ export async function onRequest(
     },
     400
   );
-     }
+}
