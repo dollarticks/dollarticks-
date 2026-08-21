@@ -898,7 +898,7 @@ Percentages are based on recent ticks and are
 </div>
 
 
-<!-- REAL ACCOUNT MONEY -->
+<!-- REAL ACCOUNT -->
 
 <div id="realMoneyControls" class="card">
 
@@ -926,12 +926,8 @@ Withdraw
 
 </div>
 
-<div
-  id="cashierStatus"
-  class="accountInfo"
-  style="text-align:center"
->
-  Deposit and withdrawal are handled securely by Deriv.
+<div class="contractHint">
+Deposit and withdrawal are handled securely through your Deriv Wallet.
 </div>
 
 </div>
@@ -2701,6 +2697,19 @@ async function buyContract(){
     }
 
 
+    /*
+     * IMPORTANT:
+     *
+     * The backend has already completed
+     * proposal -> buy.
+     *
+     * We deliberately DO NOT show:
+     *
+     * "Trade purchased successfully"
+     *
+     * Instead we monitor the returned contract.
+     */
+
     const contract =
       data.contract || {};
 
@@ -2851,36 +2860,27 @@ $("clearHistory").addEventListener(
 /*
  * IMPORTANT:
  *
- * DollarTicks does not process deposits or withdrawals.
- * The buttons send the user to Deriv's official cashier.
+ * The old URLs:
  *
- * This keeps payment credentials and financial actions
- * inside Deriv rather than inside DollarTicks.
+ *   https://app.deriv.com/cashier/deposit
+ *   https://app.deriv.com/cashier/withdrawal
+ *
+ * are removed.
+ *
+ * Deriv's current client flow handles deposits and
+ * withdrawals through the Deriv Wallet.
+ *
+ * We therefore open the authenticated Deriv Wallet
+ * entry point instead of a legacy cashier URL.
  */
 
-function openDerivCashier(path){
+function openDerivWallet(){
 
-  const url =
-    "https://app.deriv.com" + path;
-
-  const opened =
-    window.open(
-      url,
-      "_blank",
-      "noopener,noreferrer"
-    );
-
-  if(!opened){
-
-    window.location.href =
-      url;
-
-    return;
-  }
-
-  $("cashierStatus").textContent =
-    "Deriv cashier opened in a new tab.";
-
+  window.open(
+    "https://app.deriv.com/",
+    "_blank",
+    "noopener,noreferrer"
+  );
 }
 
 
@@ -2888,9 +2888,7 @@ $("depositButton").addEventListener(
   "click",
   function(){
 
-    openDerivCashier(
-      "/cashier/deposit"
-    );
+    openDerivWallet();
 
   }
 );
@@ -2900,9 +2898,7 @@ $("withdrawButton").addEventListener(
   "click",
   function(){
 
-    openDerivCashier(
-      "/cashier/withdrawal"
-    );
+    openDerivWallet();
 
   }
 );
@@ -2933,6 +2929,10 @@ async function initialize(){
 
     return;
   }
+
+  /*
+   * Load history AFTER account ID is known.
+   */
 
   tradeHistory =
     loadTradeHistory();
