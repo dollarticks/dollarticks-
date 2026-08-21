@@ -577,6 +577,7 @@ button.money.deposit{
 
 </div>
 
+
 <div id="dashboard">
 
 <div class="wrap">
@@ -592,6 +593,9 @@ button.money.deposit{
   </div>
 
 </div>
+
+
+<!-- ACCOUNT -->
 
 <div class="card">
 
@@ -647,6 +651,9 @@ button.money.deposit{
 
 </div>
 
+
+<!-- MARKET -->
+
 <div class="card">
 
 <label>Volatility Market</label>
@@ -671,6 +678,9 @@ Waiting for tick…
 
 </div>
 
+
+<!-- FREQUENCY -->
+
 <div class="card">
 
 <div class="latestBadge">
@@ -681,6 +691,9 @@ LAST <b id="countLabel">100</b> TICKS
 <div id="digits" class="grid"></div>
 
 </div>
+
+
+<!-- TRADE -->
 
 <div class="card">
 
@@ -742,6 +755,12 @@ TRADE ENTRY
 BUY
 </button>
 
+<!--
+  IMPORTANT:
+  This status box stays hidden while a trade is being
+  purchased or waiting for the contract result.
+  It is only displayed after WON or LOST is confirmed.
+-->
 <div id="tradeStatus" class="tradeStatus hidden"></div>
 
 <div id="proposalInfo" class="tradeStatus hidden"></div>
@@ -749,6 +768,9 @@ BUY
 <div id="debug" class="debug hidden"></div>
 
 </div>
+
+
+<!-- TRADE HISTORY -->
 
 <div class="card">
 
@@ -787,6 +809,9 @@ Clear Trade History
 
 </div>
 
+
+<!-- METRICS -->
+
 <div class="row">
 
 <div class="metric">
@@ -805,7 +830,11 @@ Clear Trade History
 
 </div>
 
+
 <div style="height:12px"></div>
+
+
+<!-- OVER UNDER -->
 
 <div class="card">
 
@@ -832,6 +861,9 @@ OVER / UNDER
 </div>
 
 </div>
+
+
+<!-- NOTE -->
 
 <div class="card">
 
@@ -862,6 +894,9 @@ Percentages are based on recent ticks and are
 
 </div>
 
+
+<!-- REAL ACCOUNT -->
+
 <div id="realMoneyControls" class="card">
 
 <div class="latestBadge">
@@ -882,12 +917,14 @@ Withdraw
 
 </div>
 
+
 <div class="footer">
 DollarTicks • Market data powered by Deriv
 </div>
 
 </div>
 </div>
+
 
 <script>
 
@@ -899,7 +936,7 @@ const $ = id => document.getElementById(id);
 
 
 /* =====================================================
-   LOGIN
+   LOGIN / SIGNUP
 ===================================================== */
 
 const loginButton = $("loginButton");
@@ -953,6 +990,7 @@ let currentAccountId = null;
 let currentBalance = null;
 let currentCurrency = "USD";
 
+
 function updateAccountDisplay(){
 
   const type =
@@ -998,7 +1036,7 @@ function updateAccountDisplay(){
 
 
 /* =====================================================
-   ACCOUNT CHECK
+   FAST ACCOUNT CHECK
 ===================================================== */
 
 async function checkAccount(){
@@ -1063,7 +1101,7 @@ async function checkAccount(){
 
 
 /* =====================================================
-   BALANCE
+   FAST BALANCE REFRESH
 ===================================================== */
 
 let balanceRefreshing = false;
@@ -1100,7 +1138,9 @@ async function refreshBalanceFast(){
     if(
       data &&
       data.ok &&
-      Number.isFinite(Number(data.balance))
+      Number.isFinite(
+        Number(data.balance)
+      )
     ){
 
       currentBalance =
@@ -1116,7 +1156,7 @@ async function refreshBalanceFast(){
   }catch(error){
 
     console.error(
-      "Balance refresh error:",
+      "Fast balance refresh error:",
       error
     );
 
@@ -1143,18 +1183,12 @@ const marketNames = {
   "1HZ50V":"Volatility 50 (1s)",
   "1HZ25V":"Volatility 25 (1s)",
   "1HZ10V":"Volatility 10 (1s)"
-
 };
 
 let ws = null;
 let history = [];
 let latestDigit = null;
 
-let marketReconnectTimer = null;
-let marketReconnectDelay = 1000;
-let marketConnectionId = 0;
-let marketIntentionalClose = false;
-let marketConnecting = false;
 
 function getSelectedMarket(){
 
@@ -1166,7 +1200,11 @@ function getSelectedMarket(){
     : "1HZ100V";
 }
 
-function getLastDigit(quote,pipSize){
+
+function getLastDigit(
+  quote,
+  pipSize
+){
 
   const n = Number(quote);
 
@@ -1204,6 +1242,7 @@ function getLastDigit(quote,pipSize){
   );
 }
 
+
 function addDigit(
   digit,
   quote,
@@ -1224,7 +1263,6 @@ function addDigit(
   if(
     history.length > MAX_TICKS
   ){
-
     history.shift();
   }
 
@@ -1238,6 +1276,7 @@ function addDigit(
   render();
 }
 
+
 function render(){
 
   const counts =
@@ -1246,14 +1285,7 @@ function render(){
   for(
     const digit of history
   ){
-
-    if(
-      digit >= 0 &&
-      digit <= 9
-    ){
-
-      counts[digit]++;
-    }
+    counts[digit]++;
   }
 
   $("countLabel").textContent =
@@ -1272,7 +1304,6 @@ function render(){
       counts[i] >
       counts[mostDigit]
     ){
-
       mostDigit = i;
     }
 
@@ -1280,7 +1311,6 @@ function render(){
       counts[i] <
       counts[leastDigit]
     ){
-
       leastDigit = i;
     }
   }
@@ -1375,15 +1405,9 @@ ${percentage.toFixed(1)}%
         history.length *
         100
       ).toFixed(1) + "%";
-
-  }else{
-
-    $("most").textContent = "—";
-    $("least").textContent = "—";
-    $("over5").textContent = "—";
-    $("under5").textContent = "—";
   }
 }
+
 
 function setStatus(
   text,
@@ -1398,91 +1422,16 @@ function setStatus(
 }
 
 
-/* =====================================================
-   STABLE MARKET CONNECTION
-===================================================== */
-
-function clearMarketReconnect(){
-
-  if(marketReconnectTimer){
-
-    clearTimeout(
-      marketReconnectTimer
-    );
-
-    marketReconnectTimer = null;
-  }
-}
-
-function scheduleMarketReconnect(){
-
-  if(marketIntentionalClose)
-    return;
-
-  clearMarketReconnect();
-
-  const delay =
-    marketReconnectDelay;
-
-  setStatus(
-    `Reconnecting in ${Math.ceil(delay / 1000)}s…`
-  );
-
-  marketReconnectTimer =
-    setTimeout(
-      () => {
-
-        marketReconnectTimer = null;
-
-        connectMarket();
-
-      },
-      delay
-    );
-
-  marketReconnectDelay =
-    Math.min(
-      marketReconnectDelay * 2,
-      10000
-    );
-}
-
-function closeMarketSocket(){
-
-  clearMarketReconnect();
+function connectMarket(){
 
   if(ws){
 
     try{
-
-      ws.onopen = null;
-      ws.onmessage = null;
-      ws.onerror = null;
-      ws.onclose = null;
-
       ws.close();
-
-    }catch(error){
-
-      console.error(
-        "Socket close error:",
-        error
-      );
-    }
+    }catch(e){}
 
     ws = null;
   }
-
-  marketConnecting = false;
-}
-
-function connectMarket(){
-
-  marketIntentionalClose = false;
-
-  clearMarketReconnect();
-
-  closeMarketSocket();
 
   history = [];
   latestDigit = null;
@@ -1497,76 +1446,33 @@ function connectMarket(){
 
   setStatus("Connecting…");
 
-  const connectionId =
-    ++marketConnectionId;
-
-  marketConnecting = true;
-
-  const socket =
+  ws =
     new WebSocket(WS_URL);
 
-  ws = socket;
-
-  socket.onopen =
+  ws.onopen =
     function(){
-
-      if(
-        connectionId !== marketConnectionId ||
-        ws !== socket
-      ){
-
-        try{
-          socket.close();
-        }catch(e){}
-
-        return;
-      }
-
-      marketConnecting = false;
-
-      marketReconnectDelay = 1000;
 
       setStatus(
         "LIVE",
         true
       );
 
-      try{
+      ws.send(
+        JSON.stringify({
 
-        socket.send(
-          JSON.stringify({
+          ticks_history:symbol,
+          count:MAX_TICKS,
+          end:"latest",
+          style:"ticks",
+          subscribe:1,
+          req_id:1
 
-            ticks_history:symbol,
-            count:MAX_TICKS,
-            end:"latest",
-            style:"ticks",
-            subscribe:1,
-            req_id:1
-
-          })
-        );
-
-      }catch(error){
-
-        console.error(
-          "Subscription error:",
-          error
-        );
-
-        try{
-          socket.close();
-        }catch(e){}
-      }
+        })
+      );
     };
 
-  socket.onmessage =
+  ws.onmessage =
     function(event){
-
-      if(
-        connectionId !== marketConnectionId ||
-        ws !== socket
-      )
-        return;
 
       try{
 
@@ -1576,12 +1482,7 @@ function connectMarket(){
         if(data.error){
 
           console.error(
-            "Deriv socket error:",
             data.error
-          );
-
-          setStatus(
-            "Market error"
           );
 
           return;
@@ -1597,7 +1498,7 @@ function connectMarket(){
           const times =
             data.history?.times || [];
 
-          const freshHistory = [];
+          history = [];
 
           for(
             let i = 0;
@@ -1611,21 +1512,18 @@ function connectMarket(){
                 data.pip_size
               );
 
-            if(digit !== null){
-
-              freshHistory.push(
-                digit
-              );
-            }
+            if(digit !== null)
+              history.push(digit);
           }
 
-          history =
-            freshHistory.slice(
-              -MAX_TICKS
-            );
+          if(
+            history.length > MAX_TICKS
+          ){
+            history =
+              history.slice(-MAX_TICKS);
+          }
 
           if(history.length){
-
             latestDigit =
               history[
                 history.length - 1
@@ -1683,64 +1581,33 @@ function connectMarket(){
       }catch(error){
 
         console.error(
-          "Tick processing error:",
+          "Tick error:",
           error
         );
       }
     };
 
-  socket.onerror =
-    function(error){
-
-      if(
-        connectionId !== marketConnectionId ||
-        ws !== socket
-      )
-        return;
-
-      console.error(
-        "Market WebSocket error:",
-        error
-      );
-
-      setStatus(
-        "Connection error"
-      );
+  ws.onerror =
+    function(){
+      setStatus("Connection error");
     };
 
-  socket.onclose =
+  ws.onclose =
     function(){
 
-      if(
-        connectionId !== marketConnectionId ||
-        ws !== socket
-      )
-        return;
+      setStatus("Disconnected");
 
-      marketConnecting = false;
-      ws = null;
-
-      setStatus(
-        "Disconnected"
+      setTimeout(
+        connectMarket,
+        3000
       );
-
-      scheduleMarketReconnect();
     };
 }
 
 
-/* =====================================================
-   MARKET CHANGE
-===================================================== */
-
 $("market").addEventListener(
   "change",
-  function(){
-
-    marketReconnectDelay = 1000;
-
-    connectMarket();
-  }
+  connectMarket
 );
 
 
@@ -1763,8 +1630,6 @@ async function selectAccount(type){
         },
 
         credentials:"same-origin",
-
-        cache:"no-store",
 
         body:
           JSON.stringify({
@@ -1794,8 +1659,7 @@ async function selectAccount(type){
   const account =
     data.account || {};
 
-  currentAccountType =
-    type;
+  currentAccountType = type;
 
   currentAccountId =
     account.account_id ||
@@ -1814,67 +1678,32 @@ async function selectAccount(type){
 
   $("moneyStatus").textContent =
     `${type.toUpperCase()} account selected.`;
-
-  /*
-   * Refresh once immediately after switching.
-   */
-  refreshBalanceFast();
 }
+
 
 $("demoMode").addEventListener(
   "click",
   async function(){
 
-    if(
-      currentAccountType === "demo"
-    )
-      return;
-
     try{
-
-      $("demoMode").disabled = true;
-      $("realMode").disabled = true;
-
       await selectAccount("demo");
-
     }catch(error){
-
       $("moneyStatus").textContent =
         error.message;
-
-    }finally{
-
-      $("demoMode").disabled = false;
-      $("realMode").disabled = false;
     }
   }
 );
+
 
 $("realMode").addEventListener(
   "click",
   async function(){
 
-    if(
-      currentAccountType === "real"
-    )
-      return;
-
     try{
-
-      $("demoMode").disabled = true;
-      $("realMode").disabled = true;
-
       await selectAccount("real");
-
     }catch(error){
-
       $("moneyStatus").textContent =
         error.message;
-
-    }finally{
-
-      $("demoMode").disabled = false;
-      $("realMode").disabled = false;
     }
   }
 );
@@ -1892,6 +1721,7 @@ $("depositButton").addEventListener(
       "Deposit is not connected yet.";
   }
 );
+
 
 $("withdrawButton").addEventListener(
   "click",
@@ -1941,8 +1771,6 @@ let activeContract = null;
 let contractTimer = null;
 let contractChecking = false;
 
-let contractPollDelay = 700;
-
 
 /* =====================================================
    TRADE HISTORY
@@ -1972,6 +1800,7 @@ function getTradeHistory(){
     return [];
   }
 }
+
 
 function saveTradeToHistory(
   contract
@@ -2045,11 +1874,10 @@ function saveTradeToHistory(
       currentAccountType,
 
     currency:
-      contract.currency ||
       currentCurrency,
 
     time:
-      tradeTime(contract)
+      Date.now()
   };
 
   if(existingIndex >= 0){
@@ -2074,26 +1902,6 @@ function saveTradeToHistory(
   renderTradeHistory();
 }
 
-function tradeTime(contract){
-
-  const epoch =
-    Number(
-      contract.exit_tick_time ||
-      contract.sell_time ||
-      contract.date_expiry ||
-      contract.purchase_time
-    );
-
-  if(
-    Number.isFinite(epoch) &&
-    epoch > 0
-  ){
-
-    return epoch * 1000;
-  }
-
-  return Date.now();
-}
 
 function renderTradeHistory(){
 
@@ -2287,6 +2095,7 @@ function renderTradeHistory(){
     ).join("");
 }
 
+
 $("clearHistory").addEventListener(
   "click",
   function(){
@@ -2301,7 +2110,7 @@ $("clearHistory").addEventListener(
 
 
 /* =====================================================
-   CONTRACT CHECKING
+   FAST CONTRACT STATUS
 ===================================================== */
 
 async function checkContract(){
@@ -2382,51 +2191,97 @@ async function checkContract(){
         "OPEN"
       ).toUpperCase();
 
+
+    /*
+     * IMPORTANT:
+     *
+     * Nothing is displayed while the contract
+     * is still OPEN.
+     *
+     * Only when Deriv confirms WON or LOST
+     * do we show the result.
+     */
+
     if(
       status === "WON" ||
       status === "LOST"
     ){
 
       /*
-       * IMPORTANT:
-       * History is updated FIRST.
+       * Save the completed trade immediately.
        */
+
       saveTradeToHistory(
         activeContract
       );
 
+
       /*
-       * Stop polling BEFORE balance refresh.
+       * Show ONLY the final result.
        */
+
+      const tradeStatus =
+        $("tradeStatus");
+
+      tradeStatus.classList.remove(
+        "hidden",
+        "success",
+        "error",
+        "warning"
+      );
+
+
+      if(status === "WON"){
+
+        tradeStatus.classList.add(
+          "success"
+        );
+
+        tradeStatus.textContent =
+          "TRADE WON";
+
+      }else{
+
+        tradeStatus.classList.add(
+          "error"
+        );
+
+        tradeStatus.textContent =
+          "TRADE LOST";
+      }
+
+
+      /*
+       * Stop checking immediately.
+       */
+
       stopContractChecking();
+
+
+      /*
+       * Refresh balance without delaying
+       * the result/history display.
+       */
+
+      refreshBalanceFast();
+
 
       /*
        * Clear active contract.
        */
-      const completedContract =
-        activeContract;
 
       activeContract = null;
-
-      /*
-       * Refresh balance in background.
-       * It cannot delay history.
-       */
-      refreshBalanceFast();
-
-      $("tradeStatus").classList.remove(
-        "hidden"
-      );
-
-      $("tradeStatus").innerHTML =
-        status === "WON"
-          ? '<span class="success">Trade WON ✓</span>'
-          : '<span class="error">Trade LOST</span>';
 
       return;
     }
 
   }catch(error){
+
+    /*
+     * Do NOT show errors as trade status.
+     * Keep the interface clean while the trade
+     * is being checked.
+     */
 
     console.error(
       "Contract check error:",
@@ -2439,20 +2294,27 @@ async function checkContract(){
   }
 }
 
+
+/*
+ * Faster polling.
+ *
+ * The contract is checked frequently so the
+ * final WON/LOST result appears quickly.
+ */
+
 function startContractChecking(){
 
   stopContractChecking();
-
-  contractPollDelay = 700;
 
   checkContract();
 
   contractTimer =
     setInterval(
       checkContract,
-      contractPollDelay
+      700
     );
 }
+
 
 function stopContractChecking(){
 
@@ -2481,19 +2343,26 @@ $("buyButton").addEventListener(
     const debug =
       $("debug");
 
-    button.disabled = true;
+    /*
+     * Hide any previous result when a new
+     * trade is started.
+     */
 
-    debug.classList.add(
-      "hidden"
-    );
+    $("tradeStatus")
+      .classList
+      .add("hidden");
+
+    $("tradeStatus").textContent = "";
 
     $("proposalInfo")
       .classList
       .add("hidden");
 
-    $("tradeStatus")
-      .classList
-      .add("hidden");
+    debug.classList.add(
+      "hidden"
+    );
+
+    button.disabled = true;
 
     try{
 
@@ -2536,13 +2405,6 @@ $("buyButton").addEventListener(
         );
       }
 
-      if(activeContract){
-
-        throw new Error(
-          "A trade is already being monitored. Please wait for it to finish."
-        );
-      }
-
       const payload = {
 
         action:"buy",
@@ -2568,13 +2430,6 @@ $("buyButton").addEventListener(
         duration_unit:"t"
 
       };
-
-      $("tradeStatus").classList.remove(
-        "hidden"
-      );
-
-      $("tradeStatus").textContent =
-        "Sending trade…";
 
       const response =
         await fetch(
@@ -2654,6 +2509,12 @@ $("buyButton").addEventListener(
 
       };
 
+
+      /*
+       * BUY already gives us the new balance.
+       * Display it immediately.
+       */
+
       if(
         data.account &&
         Number.isFinite(
@@ -2675,12 +2536,17 @@ $("buyButton").addEventListener(
         updateAccountDisplay();
       }
 
-      $("tradeStatus").classList.remove(
-        "hidden"
-      );
 
-      $("tradeStatus").innerHTML =
-        '<span class="warning">Trade opened — waiting for result…</span>';
+      /*
+       * Do NOT display:
+       *
+       * "Sending trade"
+       * "Trade opened"
+       * "Waiting for result"
+       *
+       * The screen remains clean until
+       * WON or LOST is confirmed.
+       */
 
       startContractChecking();
 
@@ -2691,12 +2557,10 @@ $("buyButton").addEventListener(
         error
       );
 
-      $("tradeStatus").classList.remove(
-        "hidden"
-      );
-
-      $("tradeStatus").innerHTML =
-        `<span class="error">${error.message}</span>`;
+      /*
+       * Real errors are shown in the debug
+       * area, not as fake trade-status messages.
+       */
 
       debug.textContent =
         error.message;
@@ -2714,112 +2578,10 @@ $("buyButton").addEventListener(
 
 
 /* =====================================================
-   PERIODIC BALANCE REFRESH
-===================================================== */
-
-let balanceTimer = null;
-
-function startBalanceRefresh(){
-
-  if(balanceTimer)
-    clearInterval(balanceTimer);
-
-  /*
-   * Keep balance reasonably fresh without
-   * hammering the backend.
-   */
-  balanceTimer =
-    setInterval(
-      () => {
-
-        if(
-          document.visibilityState ===
-          "visible"
-        ){
-
-          refreshBalanceFast();
-        }
-
-      },
-      5000
-    );
-}
-
-
-/* =====================================================
-   PAGE VISIBILITY
-===================================================== */
-
-document.addEventListener(
-  "visibilitychange",
-  function(){
-
-    if(
-      document.visibilityState ===
-      "visible"
-    ){
-
-      /*
-       * If the socket disappeared while
-       * the phone was asleep, reconnect.
-       */
-      if(
-        !ws ||
-        ws.readyState !==
-        WebSocket.OPEN
-      ){
-
-        connectMarket();
-
-      }
-
-      refreshBalanceFast();
-    }
-  }
-);
-
-
-/* =====================================================
-   ONLINE / OFFLINE
-===================================================== */
-
-window.addEventListener(
-  "online",
-  function(){
-
-    marketReconnectDelay = 1000;
-
-    if(
-      !ws ||
-      ws.readyState !==
-      WebSocket.OPEN
-    ){
-
-      connectMarket();
-    }
-
-    refreshBalanceFast();
-  }
-);
-
-window.addEventListener(
-  "offline",
-  function(){
-
-    setStatus(
-      "Offline"
-    );
-  }
-);
-
-
-/* =====================================================
    START
 ===================================================== */
 
 async function start(){
-
-  renderTradeHistory();
 
   const connected =
     await checkAccount();
@@ -2830,12 +2592,7 @@ async function start(){
 
     connectMarket();
 
-    startBalanceRefresh();
-
-    /*
-     * Initial balance refresh.
-     */
-    refreshBalanceFast();
+    renderTradeHistory();
 
     return;
   }
@@ -2852,4 +2609,4 @@ start();
 </script>
 
 </body>
-    </html>
+  </html>
