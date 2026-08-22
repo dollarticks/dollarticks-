@@ -27,9 +27,7 @@ function getCookie(request, name) {
     request.headers.get("Cookie") || "";
 
   for (const part of cookies.split(";")) {
-
-    const i =
-      part.indexOf("=");
+    const i = part.indexOf("=");
 
     if (i === -1)
       continue;
@@ -57,12 +55,12 @@ function getCookie(request, name) {
 ===================================================== */
 
 async function getAccounts(token) {
-
   const response =
     await fetch(
       `${DERIV_API}/trading/v1/options/accounts`,
       {
         method: "GET",
+
         headers: {
           Authorization:
             `Bearer ${token}`,
@@ -94,7 +92,6 @@ async function getAccounts(token) {
   }
 
   if (!response.ok) {
-
     throw new Error(
       data?.errors?.[0]?.message ||
       data?.errors?.[0]?.detail?.message ||
@@ -119,7 +116,6 @@ async function getAccounts(token) {
 }
 
 function getAccountId(account) {
-
   return (
     account?.account_id ||
     account?.loginid ||
@@ -129,7 +125,6 @@ function getAccountId(account) {
 }
 
 function getAccountType(account) {
-
   return String(
     account?.account_type ||
     "demo"
@@ -137,7 +132,6 @@ function getAccountType(account) {
 }
 
 function getAccountBalance(account) {
-
   const value =
     Number(
       account?.balance ?? 0
@@ -152,7 +146,6 @@ function findAccount(
   accounts,
   requestedType
 ) {
-
   const wanted =
     String(
       requestedType || "demo"
@@ -170,12 +163,10 @@ async function getSelectedAccount(
   token,
   requestedType
 ) {
-
   const accounts =
     await getAccounts(token);
 
   if (!accounts.length) {
-
     throw new Error(
       "No trading account is available."
     );
@@ -188,7 +179,6 @@ async function getSelectedAccount(
     );
 
   if (!account) {
-
     throw new Error(
       `No ${String(
         requestedType
@@ -200,7 +190,6 @@ async function getSelectedAccount(
     getAccountId(account);
 
   if (!accountId) {
-
     throw new Error(
       "Trading account information is incomplete."
     );
@@ -226,7 +215,6 @@ async function getOTP(
   token,
   accountId
 ) {
-
   const response =
     await fetch(
       `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(
@@ -266,7 +254,6 @@ async function getOTP(
   }
 
   if (!response.ok) {
-
     throw new Error(
       data?.errors?.[0]?.message ||
       data?.errors?.[0]?.detail?.message ||
@@ -281,7 +268,6 @@ async function getOTP(
     data?.url;
 
   if (!wsUrl) {
-
     throw new Error(
       "Trading service did not return a WebSocket URL."
     );
@@ -291,7 +277,6 @@ async function getOTP(
     !String(wsUrl)
       .startsWith("wss://")
   ) {
-
     throw new Error(
       "Invalid trading WebSocket URL."
     );
@@ -305,7 +290,6 @@ async function getOTP(
 ===================================================== */
 
 function openWebSocket(wsUrl) {
-
   return new Promise(
     (resolve, reject) => {
 
@@ -327,12 +311,10 @@ function openWebSocket(wsUrl) {
         }, 8000);
 
       try {
-
         ws =
           new WebSocket(wsUrl);
 
       } catch {
-
         clearTimeout(timeout);
 
         reject(
@@ -347,9 +329,7 @@ function openWebSocket(wsUrl) {
       ws.addEventListener(
         "open",
         () => {
-
           clearTimeout(timeout);
-
           resolve(ws);
         }
       );
@@ -376,7 +356,6 @@ function openWebSocket(wsUrl) {
 }
 
 function closeWebSocket(ws) {
-
   try {
 
     if (
@@ -402,7 +381,6 @@ function sendRequest(
   wantedMsgType,
   timeoutMs = 8000
 ) {
-
   return new Promise(
     (resolve, reject) => {
 
@@ -427,7 +405,6 @@ function sendRequest(
         }, timeoutMs);
 
       function cleanup() {
-
         clearTimeout(timeout);
 
         ws.removeEventListener(
@@ -465,18 +442,15 @@ function sendRequest(
         let data;
 
         try {
-
           data =
             JSON.parse(
               event.data
             );
-
         } catch {
           return;
         }
 
         if (data.error) {
-
           fail(
             data.error.message ||
             data.error?.detail?.message ||
@@ -536,7 +510,6 @@ function sendRequest(
         );
 
       } catch {
-
         fail(
           "Could not send trading request."
         );
@@ -551,7 +524,6 @@ function sendRequest(
 
 const SUPPORTED_CONTRACTS =
   new Set([
-
     "HIGHER",
     "LOWER",
 
@@ -603,7 +575,6 @@ const SUPPORTED_CONTRACTS =
 
     "TURBOSLONG",
     "TURBOSSHORT"
-
   ]);
 
 const DIGIT_BARRIER_CONTRACTS =
@@ -679,7 +650,6 @@ function buildProposalPayload({
       digit < 0 ||
       digit > 9
     ) {
-
       throw new Error(
         "Digit barrier must be between 0 and 9."
       );
@@ -702,7 +672,6 @@ function buildProposalPayload({
       !Number.isFinite(value) ||
       value <= 0
     ) {
-
       throw new Error(
         "Multiplier must be greater than 0."
       );
@@ -723,7 +692,6 @@ function buildProposalPayload({
       !Number.isFinite(value) ||
       value <= 0
     ) {
-
       throw new Error(
         "Growth rate is required."
       );
@@ -754,7 +722,9 @@ function normalizeContract(
 
   const isSold =
     source?.is_sold === true ||
-    source?.is_sold === 1;
+    source?.is_sold === 1 ||
+    source?.is_expired === true ||
+    source?.is_expired === 1;
 
   const profit =
     Number(
@@ -764,12 +734,16 @@ function normalizeContract(
   let status =
     rawStatus;
 
+  /*
+   * Deriv's current API uses is_sold
+   * and proposal_open_contract updates.
+   */
+
   if (
     isSold &&
     status !== "WON" &&
     status !== "LOST"
   ) {
-
     status =
       profit > 0
         ? "WON"
@@ -777,7 +751,6 @@ function normalizeContract(
   }
 
   if (!status) {
-
     status =
       isSold
         ? (
@@ -818,19 +791,24 @@ function normalizeContract(
         ? profit
         : 0,
 
+    /*
+     * Current Deriv field.
+     */
     exit_spot:
-      source?.exit_tick ??
       source?.exit_spot ??
+      source?.sell_spot ??
+      source?.exit_tick ??
       null,
 
     entry_spot:
-      source?.entry_tick ??
       source?.entry_spot ??
+      source?.entry_tick ??
       null,
 
     sell_price:
       Number(
         source?.sell_price ??
+        source?.bid_price ??
         0
       ),
 
@@ -845,12 +823,16 @@ function normalizeContract(
 
     barrier:
       source?.barrier ??
+      null,
+
+    currency:
+      source?.currency ||
       null
   };
 }
 
 /* =====================================================
-   CONTRACT STATUS
+   FAST CONTRACT RESULT
 ===================================================== */
 
 async function getContractResult(
@@ -862,6 +844,10 @@ async function getContractResult(
   let ws;
 
   try {
+
+    /*
+     * Create authenticated trading session.
+     */
 
     const wsUrl =
       await getOTP(
@@ -878,6 +864,14 @@ async function getContractResult(
       (resolve, reject) => {
 
         let finished = false;
+
+        /*
+         * We only use this as a safety
+         * timeout. Normally the WebSocket
+         * settles the request immediately.
+         *
+         * 6 seconds instead of 12 seconds.
+         */
 
         const timeout =
           setTimeout(() => {
@@ -898,7 +892,7 @@ async function getContractResult(
               }
             });
 
-          }, 12000);
+          }, 6000);
 
         function cleanup() {
 
@@ -922,7 +916,7 @@ async function getContractResult(
 
         function finish(result) {
 
-          if(finished)
+          if (finished)
             return;
 
           finished = true;
@@ -936,7 +930,7 @@ async function getContractResult(
 
         function fail(error) {
 
-          if(finished)
+          if (finished)
             return;
 
           finished = true;
@@ -967,11 +961,12 @@ async function getContractResult(
             return;
           }
 
-          if(data.error){
+          if (data.error) {
 
             fail(
               new Error(
                 data.error.message ||
+                data.error?.detail?.message ||
                 "Deriv rejected the request."
               )
             );
@@ -979,36 +974,62 @@ async function getContractResult(
             return;
           }
 
-          if(
-            data.msg_type ===
+          if (
+            data.msg_type !==
             "proposal_open_contract"
-          ){
+          ) {
+            return;
+          }
 
-            const raw =
-              data.proposal_open_contract;
+          const raw =
+            data.proposal_open_contract;
 
-            if(!raw)
-              return;
+          if (!raw)
+            return;
 
-            const contract =
-              normalizeContract(
-                raw,
-                contractId
-              );
+          /*
+           * Make sure this update belongs
+           * to the requested contract.
+           */
 
-            const finishedContract =
-              contract.is_sold ||
-              contract.status === "WON" ||
-              contract.status === "LOST";
+          const returnedContractId =
+            Number(
+              raw.contract_id
+            );
 
-            if(
-              finishedContract
-            ){
+          if (
+            returnedContractId !==
+            Number(contractId)
+          ) {
+            return;
+          }
 
-              finish({
-                contract
-              });
-            }
+          const contract =
+            normalizeContract(
+              raw,
+              contractId
+            );
+
+          /*
+           * Deriv sends live updates through
+           * proposal_open_contract.
+           *
+           * Once is_sold becomes true,
+           * this is the final result.
+           */
+
+          const finishedContract =
+            contract.is_sold ||
+            contract.status === "WON" ||
+            contract.status === "LOST";
+
+          if (
+            finishedContract
+          ) {
+
+            finish({
+              contract
+            });
           }
         }
 
@@ -1023,7 +1044,7 @@ async function getContractResult(
 
         function onClose() {
 
-          if(!finished){
+          if (!finished) {
 
             fail(
               new Error(
@@ -1048,22 +1069,37 @@ async function getContractResult(
           onClose
         );
 
-        ws.send(
-          JSON.stringify({
+        /*
+         * Current Deriv request.
+         *
+         * No loginid is required.
+         */
 
-            proposal_open_contract:
-              1,
+        try {
 
-            contract_id:
-              Number(contractId),
+          ws.send(
+            JSON.stringify({
 
-            subscribe:
-              1,
+              proposal_open_contract:
+                1,
 
-            req_id:
-              9001
-          })
-        );
+              contract_id:
+                Number(contractId),
+
+              subscribe:
+                1,
+
+              req_id:
+                9001
+            })
+          );
+
+        } catch(error) {
+
+          fail(
+            error
+          );
+        }
       }
     );
 
@@ -1092,6 +1128,7 @@ export async function onRequest(
     return json(
       {
         ok: false,
+
         error:
           "Method not allowed."
       },
@@ -1110,7 +1147,10 @@ export async function onRequest(
     return json(
       {
         ok: false,
-        connected: false,
+
+        connected:
+          false,
+
         error:
           "Trading session unavailable. Please log in again."
       },
@@ -1120,9 +1160,9 @@ export async function onRequest(
 
   let body = {};
 
-  if(
+  if (
     request.method === "POST"
-  ){
+  ) {
 
     try {
 
@@ -1134,6 +1174,7 @@ export async function onRequest(
       return json(
         {
           ok: false,
+
           error:
             "Invalid trading request."
         },
@@ -1161,10 +1202,10 @@ export async function onRequest(
         "account_type"
       );
 
-    if(
+    if (
       queryType === "demo" ||
       queryType === "real"
-    ){
+    ) {
 
       requestedType =
         queryType;
@@ -1172,10 +1213,10 @@ export async function onRequest(
 
   } catch {}
 
-  if(
+  if (
     body.account_type === "demo" ||
     body.account_type === "real"
-  ){
+  ) {
 
     requestedType =
       body.account_type;
@@ -1200,7 +1241,10 @@ export async function onRequest(
     return json(
       {
         ok: false,
-        connected: false,
+
+        connected:
+          false,
+
         error:
           error.message ||
           "Trading account unavailable."
@@ -1221,9 +1265,9 @@ export async function onRequest(
      GET
   ===================================================== */
 
-  if(
+  if (
     request.method === "GET"
-  ){
+  ) {
 
     return json({
 
@@ -1258,10 +1302,10 @@ export async function onRequest(
      SELECT ACCOUNT
   ===================================================== */
 
-  if(
+  if (
     body.action ===
     "select_account"
-  ){
+  ) {
 
     return json({
 
@@ -1296,17 +1340,10 @@ export async function onRequest(
      BALANCE
   ===================================================== */
 
-  if(
+  if (
     body.action ===
     "balance"
-  ){
-
-    /*
-     * Do NOT open an OTP WebSocket here.
-     *
-     * Account GET is much faster and doesn't
-     * require another trading session.
-     */
+  ) {
 
     try {
 
@@ -1321,7 +1358,7 @@ export async function onRequest(
           accountType
         );
 
-      if(freshAccount){
+      if (freshAccount) {
 
         return json({
 
@@ -1352,7 +1389,7 @@ export async function onRequest(
         });
       }
 
-    } catch(error){
+    } catch(error) {
 
       console.error(
         "Fast balance error:",
@@ -1386,22 +1423,22 @@ export async function onRequest(
      CONTRACT STATUS
   ===================================================== */
 
-  if(
+  if (
     body.action ===
     "contract_status"
-  ){
+  ) {
 
     const contractId =
       Number(
         body.contract_id
       );
 
-    if(
+    if (
       !Number.isFinite(
         contractId
       ) ||
       contractId <= 0
-    ){
+    ) {
 
       return json(
         {
@@ -1442,7 +1479,7 @@ export async function onRequest(
         }
       });
 
-    } catch(error){
+    } catch(error) {
 
       return json(
         {
@@ -1465,12 +1502,12 @@ export async function onRequest(
      SESSION
   ===================================================== */
 
-  if(
+  if (
     body.action ===
       "session" ||
     body.action ===
       "trading_session"
-  ){
+  ) {
 
     let ws;
 
@@ -1490,6 +1527,7 @@ export async function onRequest(
       const result =
         await sendRequest(
           ws,
+
           {
             balance:
               1,
@@ -1497,7 +1535,9 @@ export async function onRequest(
             req_id:
               3001
           },
+
           "balance",
+
           8000
         );
 
@@ -1530,7 +1570,7 @@ export async function onRequest(
         }
       });
 
-    } catch(error){
+    } catch(error) {
 
       return json(
         {
@@ -1560,10 +1600,10 @@ export async function onRequest(
      BUY
   ===================================================== */
 
-  if(
+  if (
     body.action ===
     "buy"
-  ){
+  ) {
 
     let ws;
 
@@ -1577,7 +1617,7 @@ export async function onRequest(
           ""
         ).trim();
 
-      if(!market){
+      if (!market) {
 
         throw new Error(
           "No trading market was selected."
@@ -1592,18 +1632,18 @@ export async function onRequest(
         .trim()
         .toUpperCase();
 
-      if(!contractType){
+      if (!contractType) {
 
         throw new Error(
           "No contract type was selected."
         );
       }
 
-      if(
+      if (
         !SUPPORTED_CONTRACTS.has(
           contractType
         )
-      ){
+      ) {
 
         throw new Error(
           `Unsupported contract type: ${contractType}`
@@ -1615,10 +1655,10 @@ export async function onRequest(
           body.stake
         );
 
-      if(
+      if (
         !Number.isFinite(stake) ||
         stake <= 0
-      ){
+      ) {
 
         throw new Error(
           "Enter a valid stake greater than 0."
@@ -1630,10 +1670,10 @@ export async function onRequest(
           body.duration || 1
         );
 
-      if(
+      if (
         !Number.isFinite(duration) ||
         duration < 1
-      ){
+      ) {
 
         throw new Error(
           "Enter a valid duration."
@@ -1713,7 +1753,7 @@ export async function onRequest(
       const proposal =
         proposalResponse?.proposal;
 
-      if(!proposal?.id){
+      if (!proposal?.id) {
 
         throw new Error(
           "Deriv did not return a valid proposal."
@@ -1727,10 +1767,10 @@ export async function onRequest(
           stake
         );
 
-      if(
+      if (
         !Number.isFinite(askPrice) ||
         askPrice <= 0
-      ){
+      ) {
 
         throw new Error(
           "Deriv returned an invalid contract price."
@@ -1744,8 +1784,8 @@ export async function onRequest(
       const buyResponse =
         await sendRequest(
           ws,
-          {
 
+          {
             buy:
               String(
                 proposal.id
@@ -1756,33 +1796,24 @@ export async function onRequest(
 
             req_id:
               4002
-
           },
+
           "buy",
+
           8000
         );
 
       const buy =
         buyResponse?.buy;
 
-      if(
+      if (
         !buy?.contract_id
-      ){
+      ) {
 
         throw new Error(
           "Deriv did not return a contract ID."
         );
       }
-
-      /*
-       * IMPORTANT:
-       *
-       * balance_after comes directly from
-       * the purchase response.
-       *
-       * No second OTP.
-       * No second WebSocket.
-       */
 
       const balanceAfter =
         Number(
@@ -1870,7 +1901,7 @@ export async function onRequest(
 
       });
 
-    } catch(error){
+    } catch(error) {
 
       console.error(
         "DollarTicks BUY ERROR:",
@@ -1914,4 +1945,4 @@ export async function onRequest(
     },
     400
   );
-         }
+}
