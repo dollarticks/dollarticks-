@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DollarTicks</title>
+<title>DollarTicks Bot</title>
 
 <style>
 *{box-sizing:border-box}
@@ -15,91 +15,11 @@ body{
   font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif
 }
 
-.wrap{max-width:760px;margin:auto;padding:12px}
-
-#loginScreen{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:20px
+.wrap{
+  max-width:760px;
+  margin:auto;
+  padding:12px
 }
-
-.loginBox{
-  width:100%;
-  max-width:430px;
-  background:#10151d;
-  border:1px solid #202733;
-  border-radius:22px;
-  padding:28px 20px;
-  text-align:center;
-  box-shadow:0 20px 60px rgba(0,0,0,.35)
-}
-
-.loginLogo{font-size:34px;font-weight:900;margin-bottom:8px}
-.loginLogo span,.brand span{color:#18c6d8}
-
-.loginSubtitle{
-  color:#8995a6;
-  font-size:14px;
-  line-height:1.6;
-  margin-bottom:28px
-}
-
-.loginButton{
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  border:1px solid #18c6d8;
-  font-size:16px;
-  font-weight:800;
-  cursor:pointer;
-  margin-top:10px
-}
-
-.loginButton.login{background:#18c6d8;color:#061014}
-.loginButton.signup{background:#151b24;color:#fff;border-color:#303a49}
-
-.loginButton:disabled,button:disabled{
-  opacity:.5;
-  cursor:not-allowed
-}
-
-.loginStatus{
-  margin-top:16px;
-  color:#8995a6;
-  font-size:12px;
-  line-height:1.5
-}
-
-.loginNote,.note,.footer{
-  color:#697486;
-  font-size:11px;
-  line-height:1.5
-}
-
-.loginNote{margin-top:25px}
-
-#dashboard{display:none}
-
-.top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px
-}
-
-.brand{font-size:25px;font-weight:800}
-
-.status{
-  padding:7px 11px;
-  border-radius:20px;
-  background:#171c24;
-  color:#aab4c3;
-  font-size:12px
-}
-
-.status.live{color:#62e6a7}
 
 .card{
   background:#10151d;
@@ -109,7 +29,54 @@ body{
   margin-bottom:12px
 }
 
-select,button,input{
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:12px
+}
+
+.brand{
+  font-size:25px;
+  font-weight:900
+}
+
+.brand span{
+  color:#18c6d8
+}
+
+.status{
+  padding:7px 11px;
+  border-radius:20px;
+  background:#171c24;
+  color:#aab4c3;
+  font-size:12px
+}
+
+.status.live{
+  color:#62e6a7
+}
+
+.status.running{
+  color:#62e6a7;
+  background:#10271d
+}
+
+.status.stopped{
+  color:#ff6874;
+  background:#291317
+}
+
+label{
+  display:block;
+  color:#8f9aab;
+  font-size:12px;
+  margin-bottom:6px
+}
+
+select,
+input,
+button{
   width:100%;
   padding:12px;
   border-radius:11px;
@@ -119,48 +86,85 @@ select,button,input{
   font-size:15px
 }
 
-button{cursor:pointer;font-weight:700}
+button{
+  cursor:pointer;
+  font-weight:800
+}
 
-button.buy{
-  margin-top:10px;
+.controls{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.start{
   background:#62e6a7;
   border-color:#62e6a7;
-  color:#061014;
-  font-size:17px
-}
-
-button.clear{
-  margin-top:10px;
-  background:#171e28;
-  border-color:#303a49;
-  color:#cbd3df
-}
-
-button.money{
-  background:#151b24;
-  border-color:#303a49;
-  color:#fff
-}
-
-button.money.deposit{
-  background:#13aebf;
-  border-color:#13aebf;
   color:#061014
 }
 
-.market{font-size:18px;font-weight:800;margin-top:10px}
-.quote{color:#9da8b8;font-size:13px;margin-top:4px}
+.stop{
+  background:#ff4d5a;
+  border-color:#ff4d5a;
+  color:#fff
+}
 
-.latestBadge{
-  color:#8d98aa;
-  font-size:12px;
-  margin-bottom:9px
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed
+}
+
+.marketName{
+  font-size:18px;
+  font-weight:800;
+  margin-top:10px
+}
+
+.quote{
+  color:#9da8b8;
+  font-size:13px;
+  margin-top:4px
+}
+
+.botState{
+  background:#0d1219;
+  border-radius:12px;
+  padding:12px;
+  line-height:1.7;
+  font-size:13px
+}
+
+.botState b{
+  color:#fff
+}
+
+.strategy{
+  background:#0d1219;
+  border:1px solid #202733;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:8px
+}
+
+.strategy.active{
+  border-color:#18c6d8
+}
+
+.strategyName{
+  font-weight:900;
+  margin-bottom:5px
+}
+
+.strategyStatus{
+  color:#8995a6;
+  font-size:11px;
+  line-height:1.5
 }
 
 .grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
-  gap:10px
+  gap:8px
 }
 
 .digit{
@@ -175,11 +179,13 @@ button.money.deposit{
   align-items:center
 }
 
-.digit strong{font-size:22px}
+.digit strong{
+  font-size:21px
+}
 
 .digit small{
   color:#aeb8c7;
-  font-size:11px
+  font-size:10px
 }
 
 .digit.most::before{
@@ -190,8 +196,7 @@ button.money.deposit{
   border:5px solid transparent;
   border-top-color:#39e58c;
   border-left-color:#39e58c;
-  transform:rotate(-45deg);
-  pointer-events:none
+  transform:rotate(-45deg)
 }
 
 .digit.least::after{
@@ -202,15 +207,12 @@ button.money.deposit{
   border:5px solid transparent;
   border-bottom-color:#ff4d5a;
   border-right-color:#ff4d5a;
-  transform:rotate(-45deg);
-  pointer-events:none
+  transform:rotate(-45deg)
 }
-
-.digit.latest{box-shadow:none}
 
 .digit.latest .pointer{
   position:absolute;
-  top:-23px;
+  top:-22px;
   left:50%;
   transform:translateX(-50%);
   width:0;
@@ -221,130 +223,40 @@ button.money.deposit{
   z-index:10
 }
 
-.row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px
-}
-
-.metric{
-  background:#0d1219;
-  border-radius:12px;
-  padding:12px
-}
-
-.metric label{
-  display:block;
-  color:#8f9aab;
-  font-size:12px;
-  margin-bottom:4px
-}
-
-.metric b{font-size:19px}
-
-.hidden{display:none}
-
-.footer{
-  text-align:center;
-  padding:10px 0 20px
-}
-
-.debug{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  background:#080b10;
-  color:#8995a6;
-  font-size:11px;
-  word-break:break-word
-}
-
-.win{color:#62e6a7;font-weight:800}
-.loss{color:#ff4d5a;font-weight:800}
-
-.accountHeader{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  margin-bottom:12px
-}
-
-.accountMode{
-  display:inline-flex;
-  align-items:center;
-  gap:7px;
-  padding:7px 10px;
-  border-radius:20px;
-  background:#0d1219;
-  color:#62e6a7;
-  font-size:12px;
-  font-weight:800
-}
-
-.accountDot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:#62e6a7
-}
-
-.balanceBox{
-  background:#0d1219;
-  border-radius:14px;
-  padding:15px;
-  margin-bottom:10px
-}
-
-.balanceLabel{
-  color:#8f9aab;
-  font-size:12px;
-  margin-bottom:4px
-}
-
-.balanceValue{
-  font-size:29px;
-  font-weight:850
-}
-
-.balanceCurrency{
-  color:#8f9aab;
-  font-size:12px
-}
-
-.accountSwitch{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  padding:5px;
-  background:#0d1219;
-  border-radius:12px;
-  margin-bottom:10px
-}
-
-.accountSwitch button{
-  border:0;
-  background:transparent;
-  color:#8995a6;
-  padding:10px
-}
-
-.accountSwitch button.active{
-  background:#18c6d8;
-  color:#061014;
-  border-radius:9px
-}
-
-.moneyRow{
+.metrics{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:8px
 }
 
-.accountInfo{
-  color:#8995a6;
-  font-size:11px;
-  margin-top:9px
+.metric{
+  background:#0d1219;
+  border-radius:11px;
+  padding:11px
+}
+
+.metric label{
+  margin:0 0 4px
+}
+
+.metric b{
+  font-size:17px
+}
+
+.green{
+  color:#62e6a7
+}
+
+.red{
+  color:#ff4d5a
+}
+
+.yellow{
+  color:#ffd166
+}
+
+.purple{
+  color:#b18cff
 }
 
 .historyItem{
@@ -360,591 +272,597 @@ button.money.deposit{
 .historyTop{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  gap:8px;
-  margin-bottom:7px
+  align-items:center
 }
 
-.historyResult{
-  font-size:14px;
-  font-weight:800
+.win{
+  color:#62e6a7;
+  font-weight:900
 }
 
-.historyProfit{
-  font-size:15px;
-  font-weight:800
+.loss{
+  color:#ff4d5a;
+  font-weight:900
 }
 
 .historyMeta{
-  color:#8f9aab;
   display:flex;
   justify-content:space-between;
-  gap:10px;
   border-top:1px solid #202733;
+  margin-top:4px;
   padding-top:4px;
-  margin-top:4px
+  color:#8f9aab
 }
 
 .historyMeta b{
-  color:#f5f7fa;
-  text-align:right;
-  word-break:break-word
-}
-
-.historyEmpty{
-  color:#8995a6;
-  text-align:center;
-  padding:10px
+  color:#fff;
+  text-align:right
 }
 
 .summary{
   display:grid;
   grid-template-columns:repeat(3,1fr);
-  gap:8px;
+  gap:7px;
   margin-bottom:10px
 }
 
 .summaryBox{
   background:#0d1219;
   border-radius:10px;
-  padding:10px;
+  padding:9px;
   text-align:center
 }
 
 .summaryBox small{
   display:block;
   color:#8f9aab;
-  font-size:10px;
-  margin-bottom:3px
+  font-size:10px
 }
 
-.summaryBox b{font-size:16px}
+.summaryBox b{
+  font-size:16px
+}
 
-#realMoneyControls{display:none}
-
-.contractHint{
+.empty{
   color:#8995a6;
+  text-align:center;
+  padding:12px
+}
+
+.note{
+  color:#697486;
   font-size:11px;
-  margin-top:7px;
-  line-height:1.5
+  line-height:1.6
+}
+
+.hidden{
+  display:none
 }
 
 @media(max-width:430px){
-  .wrap{padding:9px}
-  .grid{gap:7px}
-  .digit{border-width:3px}
-  .digit strong{font-size:19px}
-  .digit small{font-size:10px}
-  .summary{gap:5px}
-  .balanceValue{font-size:26px}
-  .historyMeta{font-size:11px}
+
+  .wrap{
+    padding:9px
+  }
+
+  .grid{
+    gap:6px
+  }
+
+  .digit{
+    border-width:3px
+  }
+
+  .digit strong{
+    font-size:18px
+  }
+
+  .controls{
+    gap:7px
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div id="loginScreen">
-  <div class="loginBox">
-    <div class="loginLogo">Dollar<span>Ticks</span></div>
-
-    <div class="loginSubtitle">
-      Live digit analysis and automated trading.
-      <br>
-      Login or create your account to continue.
-    </div>
-
-    <button id="loginButton" class="loginButton login">LOG IN</button>
-    <button id="signupButton" class="loginButton signup">SIGN UP</button>
-
-    <div id="loginStatus" class="loginStatus">
-      Checking your DollarTicks session…
-    </div>
-
-    <div class="loginNote">
-      Secure authorization is handled through Deriv.
-      DollarTicks does not ask for your Deriv password.
-    </div>
-  </div>
-</div>
-
-<div id="dashboard">
 <div class="wrap">
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <div class="top">
-  <div class="brand">Dollar<span>Ticks</span></div>
-  <div id="status" class="status">Loading…</div>
+
+  <div class="brand">
+    Dollar<span>Ticks</span>
+  </div>
+
+  <div id="status" class="status stopped">
+    STOPPED
+  </div>
+
 </div>
 
+
+<!-- =====================================================
+     BOT CONTROLS
+===================================================== -->
+
 <div class="card">
-  <div class="accountHeader">
-    <div class="latestBadge" style="margin:0">ACCOUNT</div>
-    <div class="accountMode">
-      <span class="accountDot"></span>
-      <span id="accountModeText">DEMO</span>
+
+  <div class="latestBadge">
+    BOT CONTROLS
+  </div>
+
+  <div style="height:8px"></div>
+
+  <label>Volatility Market</label>
+
+  <select id="market">
+
+    <optgroup label="Volatility 1 Second">
+
+      <option value="1HZ100V">
+        Volatility 100 (1s)
+      </option>
+
+      <option value="1HZ75V">
+        Volatility 75 (1s)
+      </option>
+
+      <option value="1HZ50V">
+        Volatility 50 (1s)
+      </option>
+
+      <option value="1HZ25V">
+        Volatility 25 (1s)
+      </option>
+
+      <option value="1HZ10V">
+        Volatility 10 (1s)
+      </option>
+
+    </optgroup>
+
+    <optgroup label="Volatility">
+
+      <option value="R_100">
+        Volatility 100
+      </option>
+
+      <option value="R_75">
+        Volatility 75
+      </option>
+
+      <option value="R_50">
+        Volatility 50
+      </option>
+
+      <option value="R_25">
+        Volatility 25
+      </option>
+
+      <option value="R_10">
+        Volatility 10
+      </option>
+
+    </optgroup>
+
+  </select>
+
+  <div class="marketName" id="marketName">
+    Volatility 100 (1s)
+  </div>
+
+  <div class="quote" id="quote">
+    Waiting for tick…
+  </div>
+
+  <div style="height:12px"></div>
+
+  <div class="controls">
+
+    <div>
+
+      <label>Stake</label>
+
+      <input
+        id="stake"
+        type="number"
+        min="0.01"
+        step="0.01"
+        value="1"
+      >
+
     </div>
+
+    <div>
+
+      <label>Duration — ticks</label>
+
+      <input
+        id="duration"
+        type="number"
+        min="1"
+        max="10"
+        step="1"
+        value="1"
+      >
+
+    </div>
+
   </div>
 
-  <div class="balanceBox">
-    <div class="balanceLabel">Balance</div>
-    <div class="balanceValue"><span id="balanceValue">—</span></div>
-    <div class="balanceCurrency"><span id="balanceCurrency">USD</span></div>
+  <div style="height:10px"></div>
+
+  <div class="controls">
+
+    <button
+      id="startButton"
+      class="start"
+    >
+      START BOT
+    </button>
+
+    <button
+      id="stopButton"
+      class="stop"
+      disabled
+    >
+      STOP BOT
+    </button>
+
   </div>
 
-  <div class="accountSwitch">
-    <button id="demoMode" class="active">DEMO</button>
-    <button id="realMode">REAL</button>
+</div>
+
+
+<!-- =====================================================
+     BOT STATE
+===================================================== -->
+
+<div class="card">
+
+  <div class="latestBadge">
+    BOT STATUS
   </div>
 
-  <div id="moneyStatus" class="accountInfo">Loading account…</div>
+  <div style="height:8px"></div>
 
-  <div class="accountInfo">
-    Account: <b id="accountId">—</b>
+  <div class="botState">
+
+    State:
+    <b id="botState">
+      Stopped
+    </b>
+
+    <br>
+
+    Strategy:
+    <b id="activeStrategy">
+      Waiting
+    </b>
+
+    <br>
+
+    Moving tick:
+    <b id="movingDigit">
+      —
+    </b>
+
+    <br>
+
+    Trade:
+    <b id="tradeState">
+      No active trade
+    </b>
+
   </div>
+
 </div>
 
-<div class="card">
-<label>Market</label>
 
-<select id="market">
-<optgroup label="Volatility — 1 Second">
-<option value="1HZ100V">Volatility 100 (1s)</option>
-<option value="1HZ75V">Volatility 75 (1s)</option>
-<option value="1HZ50V">Volatility 50 (1s)</option>
-<option value="1HZ25V">Volatility 25 (1s)</option>
-<option value="1HZ10V">Volatility 10 (1s)</option>
-</optgroup>
-
-<optgroup label="Volatility">
-<option value="R_100">Volatility 100</option>
-<option value="R_75">Volatility 75</option>
-<option value="R_50">Volatility 50</option>
-<option value="R_25">Volatility 25</option>
-<option value="R_10">Volatility 10</option>
-</optgroup>
-
-<optgroup label="Step Indices">
-<option value="stpRNG">Step Index</option>
-<option value="stpRNG1">Step Index 1</option>
-<option value="stpRNG2">Step Index 2</option>
-<option value="stpRNG3">Step Index 3</option>
-<option value="stpRNG4">Step Index 4</option>
-<option value="stpRNG5">Step Index 5</option>
-</optgroup>
-
-<optgroup label="Jump Indices">
-<option value="JD10">Jump 10 Index</option>
-<option value="JD25">Jump 25 Index</option>
-<option value="JD50">Jump 50 Index</option>
-<option value="JD75">Jump 75 Index</option>
-<option value="JD100">Jump 100 Index</option>
-</optgroup>
-</select>
-
-<div class="market" id="marketName">Volatility 100 (1s)</div>
-<div class="quote" id="quote">Waiting for tick…</div>
-</div>
-
-<div class="card">
-<div class="latestBadge">
-LAST DIGIT FREQUENCY — LAST <b id="countLabel">100</b> TICKS
-</div>
-<div id="digits" class="grid"></div>
-</div>
+<!-- =====================================================
+     DIGIT ANALYSIS
+===================================================== -->
 
 <div class="card">
 
-<div class="latestBadge">TRADE ENTRY</div>
+  <div class="latestBadge">
+    LAST DIGIT FREQUENCY —
+    LAST <b id="countLabel">100</b> TICKS
+  </div>
 
-<label>Contract type</label>
+  <div style="height:8px"></div>
 
-<select id="contractType">
-<optgroup label="Digit Contracts">
-<option value="DIGITOVER">Over</option>
-<option value="DIGITUNDER">Under</option>
-<option value="DIGITMATCH">Matches</option>
-<option value="DIGITDIFF">Differs</option>
-<option value="DIGITEVEN">Even</option>
-<option value="DIGITODD">Odd</option>
-</optgroup>
-
-<optgroup label="Rise / Fall">
-<option value="CALL">Rise / Call</option>
-<option value="PUT">Fall / Put</option>
-<option value="RISE">Rise</option>
-<option value="FALL">Fall</option>
-</optgroup>
-
-<optgroup label="Higher / Lower">
-<option value="HIGHER">Higher</option>
-<option value="LOWER">Lower</option>
-</optgroup>
-
-<optgroup label="Touch Contracts">
-<option value="TOUCH">Touch</option>
-<option value="NOTOUCH">No Touch</option>
-</optgroup>
-
-<optgroup label="Range Contracts">
-<option value="EXPIRYRANGE">Ends Between</option>
-<option value="EXPIRYMISSED">Ends Outside</option>
-</optgroup>
-</select>
-
-<div id="contractHint" class="contractHint">
-Choose a contract type.
-</div>
-
-<div style="height:10px"></div>
-
-<div id="digitControl">
-<label>Digit / Barrier</label>
-<select id="barrier">
-<option value="0">0</option>
-<option value="1">1</option>
-<option value="2">2</option>
-<option value="3">3</option>
-<option value="4">4</option>
-<option value="5" selected>5</option>
-<option value="6">6</option>
-<option value="7">7</option>
-<option value="8">8</option>
-<option value="9">9</option>
-</select>
-</div>
-
-<div id="barrierControl" class="hidden">
-<label>Barrier</label>
-<input id="barrierInput" type="number" step="any" placeholder="Enter barrier">
-</div>
-
-<div id="rangeControl" class="hidden">
-<label>Lower barrier</label>
-<input id="lowerBarrier" type="number" step="any" placeholder="Lower barrier">
-
-<div style="height:8px"></div>
-
-<label>Upper barrier</label>
-<input id="upperBarrier" type="number" step="any" placeholder="Upper barrier">
-</div>
-
-<div style="height:10px"></div>
-
-<label>Stake</label>
-<input id="stake" type="number" min="0.01" step="0.01" value="1">
-
-<div style="height:10px"></div>
-
-<label>Duration</label>
-<input id="duration" type="number" min="1" max="10" value="1">
-
-<div style="height:10px"></div>
-
-<button id="buyButton" class="buy">BUY</button>
-
-<!-- Intentionally hidden: no trade progress/result text below BUY -->
-<div id="tradeStatus" class="hidden"></div>
-<div id="proposalInfo" class="hidden"></div>
-<div id="debug" class="debug hidden"></div>
+  <div id="digits" class="grid"></div>
 
 </div>
+
+
+<!-- =====================================================
+     METRICS
+===================================================== -->
 
 <div class="card">
 
-<div class="latestBadge">TRADE HISTORY</div>
+  <div class="metrics">
 
-<div class="summary">
-<div class="summaryBox">
-<small>TRADES</small>
-<b id="totalTrades">0</b>
+    <div class="metric">
+
+      <label>
+        Green / Most frequent
+      </label>
+
+      <b id="most">
+        —
+      </b>
+
+    </div>
+
+    <div class="metric">
+
+      <label>
+        Red / Least frequent
+      </label>
+
+      <b id="least">
+        —
+      </b>
+
+    </div>
+
+  </div>
+
+  <div style="height:8px"></div>
+
+  <div class="metrics">
+
+    <div class="metric">
+
+      <label>
+        Over 5
+      </label>
+
+      <b id="over5">
+        —
+      </b>
+
+    </div>
+
+    <div class="metric">
+
+      <label>
+        Under 7
+      </label>
+
+      <b id="under7">
+        —
+      </b>
+
+    </div>
+
+  </div>
+
 </div>
 
-<div class="summaryBox">
-<small>WINS</small>
-<b id="totalWins">0</b>
-</div>
 
-<div class="summaryBox">
-<small>NET P/L</small>
-<b id="totalProfit">0.00</b>
-</div>
-</div>
-
-<div id="tradeHistory">
-<div class="historyEmpty">No completed trades yet.</div>
-</div>
-
-<button id="clearHistory" class="clear">
-Clear Trade History
-</button>
-
-</div>
-
-<div class="row">
-<div class="metric">
-<label>Most frequent</label>
-<b id="most">—</b>
-</div>
-
-<div class="metric">
-<label>Least frequent</label>
-<b id="least">—</b>
-</div>
-</div>
-
-<div style="height:12px"></div>
+<!-- =====================================================
+     STRATEGIES
+===================================================== -->
 
 <div class="card">
-<div class="latestBadge">OVER / UNDER</div>
 
-<div class="row">
-<div class="metric">
-<label>Over 5 — digits 6–9</label>
-<b id="over5">—</b>
+  <div class="latestBadge">
+    STRATEGY ENGINE
+  </div>
+
+  <div style="height:8px"></div>
+
+
+  <div id="strategy-under7" class="strategy">
+
+    <div class="strategyName">
+      Under 7
+    </div>
+
+    <div
+      id="under7Status"
+      class="strategyStatus"
+    >
+      Waiting for analysis…
+    </div>
+
+  </div>
+
+
+  <div id="strategy-over5" class="strategy">
+
+    <div class="strategyName">
+      Over 5
+    </div>
+
+    <div
+      id="over5Status"
+      class="strategyStatus"
+    >
+      Waiting for analysis…
+    </div>
+
+  </div>
+
+
+  <div id="strategy-over7" class="strategy">
+
+    <div class="strategyName">
+      Over 7
+    </div>
+
+    <div
+      id="over7Status"
+      class="strategyStatus"
+    >
+      Waiting for analysis…
+    </div>
+
+  </div>
+
+
+  <div id="strategy-over6" class="strategy">
+
+    <div class="strategyName">
+      Over 6
+    </div>
+
+    <div
+      id="over6Status"
+      class="strategyStatus"
+    >
+      Waiting for analysis…
+    </div>
+
+  </div>
+
+
+  <div id="strategy-under4" class="strategy">
+
+    <div class="strategyName">
+      Under 4
+    </div>
+
+    <div
+      id="under4Status"
+      class="strategyStatus"
+    >
+      Waiting for analysis…
+    </div>
+
+  </div>
+
 </div>
 
-<div class="metric">
-<label>Under 5 — digits 0–4</label>
-<b id="under5">—</b>
-</div>
-</div>
-</div>
+
+<!-- =====================================================
+     TRADE HISTORY
+===================================================== -->
 
 <div class="card">
-<div class="note">
-<b>DollarTicks</b>
-reads public Deriv tick data and calculates last-digit frequencies locally.
 
-<br><br>
+  <div class="latestBadge">
+    TRADE HISTORY
+  </div>
 
-🟢 Green half-circle = most occurring digit.
-<br>
-🔴 Red half-circle = least occurring digit.
-<br>
-🟣 Purple pointer = current moving tick.
+  <div style="height:8px"></div>
 
-<br><br>
+  <div class="summary">
 
-Percentages are based on recent ticks and are
-<b>not guaranteed predictions</b> of the next tick.
+    <div class="summaryBox">
+
+      <small>
+        TRADES
+      </small>
+
+      <b id="totalTrades">
+        0
+      </b>
+
+    </div>
+
+    <div class="summaryBox">
+
+      <small>
+        WINS
+      </small>
+
+      <b id="totalWins">
+        0
+      </b>
+
+    </div>
+
+    <div class="summaryBox">
+
+      <small>
+        NET P/L
+      </small>
+
+      <b id="totalProfit">
+        0.00
+      </b>
+
+    </div>
+
+  </div>
+
+  <div id="tradeHistory">
+
+    <div class="empty">
+      No completed trades yet.
+    </div>
+
+  </div>
+
+  <button
+    id="clearHistory"
+  >
+    Clear Trade History
+  </button>
+
 </div>
+
+
+<!-- =====================================================
+     NOTE
+===================================================== -->
+
+<div class="card">
+
+  <div class="note">
+
+    DollarTicks receives live tick data from Deriv
+    and evaluates the five configured strategies.
+
+    <br><br>
+
+    🟢 Green = most frequent digit.
+
+    <br>
+
+    🔴 Red = least frequent digit.
+
+    <br>
+
+    🟣 Purple pointer = latest moving tick.
+
+    <br><br>
+
+    The bot never opens more than one trade at a time.
+
+    <br><br>
+
+    Trading involves risk. Strategy conditions are
+    rules for automation and do not guarantee profit.
+
+  </div>
+
 </div>
 
-<div id="realMoneyControls" class="card">
-<div class="latestBadge">REAL ACCOUNT</div>
-
-<div class="moneyRow">
-<button id="depositButton" class="money deposit" type="button">Deposit</button>
-<button id="withdrawButton" class="money" type="button">Withdraw</button>
 </div>
 
-<div class="contractHint">
-Deposit and withdrawal are handled securely through your Deriv Wallet.
-</div>
-</div>
-
-<div class="footer">
-DollarTicks • Market data powered by Deriv
-</div>
-
-</div>
-</div>
 
 <script>
 
-const $ = id => document.getElementById(id);
-
-
 /* =====================================================
-   LOGIN
+   BASIC HELPERS
 ===================================================== */
 
-function startAuthorization(mode){
-
-  $("loginButton").disabled = true;
-  $("signupButton").disabled = true;
-
-  $("loginStatus").textContent =
-    mode === "signup"
-      ? "Opening secure registration…"
-      : "Opening secure login…";
-
-  window.location.href =
-    mode === "signup"
-      ? "/auth?mode=signup"
-      : "/auth";
-}
-
-function showDashboard(){
-  $("loginScreen").style.display = "none";
-  $("dashboard").style.display = "block";
-}
-
-$("loginButton").addEventListener(
-  "click",
-  () => startAuthorization("login")
-);
-
-$("signupButton").addEventListener(
-  "click",
-  () => startAuthorization("signup")
-);
+const $ = id =>
+  document.getElementById(id);
 
 
 /* =====================================================
-   ACCOUNT
-===================================================== */
-
-let currentAccountType = "demo";
-let currentAccountId = null;
-let currentBalance = null;
-let currentCurrency = "USD";
-
-function updateAccountDisplay(){
-
-  const type =
-    String(currentAccountType || "demo").toLowerCase();
-
-  $("accountModeText").textContent = type.toUpperCase();
-  $("accountId").textContent = currentAccountId || "—";
-  $("balanceCurrency").textContent = currentCurrency || "USD";
-
-  if(
-    currentBalance !== null &&
-    Number.isFinite(Number(currentBalance))
-  ){
-    $("balanceValue").textContent =
-      Number(currentBalance).toFixed(2);
-  }else{
-    $("balanceValue").textContent = "—";
-  }
-
-  $("demoMode").classList.toggle("active",type === "demo");
-  $("realMode").classList.toggle("active",type === "real");
-
-  $("realMoneyControls").style.display =
-    type === "real" ? "block" : "none";
-}
-
-
-/* =====================================================
-   CHECK ACCOUNT
-===================================================== */
-
-async function checkAccount(){
-
-  try{
-
-    const response = await fetch(
-      "/trading",
-      {
-        method:"GET",
-        credentials:"same-origin",
-        cache:"no-store"
-      }
-    );
-
-    const data = await response.json();
-
-    if(data && data.ok && data.connected){
-
-      const account = data.account || {};
-
-      currentAccountType =
-        String(account.account_type || "demo").toLowerCase();
-
-      currentAccountId = account.account_id || null;
-      currentCurrency = account.currency || "USD";
-
-      currentBalance =
-        Number.isFinite(Number(account.balance))
-          ? Number(account.balance)
-          : null;
-
-      updateAccountDisplay();
-
-      $("moneyStatus").textContent =
-        `${currentAccountType.toUpperCase()} account ready.`;
-
-      showDashboard();
-      connectMarket();
-      refreshBalanceFast();
-
-      return true;
-    }
-
-    $("loginStatus").textContent =
-      "Choose an option to continue.";
-
-    return false;
-
-  }catch(error){
-
-    console.error("Account check error:",error);
-
-    $("loginStatus").textContent =
-      "Session not connected. Tap LOG IN.";
-
-    return false;
-  }
-}
-
-
-/* =====================================================
-   BALANCE
-===================================================== */
-
-let balanceRefreshing = false;
-
-async function refreshBalanceFast(){
-
-  if(balanceRefreshing) return;
-
-  balanceRefreshing = true;
-
-  try{
-
-    const response = await fetch(
-      "/trading",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        credentials:"same-origin",
-        cache:"no-store",
-        body:JSON.stringify({
-          action:"balance",
-          account_type:currentAccountType
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if(
-      data &&
-      data.ok &&
-      Number.isFinite(Number(data.balance))
-    ){
-      currentBalance = Number(data.balance);
-
-      if(data.currency)
-        currentCurrency = data.currency;
-
-      updateAccountDisplay();
-    }
-
-  }catch(error){
-    console.error("Balance refresh error:",error);
-  }finally{
-    balanceRefreshing = false;
-  }
-}
-
-
-/* =====================================================
-   MARKETS
+   MARKET DATA
 ===================================================== */
 
 const WS_URL =
@@ -953,110 +871,203 @@ const WS_URL =
 const MAX_TICKS = 100;
 
 const marketNames = {
-  "1HZ100V":"Volatility 100 (1s)",
-  "1HZ75V":"Volatility 75 (1s)",
-  "1HZ50V":"Volatility 50 (1s)",
-  "1HZ25V":"Volatility 25 (1s)",
-  "1HZ10V":"Volatility 10 (1s)",
 
-  "R_100":"Volatility 100",
-  "R_75":"Volatility 75",
-  "R_50":"Volatility 50",
-  "R_25":"Volatility 25",
-  "R_10":"Volatility 10",
+  "1HZ100V":
+    "Volatility 100 (1s)",
 
-  "stpRNG":"Step Index",
-  "stpRNG1":"Step Index 1",
-  "stpRNG2":"Step Index 2",
-  "stpRNG3":"Step Index 3",
-  "stpRNG4":"Step Index 4",
-  "stpRNG5":"Step Index 5",
+  "1HZ75V":
+    "Volatility 75 (1s)",
 
-  "JD10":"Jump 10 Index",
-  "JD25":"Jump 25 Index",
-  "JD50":"Jump 50 Index",
-  "JD75":"Jump 75 Index",
-  "JD100":"Jump 100 Index"
+  "1HZ50V":
+    "Volatility 50 (1s)",
+
+  "1HZ25V":
+    "Volatility 25 (1s)",
+
+  "1HZ10V":
+    "Volatility 10 (1s)",
+
+  "R_100":
+    "Volatility 100",
+
+  "R_75":
+    "Volatility 75",
+
+  "R_50":
+    "Volatility 50",
+
+  "R_25":
+    "Volatility 25",
+
+  "R_10":
+    "Volatility 10"
 };
 
+
 let ws = null;
+
 let history = [];
+
 let latestDigit = null;
-let reconnectTimer = null;
-let manuallyChangingMarket = false;
+
 let currentPipSize = null;
 
-function getSelectedMarket(){
+let manuallyStopped = true;
 
-  const selected = $("market").value;
-
-  return marketNames[selected]
-    ? selected
-    : "1HZ100V";
-}
+let reconnectTimer = null;
 
 
 /* =====================================================
-   DIGIT
+   BOT VARIABLES
 ===================================================== */
 
-function getLastDigit(quote,pipSize){
+let botRunning = false;
 
-  const n = Number(quote);
+let tradeActive = false;
 
-  if(!Number.isFinite(n)) return null;
+let currentTrade = null;
 
-  const size = Number(pipSize);
+let contractPolling = false;
+
+let strategyCandidate = null;
+
+let movingSequence = [];
+
+let strategyState = {};
+
+let previousPercentages = null;
+
+
+/* =====================================================
+   CONFIG
+===================================================== */
+
+const STRATEGIES = {
+
+  UNDER7:"UNDER7",
+
+  OVER5:"OVER5",
+
+  OVER7:"OVER7",
+
+  OVER6:"OVER6",
+
+  UNDER4:"UNDER4"
+
+};
+
+
+/* =====================================================
+   DIGIT EXTRACTION
+===================================================== */
+
+function getLastDigit(
+  quote,
+  pipSize
+){
+
+  const n =
+    Number(quote);
+
+  if(!Number.isFinite(n))
+    return null;
+
+  const size =
+    Number(pipSize);
 
   if(
     Number.isFinite(size) &&
     size >= 0 &&
     size <= 10
   ){
-    const factor = 10 ** size;
+
+    const factor =
+      10 ** size;
 
     return Math.abs(
       Math.round(n * factor)
     ) % 10;
   }
 
-  const text = String(quote);
-  const decimal = text.split(".")[1];
+  const text =
+    String(quote);
+
+  const decimal =
+    text.split(".")[1];
 
   if(decimal){
 
     const digits =
-      decimal.replace(/[^0-9]/g,"");
+      decimal.replace(
+        /[^0-9]/g,
+        ""
+      );
 
     if(digits.length)
-      return Number(digits.charAt(digits.length - 1));
+      return Number(
+        digits.charAt(
+          digits.length - 1
+        )
+      );
   }
 
-  const clean = text.replace(/[^0-9]/g,"");
-
-  if(!clean) return null;
-
-  return Number(clean.charAt(clean.length - 1));
+  return null;
 }
 
-function addDigit(digit,quote,epoch){
 
-  if(digit === null || digit < 0 || digit > 9)
+/* =====================================================
+   ADD TICK
+===================================================== */
+
+function addTick(
+  digit,
+  quote,
+  epoch
+){
+
+  if(
+    digit === null ||
+    digit < 0 ||
+    digit > 9
+  ){
     return;
+  }
 
-  latestDigit = digit;
+  latestDigit =
+    digit;
+
   history.push(digit);
 
-  if(history.length > MAX_TICKS)
+  if(history.length > MAX_TICKS){
+
     history.shift();
 
-  if(Number.isFinite(Number(epoch))){
+  }
+
+  if(
+    Number.isFinite(
+      Number(epoch)
+    )
+  ){
+
     $("quote").textContent =
       `${quote} • ${new Date(
         epoch * 1000
       ).toLocaleTimeString()}`;
+
   }else{
-    $("quote").textContent = String(quote);
+
+    $("quote").textContent =
+      String(quote);
+
+  }
+
+  if(botRunning && !tradeActive){
+
+    movingSequence.push(digit);
+
+    processStrategies();
+
   }
 
   render();
@@ -1064,75 +1075,137 @@ function addDigit(digit,quote,epoch){
 
 
 /* =====================================================
-   RENDER
+   COUNTS
+===================================================== */
+
+function getCounts(){
+
+  const counts =
+    Array(10).fill(0);
+
+  for(const d of history){
+
+    if(
+      Number.isInteger(d) &&
+      d >= 0 &&
+      d <= 9
+    ){
+
+      counts[d]++;
+
+    }
+
+  }
+
+  return counts;
+}
+
+
+function getPercentages(){
+
+  const counts =
+    getCounts();
+
+  const total =
+    history.length;
+
+  if(!total)
+    return Array(10).fill(0);
+
+  return counts.map(
+    value =>
+      value / total * 100
+  );
+}
+
+
+/* =====================================================
+   RENDER DIGITS
 ===================================================== */
 
 function render(){
 
-  const counts = Array(10).fill(0);
+  const counts =
+    getCounts();
 
-  for(const digit of history){
-    if(
-      Number.isInteger(digit) &&
-      digit >= 0 &&
-      digit <= 9
-    ){
-      counts[digit]++;
-    }
-  }
+  const percentages =
+    getPercentages();
 
-  $("countLabel").textContent = history.length;
+  $("countLabel").textContent =
+    history.length;
 
   if(!history.length){
 
     $("digits").innerHTML =
       counts.map(
-        (unused,digit) => `
+        (x,digit) => `
+
           <div class="digit">
-            <strong>${digit}</strong>
-            <small>0 • 0.0%</small>
+
+            <strong>
+              ${digit}
+            </strong>
+
+            <small>
+              0 • 0.0%
+            </small>
+
           </div>
+
         `
       ).join("");
-
-    $("most").textContent = "—";
-    $("least").textContent = "—";
-    $("over5").textContent = "—";
-    $("under5").textContent = "—";
 
     return;
   }
 
-  let mostDigit = 0;
-  let leastDigit = 0;
+
+  let most =
+    0;
+
+  let least =
+    0;
+
 
   for(let i=1;i<10;i++){
 
-    if(counts[i] > counts[mostDigit])
-      mostDigit = i;
+    if(
+      counts[i] >
+      counts[most]
+    ){
 
-    if(counts[i] < counts[leastDigit])
-      leastDigit = i;
+      most = i;
+
+    }
+
+    if(
+      counts[i] <
+      counts[least]
+    ){
+
+      least = i;
+
+    }
+
   }
+
 
   $("digits").innerHTML =
     counts.map(
       (count,digit) => {
 
-        const percentage =
-          count / history.length * 100;
-
         const isMost =
-          digit === mostDigit &&
-          counts[mostDigit] > 0;
+          digit === most &&
+          count > 0;
 
         const isLeast =
-          digit === leastDigit;
+          digit === least;
 
         const isLatest =
           digit === latestDigit;
 
+
         return `
+
           <div class="digit
             ${isMost ? "most" : ""}
             ${isLeast ? "least" : ""}
@@ -1145,55 +1218,1005 @@ function render(){
                 : ""
             }
 
-            <strong>${digit}</strong>
+            <strong>
+              ${digit}
+            </strong>
 
             <small>
               ${count} •
-              ${percentage.toFixed(1)}%
+              ${percentages[digit].toFixed(1)}%
             </small>
 
           </div>
+
         `;
+
       }
     ).join("");
 
+
   $("most").textContent =
-    `${mostDigit} (${(
-      counts[mostDigit] /
-      history.length * 100
-    ).toFixed(1)}%)`;
+    `${most} (${percentages[most].toFixed(1)}%)`;
+
 
   $("least").textContent =
-    `${leastDigit} (${(
-      counts[leastDigit] /
-      history.length * 100
-    ).toFixed(1)}%)`;
+    `${least} (${percentages[least].toFixed(1)}%)`;
 
-  const over =
-    counts[6]+counts[7]+counts[8]+counts[9];
 
-  const under =
-    counts[0]+counts[1]+counts[2]+
-    counts[3]+counts[4];
+  const over5 =
+    counts[6] +
+    counts[7] +
+    counts[8] +
+    counts[9];
+
+
+  const under7 =
+    counts[0] +
+    counts[1] +
+    counts[2] +
+    counts[3] +
+    counts[4] +
+    counts[5] +
+    counts[6];
+
 
   $("over5").textContent =
-    (over / history.length * 100).toFixed(1)+"%";
+    `${(
+      over5 / history.length * 100
+    ).toFixed(1)}%`;
 
-  $("under5").textContent =
-    (under / history.length * 100).toFixed(1)+"%";
+
+  $("under7").textContent =
+    `${(
+      under7 / history.length * 100
+    ).toFixed(1)}%`;
+
 }
 
 
 /* =====================================================
-   STATUS
+   RESET MOVING SEQUENCE
 ===================================================== */
 
-function setStatus(text,live=false){
+function resetMovingSequence(){
 
-  $("status").textContent = text;
+  movingSequence = [];
 
-  $("status").className =
-    "status" + (live ? " live" : "");
+  strategyCandidate = null;
+
+}
+
+
+/* =====================================================
+   UNDER 7
+===================================================== */
+
+function checkUnder7(
+  percentages
+){
+
+  /*
+   * Green and red must both be below 7.
+   */
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  if(
+    green >= 7 ||
+    red >= 7
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * Green must appear before red
+   * in the recent tick sequence.
+   */
+
+  const greenPosition =
+    findLastPosition(
+      movingSequence,
+      green
+    );
+
+  const redPosition =
+    findLastPosition(
+      movingSequence,
+      red
+    );
+
+
+  if(
+    greenPosition === -1 ||
+    redPosition === -1 ||
+    greenPosition >= redPosition
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * Once valid, wait for 8 or 9.
+   */
+
+  if(
+    latestDigit === 8 ||
+    latestDigit === 9
+  ){
+
+    return true;
+
+  }
+
+  return false;
+}
+
+
+/* =====================================================
+   OVER 5
+===================================================== */
+
+function checkOver5(){
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  if(
+    !(red === 0 || red === 1)
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    !(green === 8 || green === 9)
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * Entry occurs after moving tick
+   * touches 0 or 1.
+   */
+
+  if(
+    latestDigit === 0 ||
+    latestDigit === 1
+  ){
+
+    return true;
+
+  }
+
+  return false;
+}
+
+
+/* =====================================================
+   OVER 7
+===================================================== */
+
+function checkOver7(
+  percentages
+){
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  if(green !== 9)
+    return false;
+
+  if(red !== 0)
+    return false;
+
+
+  if(
+    percentages[8] <= 12.5 ||
+    percentages[9] <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * Every digit below 7
+   * must be below 10%.
+   */
+
+  for(let i=0;i<7;i++){
+
+    if(percentages[i] >= 10){
+
+      return false;
+
+    }
+
+  }
+
+
+  /*
+   * Minimum four distinct digits
+   * touched.
+   */
+
+  const unique =
+    new Set(movingSequence);
+
+
+  if(unique.size < 4)
+    return false;
+
+
+  /*
+   * Enter exactly when the
+   * fourth distinct digit is touched.
+   */
+
+  if(
+    unique.size >= 4 &&
+    movingSequence.length
+  ){
+
+    const current =
+      latestDigit;
+
+    const previousUnique =
+      new Set(
+        movingSequence.slice(
+          0,
+          -1
+        )
+      );
+
+    if(
+      previousUnique.size === 3 &&
+      !previousUnique.has(current)
+    ){
+
+      return true;
+
+    }
+
+  }
+
+  return false;
+}
+
+
+/* =====================================================
+   OVER 6
+===================================================== */
+
+function checkOver6(
+  percentages
+){
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  if(green !== 9)
+    return false;
+
+  if(red !== 0)
+    return false;
+
+
+  if(
+    percentages[9] <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    percentages[0] > 8.5
+  ){
+
+    return false;
+
+  }
+
+
+  for(
+    const digit of [6,7,8]
+  ){
+
+    if(
+      percentages[digit] <= 10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  /*
+   * Do not enter if any of
+   * 6,7,8,9 is decreasing.
+   */
+
+  if(previousPercentages){
+
+    for(
+      const digit of [6,7,8,9]
+    ){
+
+      if(
+        percentages[digit] <
+        previousPercentages[digit]
+      ){
+
+        return false;
+
+      }
+
+    }
+
+  }
+
+
+  /*
+   * Need at least three distinct
+   * digits below 6.
+   */
+
+  const belowSix =
+    movingSequence.filter(
+      digit => digit < 6
+    );
+
+
+  const unique =
+    [...new Set(belowSix)];
+
+
+  if(unique.length < 3)
+    return false;
+
+
+  /*
+   * 1 must always be the last
+   * digit touched before entry.
+   */
+
+  if(latestDigit !== 1)
+    return false;
+
+
+  /*
+   * Make sure the current 1
+   * completes the three-number
+   * requirement.
+   */
+
+  const beforeCurrent =
+    movingSequence.slice(
+      0,
+      -1
+    );
+
+
+  const beforeUnique =
+    [...new Set(
+      beforeCurrent.filter(
+        digit => digit < 6
+      )
+    )];
+
+
+  if(beforeUnique.length < 2)
+    return false;
+
+
+  return true;
+}
+
+
+/* =====================================================
+   UNDER 4
+===================================================== */
+
+function checkUnder4(
+  percentages
+){
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  const setupA =
+    green === 0 &&
+    red === 9;
+
+
+  const setupB =
+    green === 0 &&
+    red === 1;
+
+
+  if(
+    !setupA &&
+    !setupB
+  ){
+
+    return false;
+
+  }
+
+
+  /*
+   * Digits above 4 must be below 10%.
+   */
+
+  for(let i=5;i<=9;i++){
+
+    if(
+      percentages[i] >= 10
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  /*
+   * 0 through 4 must all be
+   * above 10.5%.
+   */
+
+  for(let i=0;i<=4;i++){
+
+    if(
+      percentages[i] <= 10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  /*
+   * Wait for four distinct digits
+   * above 4.
+   */
+
+  const aboveFour =
+    movingSequence.filter(
+      digit => digit > 4
+    );
+
+
+  const unique =
+    [...new Set(aboveFour)];
+
+
+  if(unique.length < 4)
+    return false;
+
+
+  /*
+   * Enter when the fourth distinct
+   * digit above 4 is touched.
+   */
+
+  const current =
+    latestDigit;
+
+  if(current <= 4)
+    return false;
+
+
+  const before =
+    movingSequence.slice(
+      0,
+      -1
+    );
+
+
+  const beforeUnique =
+    new Set(
+      before.filter(
+        digit => digit > 4
+      )
+    );
+
+
+  if(
+    beforeUnique.size === 3 &&
+    !beforeUnique.has(current)
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+}
+
+
+/* =====================================================
+   DIGIT HELPERS
+===================================================== */
+
+function findMostDigit(){
+
+  const counts =
+    getCounts();
+
+  let digit = 0;
+
+  for(let i=1;i<10;i++){
+
+    if(
+      counts[i] >
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
+
+  }
+
+  return digit;
+}
+
+
+function findLeastDigit(){
+
+  const counts =
+    getCounts();
+
+  let digit = 0;
+
+  for(let i=1;i<10;i++){
+
+    if(
+      counts[i] <
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
+
+  }
+
+  return digit;
+}
+
+
+function findLastPosition(
+  array,
+  value
+){
+
+  for(
+    let i=array.length-1;
+    i>=0;
+    i--
+  ){
+
+    if(
+      array[i] === value
+    ){
+
+      return i;
+
+    }
+
+  }
+
+  return -1;
+}
+
+
+/* =====================================================
+   STRATEGY ENGINE
+===================================================== */
+
+function processStrategies(){
+
+  if(
+    !botRunning ||
+    tradeActive ||
+    history.length < MAX_TICKS
+  ){
+
+    return;
+
+  }
+
+
+  const percentages =
+    getPercentages();
+
+
+  /*
+   * Save previous percentages
+   * for the Over 6 rule.
+   */
+
+  const oldPercentages =
+    previousPercentages;
+
+  previousPercentages =
+    percentages.slice();
+
+
+  const results = {
+
+    UNDER7:
+      checkUnder7(percentages),
+
+    OVER5:
+      checkOver5(),
+
+    OVER7:
+      checkOver7(percentages),
+
+    OVER6:
+      checkOver6(percentages),
+
+    UNDER4:
+      checkUnder4(percentages)
+
+  };
+
+
+  updateStrategyDisplay(
+    percentages,
+    results
+  );
+
+
+  /*
+   * Priority order.
+   */
+
+  const order = [
+
+    STRATEGIES.UNDER7,
+
+    STRATEGIES.OVER5,
+
+    STRATEGIES.OVER7,
+
+    STRATEGIES.OVER6,
+
+    STRATEGIES.UNDER4
+
+  ];
+
+
+  for(
+    const strategy of order
+  ){
+
+    if(results[strategy]){
+
+      strategyCandidate =
+        strategy;
+
+      executeStrategyTrade(
+        strategy
+      );
+
+      return;
+
+    }
+
+  }
+
+}
+
+
+/* =====================================================
+   STRATEGY DISPLAY
+===================================================== */
+
+function updateStrategyDisplay(
+  percentages,
+  results
+){
+
+  const green =
+    findMostDigit();
+
+  const red =
+    findLeastDigit();
+
+
+  $("under7Status").textContent =
+    `Green ${green}, Red ${red}. ` +
+    (
+      results.UNDER7
+        ? "ENTRY TRIGGERED"
+        : "Waiting for conditions."
+    );
+
+
+  $("over5Status").textContent =
+    `Green ${green}, Red ${red}. ` +
+    (
+      results.OVER5
+        ? "ENTRY TRIGGERED"
+        : "Waiting for conditions."
+    );
+
+
+  $("over7Status").textContent =
+    `9 ${percentages[9].toFixed(1)}% • ` +
+    `8 ${percentages[8].toFixed(1)}%. ` +
+    (
+      results.OVER7
+        ? "ENTRY TRIGGERED"
+        : "Waiting for conditions."
+    );
+
+
+  $("over6Status").textContent =
+    `9 ${percentages[9].toFixed(1)}% • ` +
+    `0 ${percentages[0].toFixed(1)}% • ` +
+    `6 ${percentages[6].toFixed(1)}% • ` +
+    `7 ${percentages[7].toFixed(1)}% • ` +
+    `8 ${percentages[8].toFixed(1)}%. ` +
+    (
+      results.OVER6
+        ? "ENTRY TRIGGERED"
+        : "Waiting for conditions."
+    );
+
+
+  $("under4Status").textContent =
+    `0 ${percentages[0].toFixed(1)}% • ` +
+    `4 ${percentages[4].toFixed(1)}%. ` +
+    (
+      results.UNDER4
+        ? "ENTRY TRIGGERED"
+        : "Waiting for conditions."
+    );
+
+
+  document
+    .querySelectorAll(".strategy")
+    .forEach(
+      element =>
+        element.classList.remove(
+          "active"
+        )
+    );
+
+
+  if(results.UNDER7)
+    $("strategy-under7")
+      .classList.add("active");
+
+  if(results.OVER5)
+    $("strategy-over5")
+      .classList.add("active");
+
+  if(results.OVER7)
+    $("strategy-over7")
+      .classList.add("active");
+
+  if(results.OVER6)
+    $("strategy-over6")
+      .classList.add("active");
+
+  if(results.UNDER4)
+    $("strategy-under4")
+      .classList.add("active");
+}
+
+
+/* =====================================================
+   START BOT
+===================================================== */
+
+async function startBot(){
+
+  if(botRunning)
+    return;
+
+
+  const stake =
+    Number(
+      $("stake").value
+    );
+
+
+  const duration =
+    Number(
+      $("duration").value
+    );
+
+
+  if(
+    !Number.isFinite(stake) ||
+    stake <= 0
+  ){
+
+    alert(
+      "Enter a valid stake."
+    );
+
+    return;
+
+  }
+
+
+  if(
+    !Number.isInteger(duration) ||
+    duration < 1
+  ){
+
+    alert(
+      "Duration must be a whole number of ticks."
+    );
+
+    return;
+
+  }
+
+
+  botRunning = true;
+
+  manuallyStopped = false;
+
+  tradeActive = false;
+
+  strategyCandidate = null;
+
+  resetMovingSequence();
+
+  previousPercentages = null;
+
+
+  $("startButton").disabled =
+    true;
+
+  $("stopButton").disabled =
+    false;
+
+
+  $("botState").textContent =
+    "Running";
+
+
+  $("activeStrategy").textContent =
+    "Analysing";
+
+
+  $("tradeState").textContent =
+    "Waiting for setup";
+
+
+  setStatus(
+    "RUNNING",
+    true
+  );
+
+
+  /*
+   * Start live market connection
+   * immediately.
+   */
+
+  connectMarket();
+
+}
+
+
+/* =====================================================
+   STOP BOT
+===================================================== */
+
+function stopBot(){
+
+  botRunning = false;
+
+  manuallyStopped = true;
+
+  strategyCandidate = null;
+
+  resetMovingSequence();
+
+  previousPercentages = null;
+
+
+  $("startButton").disabled =
+    false;
+
+  $("stopButton").disabled =
+    true;
+
+
+  if(!tradeActive){
+
+    $("botState").textContent =
+      "Stopped";
+
+    $("activeStrategy").textContent =
+      "Stopped";
+
+    $("tradeState").textContent =
+      "No active trade";
+
+  }else{
+
+    $("botState").textContent =
+      "Stopped — monitoring active trade";
+
+  }
+
+
+  setStatus(
+    "STOPPED"
+  );
+
+
+  /*
+   * Stop receiving new ticks.
+   * Existing contract continues to
+   * be monitored.
+   */
+
+  if(ws){
+
+    try{
+
+      ws.onclose = null;
+
+      ws.close();
+
+    }catch(e){}
+
+    ws = null;
+
+  }
+
 }
 
 
@@ -1203,986 +2226,597 @@ function setStatus(text,live=false){
 
 function connectMarket(){
 
-  manuallyChangingMarket = true;
-
   if(reconnectTimer){
-    clearTimeout(reconnectTimer);
+
+    clearTimeout(
+      reconnectTimer
+    );
+
     reconnectTimer = null;
+
   }
+
 
   if(ws){
 
     try{
+
       ws.onclose = null;
+
       ws.close();
+
     }catch(e){}
 
     ws = null;
+
   }
 
+
   history = [];
+
   latestDigit = null;
+
   currentPipSize = null;
+
+  resetMovingSequence();
+
+  previousPercentages = null;
 
   render();
 
-  const symbol = getSelectedMarket();
+
+  const symbol =
+    $("market").value;
+
 
   $("marketName").textContent =
     marketNames[symbol];
 
+
   $("quote").textContent =
     "Connecting to Deriv…";
 
-  setStatus("Connecting…");
 
-  const socket = new WebSocket(WS_URL);
+  const socket =
+    new WebSocket(
+      WS_URL
+    );
+
 
   ws = socket;
 
-  socket.onopen = function(){
 
-    if(socket !== ws) return;
+  socket.onopen =
+    function(){
 
-    manuallyChangingMarket = false;
-
-    setStatus("LIVE",true);
-
-    socket.send(
-      JSON.stringify({
-        ticks_history:symbol,
-        count:MAX_TICKS,
-        end:"latest",
-        style:"ticks",
-        subscribe:1,
-        req_id:1
-      })
-    );
-  };
-
-  socket.onmessage = function(event){
-
-    if(socket !== ws) return;
-
-    try{
-
-      const data = JSON.parse(event.data);
-
-      if(data.error){
-
-        setStatus("Error");
-
-        $("quote").textContent =
-          data.error.message ||
-          "Deriv connection error.";
-
+      if(socket !== ws)
         return;
-      }
 
-      if(data.msg_type === "history"){
 
-        const prices =
-          data.history?.prices || [];
+      setStatus(
+        botRunning
+          ? "RUNNING"
+          : "LIVE",
+        true
+      );
 
-        const times =
-          data.history?.times || [];
 
-        if(Number.isFinite(Number(data.pip_size)))
-          currentPipSize = Number(data.pip_size);
+      socket.send(
+        JSON.stringify({
 
-        history = [];
+          ticks_history:
+            symbol,
 
-        for(let i=0;i<prices.length;i++){
+          count:
+            MAX_TICKS,
+
+          end:
+            "latest",
+
+          style:
+            "ticks",
+
+          subscribe:
+            1,
+
+          req_id:
+            1
+
+        })
+      );
+
+    };
+
+
+  socket.onmessage =
+    function(event){
+
+      if(socket !== ws)
+        return;
+
+
+      try{
+
+        const data =
+          JSON.parse(
+            event.data
+          );
+
+
+        if(data.error){
+
+          console.error(
+            data.error
+          );
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "history"
+        ){
+
+          const prices =
+            data.history?.prices ||
+            [];
+
+          const times =
+            data.history?.times ||
+            [];
+
+
+          if(
+            Number.isFinite(
+              Number(
+                data.pip_size
+              )
+            )
+          ){
+
+            currentPipSize =
+              Number(
+                data.pip_size
+              );
+
+          }
+
+
+          history = [];
+
+
+          for(
+            let i=0;
+            i<prices.length;
+            i++
+          ){
+
+            const digit =
+              getLastDigit(
+                prices[i],
+                currentPipSize
+              );
+
+
+            if(
+              digit !== null
+            ){
+
+              history.push(
+                digit
+              );
+
+            }
+
+          }
+
+
+          if(
+            history.length >
+            MAX_TICKS
+          ){
+
+            history =
+              history.slice(
+                -MAX_TICKS
+              );
+
+          }
+
+
+          if(history.length){
+
+            latestDigit =
+              history[
+                history.length - 1
+              ];
+
+          }
+
+
+          if(prices.length){
+
+            const price =
+              prices[
+                prices.length - 1
+              ];
+
+            const time =
+              times[
+                times.length - 1
+              ];
+
+
+            $("quote").textContent =
+              Number.isFinite(
+                Number(time)
+              )
+                ? `${price} • ${new Date(
+                    time * 1000
+                  ).toLocaleTimeString()}`
+                : String(price);
+
+          }
+
+
+          render();
+
+
+          /*
+           * Analyse immediately
+           * after loading the 100 ticks.
+           */
+
+          if(
+            botRunning &&
+            !tradeActive
+          ){
+
+            processStrategies();
+
+          }
+
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "tick"
+        ){
+
+          const tick =
+            data.tick;
+
+
+          if(!tick)
+            return;
+
+
+          if(
+            Number.isFinite(
+              Number(
+                tick.pip_size
+              )
+            )
+          ){
+
+            currentPipSize =
+              Number(
+                tick.pip_size
+              );
+
+          }
+
 
           const digit =
             getLastDigit(
-              prices[i],
+              tick.quote,
               currentPipSize
             );
 
-          if(digit !== null)
-            history.push(digit);
-        }
 
-        if(history.length > MAX_TICKS)
-          history = history.slice(-MAX_TICKS);
-
-        if(history.length)
-          latestDigit =
-            history[history.length - 1];
-
-        if(prices.length){
-
-          const lastPrice =
-            prices[prices.length - 1];
-
-          const lastTime =
-            times[times.length - 1];
-
-          if(Number.isFinite(Number(lastTime))){
-            $("quote").textContent =
-              `${lastPrice} • ${new Date(
-                lastTime * 1000
-              ).toLocaleTimeString()}`;
-          }else{
-            $("quote").textContent =
-              String(lastPrice);
-          }
-        }
-
-        render();
-        return;
-      }
-
-      if(data.msg_type === "tick"){
-
-        const tick = data.tick;
-
-        if(!tick) return;
-
-        if(Number.isFinite(Number(tick.pip_size)))
-          currentPipSize =
-            Number(tick.pip_size);
-
-        const digit =
-          getLastDigit(
+          addTick(
+            digit,
             tick.quote,
-            currentPipSize
+            tick.epoch
           );
 
-        addDigit(
-          digit,
-          tick.quote,
-          tick.epoch
+        }
+
+      }catch(error){
+
+        console.error(
+          "Tick error:",
+          error
         );
 
-        setStatus("LIVE",true);
       }
 
-    }catch(error){
-      console.error("Tick processing error:",error);
-    }
-  };
-
-  socket.onerror = function(){
-
-    if(socket !== ws) return;
-
-    setStatus("Connection error");
-
-    $("quote").textContent =
-      "Unable to connect to Deriv market data.";
-  };
-
-  socket.onclose = function(){
-
-    if(socket !== ws) return;
-
-    ws = null;
-
-    setStatus("Disconnected");
-
-    if(!manuallyChangingMarket){
-
-      reconnectTimer =
-        setTimeout(
-          connectMarket,
-          3000
-        );
-    }
-  };
-}
-
-$("market").addEventListener(
-  "change",
-  connectMarket
-);
-
-
-/* =====================================================
-   ACCOUNT SWITCH
-===================================================== */
-
-async function selectAccount(type){
-
-  const response = await fetch(
-    "/trading",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-      },
-      credentials:"same-origin",
-      body:JSON.stringify({
-        action:"select_account",
-        account_type:type
-      })
-    }
-  );
-
-  const data = await response.json();
-
-  if(!response.ok || !data.ok){
-    throw new Error(
-      data.error ||
-      "Could not switch account."
-    );
-  }
-
-  const account = data.account || {};
-
-  currentAccountType = type;
-
-  currentAccountId =
-    account.account_id ||
-    currentAccountId;
-
-  currentCurrency =
-    account.currency ||
-    currentCurrency;
-
-  currentBalance =
-    Number(account.balance ?? 0);
-
-  updateAccountDisplay();
-
-  $("moneyStatus").textContent =
-    `${type.toUpperCase()} account selected.`;
-
-  refreshBalanceFast();
-
-  tradeHistory = loadTradeHistory();
-  renderTradeHistory();
-}
-
-$("demoMode").addEventListener(
-  "click",
-  async function(){
-
-    try{
-      await selectAccount("demo");
-    }catch(error){
-      $("moneyStatus").textContent =
-        error.message;
-    }
-  }
-);
-
-$("realMode").addEventListener(
-  "click",
-  async function(){
-
-    try{
-      await selectAccount("real");
-    }catch(error){
-      $("moneyStatus").textContent =
-        error.message;
-    }
-  }
-);
-
-
-/* =====================================================
-   CONTRACT CONTROLS
-===================================================== */
-
-function updateContractControls(){
-
-  const type =
-    $("contractType").value;
-
-  const digitTypes = [
-    "DIGITOVER",
-    "DIGITUNDER",
-    "DIGITMATCH",
-    "DIGITDIFF",
-    "DIGITEVEN",
-    "DIGITODD"
-  ];
-
-  const rangeTypes = [
-    "EXPIRYRANGE",
-    "EXPIRYMISSED"
-  ];
-
-  const barrierTypes = [
-    "HIGHER",
-    "LOWER",
-    "TOUCH",
-    "NOTOUCH"
-  ];
-
-  const isDigit =
-    digitTypes.includes(type);
-
-  const isRange =
-    rangeTypes.includes(type);
-
-  const isBarrier =
-    barrierTypes.includes(type);
-
-  $("digitControl").style.display =
-    isDigit ? "block" : "none";
-
-  $("barrierControl").classList.toggle(
-    "hidden",
-    !isBarrier
-  );
-
-  $("rangeControl").classList.toggle(
-    "hidden",
-    !isRange
-  );
-
-  const hints = {
-
-    DIGITOVER:
-      "Wins if the last digit is above your selected digit.",
-
-    DIGITUNDER:
-      "Wins if the last digit is below your selected digit.",
-
-    DIGITMATCH:
-      "Wins if the last digit matches your selected digit.",
-
-    DIGITDIFF:
-      "Wins if the last digit differs from your selected digit.",
-
-    DIGITEVEN:
-      "Wins if the last digit is even.",
-
-    DIGITODD:
-      "Wins if the last digit is odd.",
-
-    CALL:
-      "Rise / Call contract.",
-
-    PUT:
-      "Fall / Put contract.",
-
-    RISE:
-      "Rise contract.",
-
-    FALL:
-      "Fall contract.",
-
-    HIGHER:
-      "Wins if the final price is higher than the barrier.",
-
-    LOWER:
-      "Wins if the final price is lower than the barrier.",
-
-    TOUCH:
-      "Wins if the barrier is touched.",
-
-    NOTOUCH:
-      "Wins if the barrier is not touched.",
-
-    EXPIRYRANGE:
-      "Wins if the contract ends between the two barriers.",
-
-    EXPIRYMISSED:
-      "Wins if the contract ends outside the two barriers."
-  };
-
-  $("contractHint").textContent =
-    hints[type] ||
-    "Choose a contract type.";
-}
-
-$("contractType").addEventListener(
-  "change",
-  updateContractControls
-);
-
-
-/* =====================================================
-   TRADE HISTORY
-===================================================== */
-
-function getHistoryKey(){
-
-  return (
-    "dollarticks_trade_history_" +
-    String(currentAccountId || "unknown")
-  );
-}
-
-function loadTradeHistory(){
-
-  try{
-
-    const saved =
-      localStorage.getItem(getHistoryKey());
-
-    if(!saved) return [];
-
-    const parsed = JSON.parse(saved);
-
-    return Array.isArray(parsed)
-      ? parsed
-      : [];
-
-  }catch(e){
-    return [];
-  }
-}
-
-let tradeHistory = [];
-
-function saveTradeHistory(){
-
-  try{
-    localStorage.setItem(
-      getHistoryKey(),
-      JSON.stringify(tradeHistory)
-    );
-  }catch(e){
-    console.error(
-      "Could not save trade history:",
-      e
-    );
-  }
-}
-
-function formatSpot(value){
-
-  if(
-    value === null ||
-    value === undefined ||
-    value === ""
-  ){
-    return "—";
-  }
-
-  return String(value);
-}
-
-function renderTradeHistory(){
-
-  const container = $("tradeHistory");
-
-  if(!tradeHistory.length){
-
-    container.innerHTML =
-      '<div class="historyEmpty">No completed trades yet.</div>';
-
-    $("totalTrades").textContent = "0";
-    $("totalWins").textContent = "0";
-    $("totalProfit").textContent = "0.00";
-
-    return;
-  }
-
-  let wins = 0;
-  let profit = 0;
-
-  container.innerHTML =
-    tradeHistory.map(item => {
-
-      const pnl =
-        Number(item.profit || 0);
-
-      profit += pnl;
-
-      if(item.result === "win")
-        wins++;
-
-      const resultClass =
-        item.result === "win"
-          ? "win"
-          : "loss";
-
-      const resultText =
-        item.result === "win"
-          ? "WIN"
-          : "LOSS";
-
-      return `
-        <div class="historyItem">
-
-          <div class="historyTop">
-
-            <div class="historyResult ${resultClass}">
-              ${resultText}
-            </div>
-
-            <div class="historyProfit ${resultClass}">
-              ${pnl >= 0 ? "+" : ""}
-              ${pnl.toFixed(2)}
-            </div>
-
-          </div>
-
-          <div>
-            ${escapeHtml(
-              item.contract_type || "Trade"
-            )}
-          </div>
-
-          <div class="historyMeta">
-            <span>Market</span>
-            <b>${escapeHtml(
-              item.symbol || "—"
-            )}</b>
-          </div>
-
-          <div class="historyMeta">
-            <span>Stake</span>
-            <b>${escapeHtml(
-              String(item.stake ?? "—")
-            )}</b>
-          </div>
-
-          <div class="historyMeta">
-            <span>Entry Spot</span>
-            <b>${escapeHtml(
-              formatSpot(item.entry_spot)
-            )}</b>
-          </div>
-
-          <div class="historyMeta">
-            <span>Exit Spot</span>
-            <b>${escapeHtml(
-              formatSpot(item.exit_spot)
-            )}</b>
-          </div>
-
-          <div class="historyMeta">
-            <span>Contract</span>
-            <b>${escapeHtml(
-              String(item.contract_id || "—")
-            )}</b>
-          </div>
-
-          <div class="historyMeta">
-            <span>Time</span>
-            <b>${escapeHtml(
-              item.time || "—"
-            )}</b>
-          </div>
-
-        </div>
-      `;
-    }).join("");
-
-  $("totalTrades").textContent =
-    tradeHistory.length;
-
-  $("totalWins").textContent =
-    wins;
-
-  $("totalProfit").textContent =
-    profit.toFixed(2);
-}
-
-function addCompletedTrade(contract){
-
-  if(!contract) return;
-
-  const contractId =
-    Number(contract.contract_id);
-
-  if(
-    !Number.isFinite(contractId) ||
-    contractId <= 0
-  ){
-    return;
-  }
-
-  const alreadyExists =
-    tradeHistory.some(
-      item =>
-        Number(item.contract_id) ===
-        contractId
-    );
-
-  if(alreadyExists) return;
-
-  const profit =
-    Number(contract.profit || 0);
-
-  const result =
-    (
-      String(
-        contract.status || ""
-      ).toUpperCase() === "WON" ||
-      profit > 0
-    )
-      ? "win"
-      : "loss";
-
-  const entrySpot =
-    contract.entry_spot ??
-    contract.entry_tick ??
-    contract.current_spot ??
-    currentTrade?.entry_spot ??
-    "—";
-
-  const exitSpot =
-    contract.exit_spot ??
-    contract.exit_tick ??
-    contract.current_spot ??
-    "—";
-
-  tradeHistory.unshift({
-
-    contract_id:contractId,
-
-    result:result,
-
-    profit:Number.isFinite(profit)
-      ? profit
-      : 0,
-
-    contract_type:
-      contract.contract_type ||
-      currentTrade?.contract_type ||
-      "Trade",
-
-    symbol:
-      contract.underlying_symbol ||
-      currentTrade?.symbol ||
-      "—",
-
-    stake:
-      contract.buy_price ??
-      currentTrade?.stake ??
-      "—",
-
-    entry_spot:entrySpot,
-
-    exit_spot:exitSpot,
-
-    time:new Date().toLocaleString()
-
-  });
-
-  if(tradeHistory.length > 100)
-    tradeHistory =
-      tradeHistory.slice(0,100);
-
-  saveTradeHistory();
-  renderTradeHistory();
-}
-
-
-/* =====================================================
-   ACTIVE TRADE
-===================================================== */
-
-let currentTrade = null;
-let contractPolling = false;
-
-/*
- * Fast monitoring:
- * No 3-second waiting period.
- * The next check starts immediately after the previous
- * response, with a very small delay to avoid overlapping
- * requests.
- */
-const CONTRACT_CHECK_DELAY = 120;
-
-async function checkContractStatus(){
-
-  if(!currentTrade) return;
-
-  if(contractPolling) return;
-
-  contractPolling = true;
-
-  try{
-
-    const response = await fetch(
-      "/trading",
-      {
-        method:"POST",
-        headers:{
-          "Content-Type":"application/json"
-        },
-        credentials:"same-origin",
-        cache:"no-store",
-        body:JSON.stringify({
-
-          action:"contract_status",
-
-          account_type:
-            currentAccountType,
-
-          contract_id:
-            currentTrade.contract_id
-        })
-      }
-    );
-
-    const data = await response.json();
-
-    if(!response.ok || !data.ok){
-
-      throw new Error(
-        data.error ||
-        "Could not check contract status."
-      );
-    }
-
-    const contract =
-      data.contract || {};
-
-    const status =
-      String(
-        contract.status || "OPEN"
-      ).toUpperCase();
-
-    const sold =
-      contract.is_sold === true;
-
-    if(
-      status === "WON" ||
-      status === "LOST" ||
-      sold
-    ){
-
-      const finishedTrade = {
-        ...contract,
-        contract_id:currentTrade.contract_id,
-        contract_type:
-          contract.contract_type ||
-          currentTrade.contract_type,
-        underlying_symbol:
-          contract.underlying_symbol ||
-          currentTrade.symbol,
-        buy_price:
-          contract.buy_price ??
-          currentTrade.stake,
-        entry_spot:
-          contract.entry_spot ??
-          contract.entry_tick ??
-          currentTrade.entry_spot ??
-          "—",
-        exit_spot:
-          contract.exit_spot ??
-          contract.exit_tick ??
-          contract.current_spot ??
-          "—"
-      };
-
-      addCompletedTrade(finishedTrade);
-
-      currentTrade = null;
-
-      await refreshBalanceFast();
-
-      return true;
-    }
-
-    return false;
-
-  }catch(error){
-
-    console.error(
-      "Contract status error:",
-      error
-    );
-
-    return false;
-
-  }finally{
-
-    contractPolling = false;
-  }
-}
-
-function startContractMonitoring(){
-
-  if(!currentTrade) return;
-
-  const monitor = async () => {
-
-    if(!currentTrade)
-      return;
-
-    const finished =
-      await checkContractStatus();
-
-    if(finished || !currentTrade)
-      return;
-
-    currentTrade.monitor =
-      setTimeout(
-        monitor,
-        CONTRACT_CHECK_DELAY
-      );
-  };
-
-  monitor();
-}
-
-
-/* =====================================================
-   BUY
-===================================================== */
-
-async function buyContract(){
-
-  const buyButton =
-    $("buyButton");
-
-  const contractType =
-    $("contractType").value;
-
-  const stake =
-    Number($("stake").value);
-
-  const duration =
-    Number($("duration").value);
-
-  const symbol =
-    getSelectedMarket();
-
-  if(
-    !Number.isFinite(stake) ||
-    stake <= 0
-  ){
-    showTradeError("Enter a valid stake.");
-    return;
-  }
-
-  if(
-    !Number.isFinite(duration) ||
-    duration < 1
-  ){
-    showTradeError("Enter a valid duration.");
-    return;
-  }
-
-  if(currentTrade){
-    showTradeError(
-      "A trade is already active."
-    );
-    return;
-  }
-
-  buyButton.disabled = true;
-
-  /* Keep everything below BUY invisible */
-  $("tradeStatus").classList.add("hidden");
-  $("proposalInfo").classList.add("hidden");
-  $("debug").classList.add("hidden");
-
-  try{
-
-    const payload = {
-
-      action:"buy",
-
-      account_type:
-        currentAccountType,
-
-      symbol:symbol,
-
-      contract_type:
-        contractType,
-
-      stake:stake,
-
-      duration:duration,
-
-      duration_unit:"t",
-
-      barrier:null,
-
-      currency:
-        currentCurrency
     };
 
-    if(
-      [
-        "DIGITOVER",
-        "DIGITUNDER",
-        "DIGITMATCH",
-        "DIGITDIFF"
-      ].includes(contractType)
-    ){
-      payload.barrier =
-        $("barrier").value;
-    }
 
-    if(
-      [
-        "HIGHER",
-        "LOWER",
-        "TOUCH",
-        "NOTOUCH"
-      ].includes(contractType)
-    ){
-      payload.barrier =
-        $("barrierInput").value;
-    }
+  socket.onerror =
+    function(){
 
-    if(
-      [
-        "EXPIRYRANGE",
-        "EXPIRYMISSED"
-      ].includes(contractType)
-    ){
-      payload.lower_barrier =
-        $("lowerBarrier").value;
+      $("quote").textContent =
+        "Deriv connection error.";
 
-      payload.upper_barrier =
-        $("upperBarrier").value;
-    }
+    };
+
+
+  socket.onclose =
+    function(){
+
+      if(socket !== ws)
+        return;
+
+
+      ws = null;
+
+
+      if(
+        botRunning &&
+        !manuallyStopped
+      ){
+
+        $("quote").textContent =
+          "Reconnecting…";
+
+
+        reconnectTimer =
+          setTimeout(
+            connectMarket,
+            1500
+          );
+
+      }
+
+    };
+
+}
+
+
+/* =====================================================
+   AUTOMATIC TRADE
+===================================================== */
+
+async function executeStrategyTrade(
+  strategy
+){
+
+  if(
+    !botRunning ||
+    tradeActive
+  ){
+
+    return;
+
+  }
+
+
+  tradeActive = true;
+
+
+  $("activeStrategy").textContent =
+    strategyName(strategy);
+
+
+  $("tradeState").textContent =
+    "Opening trade…";
+
+
+  const stake =
+    Number(
+      $("stake").value
+    );
+
+
+  const duration =
+    Number(
+      $("duration").value
+    );
+
+
+  const symbol =
+    $("market").value;
+
+
+  let contractType =
+    null;
+
+  let barrier =
+    null;
+
+
+  if(
+    strategy ===
+    STRATEGIES.UNDER7
+  ){
+
+    contractType =
+      "DIGITUNDER";
+
+    barrier =
+      "7";
+
+  }
+
+
+  if(
+    strategy ===
+    STRATEGIES.OVER5
+  ){
+
+    contractType =
+      "DIGITOVER";
+
+    barrier =
+      "5";
+
+  }
+
+
+  if(
+    strategy ===
+    STRATEGIES.OVER7
+  ){
+
+    contractType =
+      "DIGITOVER";
+
+    barrier =
+      "7";
+
+  }
+
+
+  if(
+    strategy ===
+    STRATEGIES.OVER6
+  ){
+
+    contractType =
+      "DIGITOVER";
+
+    barrier =
+      "6";
+
+  }
+
+
+  if(
+    strategy ===
+    STRATEGIES.UNDER4
+  ){
+
+    contractType =
+      "DIGITUNDER";
+
+    barrier =
+      "4";
+
+  }
+
+
+  try{
 
     const response =
       await fetch(
         "/trading",
         {
-          method:"POST",
+
+          method:
+            "POST",
 
           headers:{
             "Content-Type":
               "application/json"
           },
 
-          credentials:"same-origin",
+          credentials:
+            "same-origin",
 
-          cache:"no-store",
+          cache:
+            "no-store",
 
           body:
-            JSON.stringify(payload)
+            JSON.stringify({
+
+              action:
+                "buy",
+
+              account_type:
+                "demo",
+
+              symbol:
+                symbol,
+
+              contract_type:
+                contractType,
+
+              stake:
+                stake,
+
+              duration:
+                duration,
+
+              duration_unit:
+                "t",
+
+              barrier:
+                barrier,
+
+              currency:
+                "USD",
+
+              strategy:
+                strategy
+
+            })
+
         }
       );
+
 
     const data =
       await response.json();
 
-    if(!response.ok || !data.ok){
+
+    if(
+      !response.ok ||
+      !data.ok
+    ){
 
       throw new Error(
         data.error ||
         data.message ||
         "Trade request failed."
       );
+
     }
+
 
     const contract =
       data.contract || {};
 
+
     const contractId =
-      Number(contract.contract_id);
+      Number(
+        contract.contract_id
+      );
+
 
     if(
-      !Number.isFinite(contractId) ||
+      !Number.isFinite(
+        contractId
+      ) ||
       contractId <= 0
     ){
+
       throw new Error(
         "Deriv did not return a valid contract ID."
       );
+
     }
+
 
     currentTrade = {
 
       contract_id:
         contractId,
+
+      strategy:
+        strategy,
+
+      strategy_name:
+        strategyName(
+          strategy
+        ),
 
       contract_type:
         contract.contract_type ||
@@ -2198,100 +2832,695 @@ async function buyContract(){
           stake
         ),
 
+      duration:
+        duration,
+
       entry_spot:
         contract.entry_spot ??
         contract.entry_tick ??
         contract.current_spot ??
-        "—",
+        "—"
 
-      monitor:null
     };
 
-    if(
-      data.account &&
-      Number.isFinite(
-        Number(data.account.balance)
-      )
-    ){
 
-      currentBalance =
-        Number(data.account.balance);
+    $("tradeState").textContent =
+      "Trade active";
 
-      updateAccountDisplay();
-    }
+
+    $("activeStrategy").textContent =
+      strategyName(
+        strategy
+      );
+
 
     /*
-     * No "trade opened",
-     * no "waiting for result",
-     * no visible proposal/status message.
+     * The strategy trigger has
+     * already been consumed.
      */
+
+    resetMovingSequence();
 
     startContractMonitoring();
 
+
   }catch(error){
 
-    console.error("Buy error:",error);
+    console.error(
+      "Automatic trade error:",
+      error
+    );
 
-    showTradeError(error.message);
+
+    tradeActive = false;
+
+    currentTrade = null;
+
+
+    $("tradeState").textContent =
+      "Trade failed — continuing analysis";
+
+
+    resetMovingSequence();
+
+  }
+
+}
+
+
+/* =====================================================
+   STRATEGY NAME
+===================================================== */
+
+function strategyName(
+  strategy
+){
+
+  const names = {
+
+    UNDER7:
+      "Under 7",
+
+    OVER5:
+      "Over 5",
+
+    OVER7:
+      "Over 7",
+
+    OVER6:
+      "Over 6",
+
+    UNDER4:
+      "Under 4"
+
+  };
+
+
+  return (
+    names[strategy] ||
+    strategy
+  );
+
+}
+
+
+/* =====================================================
+   CONTRACT MONITORING
+===================================================== */
+
+const CONTRACT_CHECK_DELAY = 150;
+
+
+async function checkContractStatus(){
+
+  if(
+    !currentTrade ||
+    contractPolling
+  ){
+
+    return false;
+
+  }
+
+
+  contractPolling = true;
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/trading",
+        {
+
+          method:
+            "POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store",
+
+          body:
+            JSON.stringify({
+
+              action:
+                "contract_status",
+
+              account_type:
+                "demo",
+
+              contract_id:
+                currentTrade.contract_id
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if(
+      !response.ok ||
+      !data.ok
+    ){
+
+      return false;
+
+    }
+
+
+    const contract =
+      data.contract || {};
+
+
+    const status =
+      String(
+        contract.status ||
+        ""
+      ).toUpperCase();
+
+
+    const finished =
+      status === "WON" ||
+      status === "LOST" ||
+      contract.is_sold === true;
+
+
+    if(!finished)
+      return false;
+
+
+    addCompletedTrade(
+      contract
+    );
+
+
+    tradeActive = false;
+
+    currentTrade = null;
+
+
+    $("tradeState").textContent =
+      "Trade finished — analysing";
+
+
+    $("activeStrategy").textContent =
+      "Analysing";
+
+
+    resetMovingSequence();
+
+    previousPercentages = null;
+
+
+    /*
+     * If the bot is still running,
+     * immediately continue.
+     */
+
+    if(botRunning){
+
+      processStrategies();
+
+    }else{
+
+      $("tradeState").textContent =
+        "No active trade";
+
+    }
+
+
+    return true;
+
+
+  }catch(error){
+
+    console.error(
+      "Contract status error:",
+      error
+    );
+
+    return false;
 
   }finally{
 
-    buyButton.disabled = false;
+    contractPolling = false;
+
   }
+
 }
 
-function showTradeError(message){
 
-  /*
-   * You asked for nothing below BUY.
-   * Errors therefore appear temporarily as the
-   * button label instead of creating text below it.
-   */
+function startContractMonitoring(){
 
-  const button =
-    $("buyButton");
+  const monitor =
+    async function(){
 
-  const original =
-    "BUY";
+      if(!currentTrade)
+        return;
 
-  button.textContent =
-    "ERROR";
 
-  button.disabled = true;
+      const finished =
+        await checkContractStatus();
 
-  setTimeout(
-    function(){
 
-      button.textContent =
-        original;
+      if(
+        finished ||
+        !currentTrade
+      ){
 
-      button.disabled =
-        false;
+        return;
 
-    },
-    1200
+      }
+
+
+      setTimeout(
+        monitor,
+        CONTRACT_CHECK_DELAY
+      );
+
+    };
+
+
+  monitor();
+
+}
+
+
+/* =====================================================
+   TRADE HISTORY
+===================================================== */
+
+function historyKey(){
+
+  return (
+    "dollarticks_bot_history_" +
+    $("market").value
   );
 
-  console.error(
-    "Trade error:",
-    message
-  );
 }
 
-function escapeHtml(value){
 
-  return String(value)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+let tradeHistory = [];
+
+
+function loadHistory(){
+
+  try{
+
+    const saved =
+      localStorage.getItem(
+        historyKey()
+      );
+
+
+    if(!saved)
+      return [];
+
+
+    const parsed =
+      JSON.parse(
+        saved
+      );
+
+
+    return Array.isArray(parsed)
+      ? parsed
+      : [];
+
+
+  }catch(error){
+
+    return [];
+
+  }
+
 }
 
-$("buyButton").addEventListener(
-  "click",
-  buyContract
-);
+
+function saveHistory(){
+
+  try{
+
+    localStorage.setItem(
+      historyKey(),
+      JSON.stringify(
+        tradeHistory
+      )
+    );
+
+  }catch(error){
+
+    console.error(
+      "History save error:",
+      error
+    );
+
+  }
+
+}
+
+
+function addCompletedTrade(
+  contract
+){
+
+  if(!contract)
+    return;
+
+
+  const contractId =
+    Number(
+      contract.contract_id ??
+      currentTrade?.contract_id
+    );
+
+
+  if(
+    !Number.isFinite(
+      contractId
+    )
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    tradeHistory.some(
+      item =>
+        Number(
+          item.contract_id
+        ) === contractId
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const profit =
+    Number(
+      contract.profit || 0
+    );
+
+
+  const result =
+    String(
+      contract.status ||
+      ""
+    ).toUpperCase() === "WON" ||
+    profit > 0
+      ? "win"
+      : "loss";
+
+
+  tradeHistory.unshift({
+
+    contract_id:
+      contractId,
+
+    strategy:
+      currentTrade?.strategy_name ||
+      "Unknown",
+
+    contract_type:
+      contract.contract_type ||
+      currentTrade?.contract_type ||
+      "Trade",
+
+    symbol:
+      contract.underlying_symbol ||
+      currentTrade?.symbol ||
+      $("market").value,
+
+    stake:
+      contract.buy_price ??
+      currentTrade?.stake ??
+      "—",
+
+    duration:
+      currentTrade?.duration ??
+      "—",
+
+    entry_spot:
+      contract.entry_spot ??
+      contract.entry_tick ??
+      currentTrade?.entry_spot ??
+      "—",
+
+    exit_spot:
+      contract.exit_spot ??
+      contract.exit_tick ??
+      contract.current_spot ??
+      "—",
+
+    result:
+      result,
+
+    profit:
+      Number.isFinite(profit)
+        ? profit
+        : 0,
+
+    time:
+      new Date().toLocaleString()
+
+  });
+
+
+  if(
+    tradeHistory.length >
+    100
+  ){
+
+    tradeHistory =
+      tradeHistory.slice(
+        0,
+        100
+      );
+
+  }
+
+
+  saveHistory();
+
+  renderHistory();
+
+}
+
+
+/* =====================================================
+   RENDER HISTORY
+===================================================== */
+
+function renderHistory(){
+
+  const container =
+    $("tradeHistory");
+
+
+  if(!tradeHistory.length){
+
+    container.innerHTML =
+      `<div class="empty">
+        No completed trades yet.
+      </div>`;
+
+
+    $("totalTrades").textContent =
+      "0";
+
+
+    $("totalWins").textContent =
+      "0";
+
+
+    $("totalProfit").textContent =
+      "0.00";
+
+
+    return;
+
+  }
+
+
+  let wins = 0;
+
+  let profit = 0;
+
+
+  container.innerHTML =
+    tradeHistory.map(
+      item => {
+
+        const pnl =
+          Number(
+            item.profit || 0
+          );
+
+
+        profit += pnl;
+
+
+        if(
+          item.result === "win"
+        ){
+
+          wins++;
+
+        }
+
+
+        const resultClass =
+          item.result === "win"
+            ? "win"
+            : "loss";
+
+
+        const resultText =
+          item.result === "win"
+            ? "WIN"
+            : "LOSS";
+
+
+        return `
+
+          <div class="historyItem">
+
+            <div class="historyTop">
+
+              <b class="${resultClass}">
+                ${resultText}
+              </b>
+
+              <b class="${resultClass}">
+                ${pnl >= 0 ? "+" : ""}
+                ${pnl.toFixed(2)}
+              </b>
+
+            </div>
+
+            <div>
+              ${escapeHtml(
+                item.strategy
+              )}
+            </div>
+
+            <div class="historyMeta">
+              <span>Market</span>
+              <b>
+                ${escapeHtml(
+                  item.symbol
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Contract</span>
+              <b>
+                ${escapeHtml(
+                  item.contract_type
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Stake</span>
+              <b>
+                ${escapeHtml(
+                  String(
+                    item.stake
+                  )
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Duration</span>
+              <b>
+                ${escapeHtml(
+                  String(
+                    item.duration
+                  )
+                )} ticks
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Entry</span>
+              <b>
+                ${escapeHtml(
+                  String(
+                    item.entry_spot
+                  )
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Exit</span>
+              <b>
+                ${escapeHtml(
+                  String(
+                    item.exit_spot
+                  )
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Contract ID</span>
+              <b>
+                ${escapeHtml(
+                  String(
+                    item.contract_id
+                  )
+                )}
+              </b>
+            </div>
+
+            <div class="historyMeta">
+              <span>Time</span>
+              <b>
+                ${escapeHtml(
+                  item.time
+                )}
+              </b>
+            </div>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  $("totalTrades").textContent =
+    tradeHistory.length;
+
+
+  $("totalWins").textContent =
+    wins;
+
+
+  $("totalProfit").textContent =
+    profit.toFixed(2);
+
+}
 
 
 /* =====================================================
@@ -2306,77 +3535,132 @@ $("clearHistory").addEventListener(
       !confirm(
         "Clear all DollarTicks trade history?"
       )
-    ) return;
+    ){
+
+      return;
+
+    }
+
 
     tradeHistory = [];
 
-    saveTradeHistory();
+    saveHistory();
 
-    renderTradeHistory();
+    renderHistory();
+
   }
 );
 
 
 /* =====================================================
-   DEPOSIT / WITHDRAW
+   MARKET CHANGE
 ===================================================== */
 
-function openDerivWallet(){
+$("market").addEventListener(
+  "change",
+  function(){
 
-  window.open(
-    "https://app.deriv.com/",
-    "_blank",
-    "noopener,noreferrer"
-  );
+    $("marketName").textContent =
+      marketNames[
+        $("market").value
+      ];
+
+
+    tradeHistory =
+      loadHistory();
+
+
+    renderHistory();
+
+
+    if(botRunning){
+
+      /*
+       * Restart analysis on the
+       * newly selected market.
+       */
+
+      connectMarket();
+
+    }
+
+  }
+);
+
+
+/* =====================================================
+   START / STOP EVENTS
+===================================================== */
+
+$("startButton").addEventListener(
+  "click",
+  startBot
+);
+
+
+$("stopButton").addEventListener(
+  "click",
+  stopBot
+);
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+  value
+){
+
+  return String(value)
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
 }
-
-$("depositButton").addEventListener(
-  "click",
-  openDerivWallet
-);
-
-$("withdrawButton").addEventListener(
-  "click",
-  openDerivWallet
-);
 
 
 /* =====================================================
    INITIALIZE
 ===================================================== */
 
-async function initialize(){
+function initialize(){
 
   render();
 
-  updateContractControls();
-
-  setStatus("Checking session…");
-
-  const connected =
-    await checkAccount();
-
-  if(!connected){
-
-    setStatus("Not connected");
-
-    return;
-  }
-
   tradeHistory =
-    loadTradeHistory();
+    loadHistory();
 
-  renderTradeHistory();
+  renderHistory();
+
+  $("marketName").textContent =
+    marketNames[
+      $("market").value
+    ];
+
 }
 
-
-/* =====================================================
-   START
-===================================================== */
 
 initialize();
 
 </script>
 
 </body>
-  </html>
+    </html>
