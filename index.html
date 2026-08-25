@@ -6,1401 +6,2245 @@
 <title>DollarTicks</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box}
 
 body{
-  font-family:Arial,Helvetica,sans-serif;
-  background:#07110d;
-  color:#fff;
-  min-height:100vh;
+  margin:0;
+  background:#080b10;
+  color:#f5f7fa;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif
 }
 
-.container{
-  width:min(1100px,94%);
+.wrap{
+  max-width:760px;
   margin:auto;
-  padding:18px 0 40px;
+  padding:10px
 }
 
-header{
+.header{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:10px;
+  position:sticky;
+  top:8px;
+  z-index:100
+}
+
+.top{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  gap:12px;
-  margin-bottom:18px;
+  margin-bottom:12px
 }
 
-.logo{
-  font-size:27px;
-  font-weight:800;
-  color:#21e58b;
+.brand{
+  font-size:25px;
+  font-weight:900
+}
+
+.brand span,
+.homeHero h1 span{
+  color:#18c6d8
 }
 
 .status{
   padding:7px 11px;
   border-radius:20px;
-  background:#14241d;
-  color:#8dffbf;
+  background:#291317;
+  color:#ff6874;
   font-size:12px;
+  font-weight:800
 }
 
-.card{
-  background:#0d1a14;
-  border:1px solid #1d3328;
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:14px;
+.status.running{
+  color:#62e6a7;
+  background:#10271d
 }
 
-.card h2{
-  font-size:16px;
-  margin-bottom:13px;
-}
-
-.grid{
+.nav{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px
 }
 
-@media(max-width:650px){
-  .grid{
-    grid-template-columns:1fr;
-  }
+.nav button{
+  padding:10px 5px;
+  border-radius:10px;
+  border:1px solid #202733;
+  background:#0d1219;
+  color:#9da8b8;
+  font-size:12px;
+  font-weight:800
+}
+
+.nav button.active{
+  background:#18242b;
+  border-color:#18c6d8;
+  color:#18c6d8
+}
+
+.modeCard,
+.card,
+.balanceCard{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px
+}
+
+.modeTitle,
+.sectionTitle{
+  color:#8f9aab;
+  font-size:11px;
+  text-align:center;
+  margin-bottom:8px
+}
+
+.modeSwitch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px
+}
+
+.modeSwitch button{
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #2b3442;
+  background:#151b24;
+  color:#9da8b8;
+  font-weight:900
+}
+
+.modeSwitch button.active{
+  background:#18c6d8;
+  border-color:#18c6d8;
+  color:#061014
+}
+
+.page{
+  display:none
+}
+
+.page.active{
+  display:block
+}
+
+.homeHero{
+  text-align:center;
+  padding:28px 10px
+}
+
+.homeHero h1{
+  margin:0;
+  font-size:30px
+}
+
+.homeHero p{
+  color:#8f9aab;
+  font-size:13px;
+  line-height:1.6
+}
+
+.authButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:18px
+}
+
+.authButtons button{
+  padding:13px;
+  border-radius:11px;
+  border:1px solid #2b3442;
+  background:#151b24;
+  color:#fff;
+  font-weight:900
+}
+
+.authButtons .login{
+  background:#18c6d8;
+  border-color:#18c6d8;
+  color:#061014
+}
+
+.accountBox{
+  background:#0d1219;
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  text-align:center
+}
+
+.accountStatus{
+  color:#8f9aab;
+  font-size:12px
+}
+
+.accountStatus.connected{
+  color:#62e6a7
+}
+
+.accountName{
+  font-size:18px;
+  font-weight:900;
+  margin-top:5px
+}
+
+.balanceCard{
+  text-align:center
+}
+
+.balanceLabel{
+  color:#8f9aab;
+  font-size:11px;
+  margin-bottom:5px
+}
+
+.balance{
+  font-size:29px;
+  font-weight:900
+}
+
+.currency{
+  color:#18c6d8;
+  font-size:13px
+}
+
+.dashboardButtons,
+.manualRow,
+.controls,
+.metrics{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+
+.dashboardButton{
+  background:#0d1219;
+  border:1px solid #202733;
+  border-radius:12px;
+  padding:16px 10px;
+  text-align:center;
+  cursor:pointer
+}
+
+.dashboardButton strong{
+  display:block;
+  font-size:15px
+}
+
+.dashboardButton small{
+  display:block;
+  color:#8f9aab;
+  margin-top:4px
+}
+
+.manualTradeBox{
+  background:#0d1219;
+  border-radius:12px;
+  padding:13px
+}
+
+.manualRow{
+  margin-bottom:9px
 }
 
 label{
   display:block;
-  color:#a8b9b0;
+  color:#8f9aab;
   font-size:12px;
-  margin-bottom:5px;
+  margin-bottom:6px
 }
 
-select,
 input,
+select,
 button{
   width:100%;
-  border:none;
-  outline:none;
-  border-radius:9px;
   padding:12px;
-  font-size:14px;
-}
-
-select,
-input{
-  background:#07110d;
-  border:1px solid #284538;
+  border-radius:11px;
+  border:1px solid #2b3442;
+  background:#151b24;
   color:#fff;
+  font-size:15px
 }
 
 button{
   cursor:pointer;
-  font-weight:700;
-  background:#21e58b;
-  color:#03100a;
+  font-weight:800
+}
+
+.manualBuy,
+.start{
+  background:#62e6a7;
+  border-color:#62e6a7;
+  color:#061014
+}
+
+.manualClear,
+.stop{
+  background:#ff4d5a;
+  border-color:#ff4d5a;
+  color:#fff
 }
 
 button:disabled{
   opacity:.45;
-  cursor:not-allowed;
+  cursor:not-allowed
 }
 
-button.secondary{
-  background:#172920;
-  color:#fff;
-  border:1px solid #2c4d3c;
-}
-
-button.danger{
-  background:#ff4f67;
-  color:#fff;
-}
-
-.account-buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.account-buttons button.active{
-  background:#21e58b;
-  color:#03100a;
-}
-
-.balance{
-  font-size:25px;
-  font-weight:800;
-  color:#21e58b;
-}
-
-.account-info{
-  margin-top:5px;
-  color:#91a59a;
-  font-size:12px;
-}
-
-.trade-buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:12px;
-}
-
-.over{
-  background:#21e58b;
-}
-
-.under{
-  background:#ff4f67;
-  color:#fff;
-}
-
-.message{
-  min-height:18px;
+.manualMessage{
   margin-top:10px;
-  color:#9eb1a5;
+  background:#10151d;
+  border-radius:10px;
+  padding:10px;
+  color:#8f9aab;
   font-size:12px;
+  text-align:center
 }
 
-.tick{
-  text-align:center;
-  font-size:40px;
-  font-weight:800;
-  color:#21e58b;
+.botState{
+  background:#0d1219;
+  border-radius:12px;
   padding:12px;
+  line-height:1.8;
+  font-size:13px
 }
 
-.tick-market{
-  text-align:center;
-  color:#82958b;
-  font-size:12px;
+.botState b{
+  color:#fff
 }
 
-.digits{
+.marketScan{
+  background:#0d1219;
+  border-radius:12px;
+  padding:12px;
+  margin-top:10px
+}
+
+.scanTitle{
+  color:#8f9aab;
+  font-size:11px;
+  margin-bottom:8px
+}
+
+.scanGrid{
   display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:5px;
-  margin-top:12px;
+  grid-template-columns:1fr 1fr;
+  gap:7px
+}
+
+.scanItem{
+  border:1px solid #202733;
+  border-radius:9px;
+  padding:8px;
+  font-size:11px;
+  display:flex;
+  justify-content:space-between;
+  gap:5px
+}
+
+.scanItem b{
+  color:#aeb8c7
+}
+
+.scanItem.active{
+  border-color:#18c6d8
+}
+
+.scanItem.ready{
+  border-color:#62e6a7
+}
+
+.scanItem.error{
+  border-color:#ff4d5a
+}
+
+.latest{
+  color:#62e6a7!important
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px
 }
 
 .digit{
-  background:#07110d;
-  border:1px solid #244033;
-  border-radius:7px;
-  text-align:center;
-  padding:7px 2px;
+  position:relative;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:#0d1219;
+  border:4px solid #252d39;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center
 }
 
 .digit strong{
-  display:block;
-  font-size:14px;
+  font-size:21px
 }
 
-.digit span{
-  display:block;
-  margin-top:3px;
-  color:#84978c;
-  font-size:10px;
+.digit small{
+  color:#aeb8c7;
+  font-size:10px
 }
 
-.bars{
+.digit.most::before{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:5px solid transparent;
+  border-top-color:#39e58c;
+  border-left-color:#39e58c;
+  transform:rotate(-45deg)
+}
+
+.digit.least::after{
+  content:"";
+  position:absolute;
+  inset:-5px;
+  border-radius:50%;
+  border:5px solid transparent;
+  border-bottom-color:#ff4d5a;
+  border-right-color:#ff4d5a;
+  transform:rotate(-45deg)
+}
+
+.digit.latest .pointer{
+  position:absolute;
+  top:-22px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:13px solid #9b6cff;
+  z-index:10
+}
+
+.metric{
+  background:#0d1219;
+  border-radius:11px;
+  padding:11px
+}
+
+.metric label{
+  margin:0 0 4px
+}
+
+.metric b{
+  font-size:17px
+}
+
+.green{
+  color:#62e6a7
+}
+
+.red{
+  color:#ff4d5a
+}
+
+.yellow{
+  color:#ffd166
+}
+
+.purple{
+  color:#b18cff
+}
+
+.summary{
   display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:5px;
-  align-items:end;
-  height:110px;
-  margin-top:12px;
-}
-
-.bar-wrap{
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-end;
-  align-items:center;
-}
-
-.bar{
-  width:70%;
-  min-height:2px;
-  border-radius:4px 4px 0 0;
-}
-
-.bar.green{
-  background:#21e58b;
-}
-
-.bar.red{
-  background:#ff4f67;
-}
-
-.bar.neutral{
-  background:#385147;
-}
-
-.bar-number{
-  font-size:10px;
-  margin-top:4px;
-  color:#9bad9f;
-}
-
-.strategy-grid{
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:7px;
+  margin-bottom:10px
 }
 
-@media(max-width:800px){
-  .strategy-grid{
-    grid-template-columns:repeat(2,1fr);
-  }
+.summaryBox{
+  background:#0d1219;
+  border-radius:10px;
+  padding:9px;
+  text-align:center
 }
 
-.strategy{
-  padding:10px 5px;
-  border:1px solid #294637;
-  border-radius:9px;
-  text-align:center;
-  background:#09140f;
-  font-size:11px;
-}
-
-.strategy.ready{
-  border-color:#21e58b;
-  box-shadow:0 0 8px rgba(33,229,139,.15);
-}
-
-.strategy small{
+.summaryBox small{
   display:block;
-  color:#7f9387;
-  margin-top:4px;
+  color:#8f9aab;
+  font-size:10px
 }
 
-.history{
-  overflow-x:auto;
+.summaryBox b{
+  font-size:16px
 }
 
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:700px;
+.historyItem{
+  background:#0d1219;
+  border:1px solid #202733;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:8px;
+  font-size:12px;
+  line-height:1.7
 }
 
-th,
-td{
-  padding:9px 7px;
-  border-bottom:1px solid #1d3026;
-  text-align:left;
-  font-size:11px;
-}
-
-th{
-  color:#7f9588;
+.historyTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center
 }
 
 .win{
-  color:#21e58b;
-  font-weight:700;
+  color:#62e6a7;
+  font-weight:900
 }
 
 .loss{
-  color:#ff6476;
-  font-weight:700;
+  color:#ff4d5a;
+  font-weight:900
 }
 
-.open{
-  color:#ffc85b;
-  font-weight:700;
+.historyMeta{
+  display:flex;
+  justify-content:space-between;
+  border-top:1px solid #202733;
+  margin-top:4px;
+  padding-top:4px;
+  color:#8f9aab
+}
+
+.historyMeta b{
+  color:#fff;
+  text-align:right
 }
 
 .empty{
+  color:#8995a6;
   text-align:center;
-  color:#697c71;
-  padding:20px;
+  padding:12px
 }
 
-.hidden{
-  display:none!important;
+.note{
+  color:#697486;
+  font-size:11px;
+  line-height:1.6
+}
+
+.actionMessage{
+  background:#0d1219;
+  padding:10px;
+  border-radius:10px;
+  color:#8f9aab;
+  font-size:12px;
+  text-align:center;
+  margin-top:8px
+}
+
+.logout{
+  margin-top:10px;
+  background:#291317;
+  color:#ff6874;
+  border-color:#ff4d5a
+}
+
+@media(max-width:430px){
+
+  .wrap{
+    padding:8px
+  }
+
+  .brand{
+    font-size:23px
+  }
+
+  .nav button{
+    font-size:10px;
+    padding:9px 3px
+  }
+
+  .grid{
+    gap:6px
+  }
+
+  .digit{
+    border-width:3px
+  }
+
+  .digit strong{
+    font-size:18px
+  }
+
+  .controls{
+    gap:7px
+  }
+
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="wrap">
 
-<header>
-  <div class="logo">DollarTicks</div>
-  <div id="connectionStatus" class="status">
-    Checking connection...
+<!-- HEADER -->
+<div class="header">
+
+  <div class="top">
+
+    <div class="brand">
+      Dollar<span>Ticks</span>
+    </div>
+
+    <div id="status" class="status">
+      NOT CONNECTED
+    </div>
+
   </div>
-</header>
 
-<!-- ACCOUNT -->
-<div class="card">
-  <h2>Account</h2>
+  <div class="nav">
 
-  <div class="account-buttons">
-
-    <button
-      id="demoBtn"
+    <button id="navHome"
       class="active"
-      onclick="selectAccount('demo')">
+      onclick="showPage('home')">
+      🏠 HOME
+    </button>
+
+    <button id="navManual"
+      onclick="showPage('manual')">
+      💹 MANUAL
+    </button>
+
+    <button id="navBot"
+      onclick="showPage('bot')">
+      🤖 BOT
+    </button>
+
+    <button id="navHistory"
+      onclick="showPage('history')">
+      📊 HISTORY
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ACCOUNT MODE -->
+<div class="modeCard">
+
+  <div class="modeTitle">
+    ACCOUNT
+  </div>
+
+  <div class="modeSwitch">
+
+    <button id="demoMode"
+      class="active"
+      onclick="setAccountMode('demo')">
       DEMO
     </button>
 
-    <button
-      id="realBtn"
-      class="secondary"
-      onclick="selectAccount('real')">
+    <button id="realMode"
+      onclick="setAccountMode('real')">
       REAL
     </button>
 
   </div>
 
-  <div style="margin-top:14px">
-
-    <div
-      class="balance"
-      id="balance">
-      $0.00
-    </div>
-
-    <div
-      class="account-info"
-      id="accountInfo">
-      Loading account...
-    </div>
-
-  </div>
 </div>
 
-<!-- MARKET -->
-<div class="card">
-  <h2>Market</h2>
 
-  <div class="grid">
+<!-- HOME -->
+<section id="homePage" class="page active">
 
-    <div>
-      <label>Volatility Market</label>
+  <div class="card homeHero">
 
-      <select id="market">
+    <h1>
+      Dollar<span>Ticks</span>
+    </h1>
 
-        <option value="1HZ10V">
-          Volatility 10 (1s)
-        </option>
+    <p>
+      Your trading dashboard
+    </p>
 
-        <option value="1HZ25V">
-          Volatility 25 (1s)
-        </option>
+    <div class="authButtons">
 
-        <option value="1HZ50V">
-          Volatility 50 (1s)
-        </option>
+      <button class="login"
+        id="loginButton">
+        LOGIN
+      </button>
 
-        <option value="1HZ75V">
-          Volatility 75 (1s)
-        </option>
+      <button id="signupButton">
+        SIGN UP
+      </button>
 
-        <option value="1HZ100V">
-          Volatility 100 (1s)
-        </option>
-
-      </select>
     </div>
 
-    <div>
-      <label>Stake</label>
+    <div class="accountBox">
 
-      <input
-        id="stake"
-        type="number"
-        min="0.35"
-        step="0.01"
-        value="1">
+      <div id="accountStatus"
+        class="accountStatus">
+        Not connected
+      </div>
+
+      <div id="accountName"
+        class="accountName">
+        Login to your Deriv account
+      </div>
+
     </div>
 
-    <div>
-      <label>Duration</label>
+    <button id="logoutButton"
+      class="logout"
+      style="display:none">
+      DISCONNECT
+    </button>
 
-      <input
-        id="duration"
-        type="number"
-        min="1"
-        step="1"
-        value="1">
+  </div>
+
+
+  <div class="balanceCard">
+
+    <div class="balanceLabel">
+      BALANCE
     </div>
 
-    <div>
-      <label>Duration Unit</label>
+    <div id="homeBalance"
+      class="balance">
+      0.00
+    </div>
 
-      <select id="durationUnit">
-        <option value="t">
-          Ticks
-        </option>
-      </select>
+    <div id="homeCurrency"
+      class="currency">
+      USD
     </div>
 
   </div>
-</div>
 
-<!-- LIVE DIGITS -->
-<div class="card">
 
-  <h2>Live Digits</h2>
+  <div class="card">
 
-  <div
-    id="tick"
-    class="tick">
-    -
+    <div class="sectionTitle">
+      DASHBOARD
+    </div>
+
+    <div style="height:9px"></div>
+
+    <div class="dashboardButtons">
+
+      <div class="dashboardButton"
+        onclick="showPage('manual')">
+
+        <strong>
+          💹 MANUAL TRADING
+        </strong>
+
+        <small>
+          Trade manually
+        </small>
+
+      </div>
+
+      <div class="dashboardButton"
+        onclick="showPage('bot')">
+
+        <strong>
+          🤖 BOT TRADING
+        </strong>
+
+        <small>
+          Automated strategies
+        </small>
+
+      </div>
+
+    </div>
+
   </div>
 
-  <div
-    id="tickMarket"
-    class="tick-market">
-    Not connected to tick stream
-  </div>
+</section>
 
-  <div
-    id="digits"
-    class="digits">
-  </div>
-
-  <div
-    id="bars"
-    class="bars">
-  </div>
-
-</div>
 
 <!-- MANUAL -->
-<div class="card">
+<section id="manualPage" class="page">
 
-  <h2>Manual Over / Under</h2>
+  <div class="balanceCard">
 
-  <div class="grid">
+    <div class="balanceLabel">
+      BALANCE
+    </div>
 
-    <div>
-      <label>Manual Barrier</label>
+    <div id="manualBalance"
+      class="balance">
+      0.00
+    </div>
 
-      <select id="manualBarrier">
-
-        <option value="5">
-          Over 5 / Under 5
-        </option>
-
-        <option value="6">
-          Over 6 / Under 6
-        </option>
-
-        <option value="7">
-          Over 7 / Under 7
-        </option>
-
-        <option value="4">
-          Over 4 / Under 4
-        </option>
-
-      </select>
+    <div id="manualCurrency"
+      class="currency">
+      USD
     </div>
 
   </div>
 
-  <div class="trade-buttons">
 
-    <button
-      id="manualOver"
-      class="over"
-      onclick="manualTrade('over')">
-      OVER
-    </button>
+  <div class="card">
 
-    <button
-      id="manualUnder"
-      class="under"
-      onclick="manualTrade('under')">
-      UNDER
-    </button>
+    <div class="sectionTitle">
+      MANUAL TRADING
+    </div>
+
+    <div style="height:9px"></div>
+
+    <div class="manualTradeBox">
+
+      <div class="manualRow">
+
+        <div>
+
+          <label>
+            Market
+          </label>
+
+          <select id="manualSymbol">
+
+            <option value="1HZ100V">
+              Volatility 100 (1s)
+            </option>
+
+            <option value="1HZ75V">
+              Volatility 75 (1s)
+            </option>
+
+            <option value="1HZ50V">
+              Volatility 50 (1s)
+            </option>
+
+            <option value="1HZ25V">
+              Volatility 25 (1s)
+            </option>
+
+            <option value="1HZ10V">
+              Volatility 10 (1s)
+            </option>
+
+            <option value="R_100">
+              Volatility 100
+            </option>
+
+            <option value="R_75">
+              Volatility 75
+            </option>
+
+            <option value="R_50">
+              Volatility 50
+            </option>
+
+            <option value="R_25">
+              Volatility 25
+            </option>
+
+            <option value="R_10">
+              Volatility 10
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Stake
+          </label>
+
+          <input id="manualStake"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value="1">
+
+        </div>
+
+      </div>
+
+
+      <div class="manualRow">
+
+        <div>
+
+          <label>
+            Contract
+          </label>
+
+          <select id="manualContract">
+
+            <option value="DIGITOVER">
+              Over
+            </option>
+
+            <option value="DIGITUNDER">
+              Under
+            </option>
+
+          </select>
+
+        </div>
+
+
+        <div>
+
+          <label>
+            Barrier
+          </label>
+
+          <input id="manualBarrier"
+            type="number"
+            min="0"
+            max="9"
+            value="5">
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <label>
+          Duration — ticks
+        </label>
+
+        <input id="manualDuration"
+          type="number"
+          min="1"
+          max="10"
+          value="1">
+
+      </div>
+
+      <div style="height:10px"></div>
+
+
+      <div class="controls">
+
+        <button id="manualBuy"
+          class="manualBuy">
+          BUY
+        </button>
+
+        <button id="manualClear"
+          class="manualClear">
+          CLEAR
+        </button>
+
+      </div>
+
+
+      <div id="manualMessage"
+        class="manualMessage">
+        Login to trade manually.
+      </div>
+
+    </div>
 
   </div>
-</div>
 
-<!-- AUTOMATIC -->
-<div class="card">
+</section>
 
-  <h2>Automatic Strategies</h2>
 
-  <div class="strategy-grid">
+<!-- BOT -->
+<section id="botPage" class="page">
 
-    <div
-      id="sUNDER7"
-      class="strategy">
+  <div class="balanceCard">
 
-      UNDER 7
+    <div class="balanceLabel">
+      BALANCE
+    </div>
 
-      <small>
-        Waiting
-      </small>
+    <div id="botBalance"
+      class="balance">
+      0.00
+    </div>
+
+    <div id="botCurrency"
+      class="currency">
+      USD
+    </div>
+
+  </div>
+
+
+  <!-- CONTROLS -->
+  <div class="card">
+
+    <div class="sectionTitle">
+      BOT CONTROLS
+    </div>
+
+    <div style="height:8px"></div>
+
+
+    <div class="controls">
+
+      <div>
+
+        <label>
+          Stake
+        </label>
+
+        <input id="stake"
+          type="number"
+          min="0.01"
+          step="0.01"
+          value="1">
+
+      </div>
+
+
+      <div>
+
+        <label>
+          Duration — ticks
+        </label>
+
+        <input id="duration"
+          type="number"
+          min="1"
+          max="10"
+          value="1">
+
+      </div>
 
     </div>
 
-    <div
-      id="sOVER5"
-      class="strategy">
 
-      OVER 5
+    <div style="height:10px"></div>
 
-      <small>
-        Waiting
-      </small>
 
-    </div>
+    <div class="controls">
 
-    <div
-      id="sOVER7"
-      class="strategy">
+      <button id="startButton"
+        class="start">
+        START BOT
+      </button>
 
-      OVER 7
-
-      <small>
-        Waiting
-      </small>
+      <button id="stopButton"
+        class="stop"
+        disabled>
+        STOP BOT
+      </button>
 
     </div>
 
-    <div
-      id="sOVER6"
-      class="strategy">
+    <div id="botMessage"
+      class="actionMessage">
+      Bot stopped.
+    </div>
 
-      OVER 6
+  </div>
 
-      <small>
+
+  <!-- BOT STATUS -->
+  <div class="card">
+
+    <div class="sectionTitle">
+      BOT STATUS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="botState">
+
+      State:
+      <b id="botState">
+        Stopped
+      </b>
+
+      <br>
+
+      Account:
+      <b id="botAccountMode">
+        DEMO ACCOUNT
+      </b>
+
+      <br>
+
+      Market:
+      <b id="selectedMarket">
         Waiting
-      </small>
+      </b>
+
+      <br>
+
+      Strategy:
+      <b id="selectedStrategy">
+        Waiting
+      </b>
+
+      <br>
+
+      Trade:
+      <b id="tradeState">
+        No active trade
+      </b>
 
     </div>
 
-    <div
-      id="sUNDER4"
-      class="strategy">
 
-      UNDER 4
+    <div class="marketScan">
 
-      <small>
-        Waiting
-      </small>
+      <div class="scanTitle">
+        AUTOMATIC MARKET SCANNER
+      </div>
+
+      <div id="scanGrid"
+        class="scanGrid">
+      </div>
 
     </div>
 
   </div>
 
-  <div
-    class="grid"
-    style="margin-top:12px">
 
-    <button
-      id="autoToggle"
-      onclick="toggleAuto()">
-      START AUTO TRADING
-    </button>
+  <!-- LIVE ANALYSIS -->
+  <div class="card">
 
-    <button
-      class="secondary"
-      onclick="resetStatistics()">
-      RESET DIGITS
-    </button>
+    <div class="sectionTitle">
+      LIVE MARKET ANALYSIS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div id="marketName"
+      style="font-size:18px;font-weight:900">
+      Waiting for market
+    </div>
+
+    <div id="quote"
+      style="color:#9da8b8;font-size:13px;margin-top:4px">
+      Start the bot to scan markets.
+    </div>
 
   </div>
 
-</div>
 
-<!-- TRADE MESSAGE -->
-<div
-  id="message"
-  class="message">
-</div>
+  <!-- DIGITS -->
+  <div class="card">
+
+    <div class="sectionTitle">
+      LAST DIGIT FREQUENCY —
+      LAST <b id="countLabel">100</b> TICKS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div id="digits"
+      class="grid">
+    </div>
+
+  </div>
+
+
+  <!-- METRICS -->
+  <div class="card">
+
+    <div class="metrics">
+
+      <div class="metric">
+
+        <label>
+          Green / Most frequent
+        </label>
+
+        <b id="most"
+          class="green">
+          —
+        </b>
+
+      </div>
+
+
+      <div class="metric">
+
+        <label>
+          Red / Least frequent
+        </label>
+
+        <b id="least"
+          class="red">
+          —
+        </b>
+
+      </div>
+
+    </div>
+
+
+    <div style="height:8px"></div>
+
+
+    <div class="metrics">
+
+      <div class="metric">
+
+        <label>
+          Over 5
+        </label>
+
+        <b id="over5">
+          —
+        </b>
+
+      </div>
+
+
+      <div class="metric">
+
+        <label>
+          Under 7
+        </label>
+
+        <b id="under7">
+          —
+        </b>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="note">
+
+      DollarTicks automatically scans all configured
+      Volatility markets and looks for valid strategy
+      conditions.
+
+      <br><br>
+
+      You only control the stake and duration.
+
+      <br><br>
+
+      🟢 Green = most frequent digit.
+
+      <br>
+
+      🔴 Red = least frequent digit.
+
+      <br>
+
+      🟣 Purple pointer = latest moving tick.
+
+      <br><br>
+
+      Only one trade can be active at a time.
+
+      <br><br>
+
+      Strategy details are recorded in Trade History
+      after a completed trade.
+
+      <br><br>
+
+      Trading involves risk. Automated strategy
+      conditions do not guarantee profit.
+
+    </div>
+
+  </div>
+
+</section>
+
 
 <!-- HISTORY -->
-<div class="card">
+<section id="historyPage" class="page">
 
-  <h2>Trading History</h2>
+  <div class="card">
 
-  <div class="history">
+    <div class="sectionTitle">
+      TRADE HISTORY
+    </div>
 
-    <table>
+    <div style="height:8px"></div>
 
-      <thead>
 
-        <tr>
-          <th>Time</th>
-          <th>Strategy</th>
-          <th>Type</th>
-          <th>Market</th>
-          <th>Stake</th>
-          <th>Entry</th>
-          <th>Exit</th>
-          <th>Result</th>
-          <th>Profit</th>
-        </tr>
+    <div class="summary">
 
-      </thead>
+      <div class="summaryBox">
 
-      <tbody id="historyBody">
+        <small>
+          TRADES
+        </small>
 
-        <tr>
+        <b id="totalTrades">
+          0
+        </b>
 
-          <td
-            colspan="9"
-            class="empty">
-            No trades yet
-          </td>
+      </div>
 
-        </tr>
 
-      </tbody>
+      <div class="summaryBox">
 
-    </table>
+        <small>
+          WINS
+        </small>
+
+        <b id="totalWins">
+          0
+        </b>
+
+      </div>
+
+
+      <div class="summaryBox">
+
+        <small>
+          NET P/L
+        </small>
+
+        <b id="totalProfit">
+          0.00
+        </b>
+
+      </div>
+
+    </div>
+
+
+    <div id="tradeHistory">
+
+      <div class="empty">
+        No completed trades yet.
+      </div>
+
+    </div>
+
+
+    <button id="clearHistory">
+      Clear Trade History
+    </button>
 
   </div>
 
+</section>
+
+
+<div class="card"
+  style="text-align:center">
+
+  <button
+    onclick="showPage('history')"
+    style="
+      background:#0d1219;
+      border-color:#202733;
+      color:#18c6d8;
+    ">
+    📊 HISTORY
+  </button>
+
 </div>
 
 </div>
+
 
 <script>
 
-/* =====================================================
-   STATE
-===================================================== */
-
-const state = {
-
-  accountType:
-    "demo",
-
-  connected:
-    false,
-
-  auto:
-    false,
-
-  activeTrade:
-    null,
-
-  tick:
-    null,
-
-  market:
-    "1HZ10V",
-
-  digits:
-    [],
-
-  counts:
-    Array(10).fill(0),
-
-  touched:
-    [],
-
-  previousPercentages:
-    Array(10).fill(0),
-
-  history:
-    [],
-
-  ws:
-    null,
-
-  reconnectTimer:
-    null,
-
-  strategyTimer:
-    null,
-
-  autoBusy:
-    false
-};
+/* =========================================================
+   DOLLARTICKS — SINGLE FRONTEND SCRIPT
+========================================================= */
 
 
-/* =====================================================
-   STRATEGIES
-===================================================== */
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
 
-const STRATEGIES = {
+const $ = id => document.getElementById(id);
 
-  UNDER7:{
-    name:"Under 7",
-    contract_type:"DIGITUNDER",
-    barrier:7
-  },
+const MAX_TICKS = 100;
 
-  OVER5:{
-    name:"Over 5",
-    contract_type:"DIGITOVER",
-    barrier:5
-  },
+let accountMode = "demo";
 
-  OVER7:{
-    name:"Over 7",
-    contract_type:"DIGITOVER",
-    barrier:7
-  },
+let connectedAccount = false;
 
-  OVER6:{
-    name:"Over 6",
-    contract_type:"DIGITOVER",
-    barrier:6
-  },
+let accountBalance = 0;
 
-  UNDER4:{
-    name:"Under 4",
-    contract_type:"DIGITUNDER",
-    barrier:4
+let accountCurrency = "USD";
+
+let accountId = "";
+
+let botRunning = false;
+
+let tradeActive = false;
+
+let currentTrade = null;
+
+let currentMarketSymbol = null;
+
+let currentStrategy = null;
+
+let contractTimer = null;
+
+let scannerTimer = null;
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function showPage(page){
+
+  const names = [
+    "home",
+    "manual",
+    "bot",
+    "history"
+  ];
+
+  names.forEach(name => {
+
+    const section =
+      $(name + "Page");
+
+    if(section){
+
+      section.classList.toggle(
+        "active",
+        name === page
+      );
+
+    }
+
+  });
+
+
+  const buttons = {
+    home:"navHome",
+    manual:"navManual",
+    bot:"navBot",
+    history:"navHistory"
+  };
+
+
+  Object.keys(buttons).forEach(name => {
+
+    const button =
+      $(buttons[name]);
+
+    if(button){
+
+      button.classList.toggle(
+        "active",
+        name === page
+      );
+
+    }
+
+  });
+
+}
+
+
+/* =========================================================
+   ACCOUNT MODE
+========================================================= */
+
+function setAccountMode(mode){
+
+  accountMode =
+    mode === "real"
+      ? "real"
+      : "demo";
+
+
+  $("demoMode").classList.toggle(
+    "active",
+    accountMode === "demo"
+  );
+
+
+  $("realMode").classList.toggle(
+    "active",
+    accountMode === "real"
+  );
+
+
+  $("botAccountMode").textContent =
+    accountMode === "demo"
+      ? "DEMO ACCOUNT"
+      : "REAL ACCOUNT";
+
+
+  updateAccountDisplay();
+
+  checkConnection();
+
+}
+
+
+/* =========================================================
+   ACCOUNT DISPLAY
+========================================================= */
+
+function updateAccountDisplay(){
+
+  const balance =
+    Number(accountBalance || 0)
+      .toFixed(2);
+
+
+  $("homeBalance").textContent =
+    balance;
+
+  $("manualBalance").textContent =
+    balance;
+
+  $("botBalance").textContent =
+    balance;
+
+
+  $("homeCurrency").textContent =
+    accountCurrency;
+
+  $("manualCurrency").textContent =
+    accountCurrency;
+
+  $("botCurrency").textContent =
+    accountCurrency;
+
+
+  if(connectedAccount){
+
+    $("accountStatus").textContent =
+      accountMode === "real"
+        ? "REAL ACCOUNT CONNECTED"
+        : "DEMO ACCOUNT CONNECTED";
+
+    $("accountStatus")
+      .classList.add("connected");
+
+
+    $("accountName").textContent =
+      accountId ||
+      "Deriv account connected";
+
+
+    $("status").textContent =
+      "CONNECTED";
+
+    $("status").className =
+      "status running";
+
+
+    $("logoutButton").style.display =
+      "block";
+
+  }else{
+
+    $("accountStatus").textContent =
+      "Not connected";
+
+    $("accountStatus")
+      .classList.remove("connected");
+
+
+    $("accountName").textContent =
+      "Login to your Deriv account";
+
+
+    $("status").textContent =
+      "NOT CONNECTED";
+
+    $("status").className =
+      "status";
+
+
+    $("logoutButton").style.display =
+      "none";
+
   }
 
-};
+}
 
 
-const MAX_DIGITS = 100;
+/* =========================================================
+   LOGIN
+========================================================= */
 
+function openAuth(){
 
-/* =====================================================
-   ELEMENT HELPER
-===================================================== */
-
-const $ =
-  id =>
-    document.getElementById(id);
-
-
-/* =====================================================
-   MESSAGE
-===================================================== */
-
-function setMessage(text){
-
-  $("message").textContent =
-    text || "";
+  window.location.href = "/auth";
 
 }
 
 
-/* =====================================================
-   MONEY
-===================================================== */
-
-function money(value){
-
-  const n =
-    Number(value);
-
-  return Number.isFinite(n)
-    ? `$${n.toFixed(2)}`
-    : "$0.00";
-
-}
+$("loginButton").addEventListener(
+  "click",
+  openAuth
+);
 
 
-/* =====================================================
-   BACKEND
-===================================================== */
-
-async function trading(payload = {}){
-
-  const response =
-    await fetch(
-      "/trading",
-      {
-        method:"POST",
-
-        headers:{
-          "Content-Type":
-            "application/json"
-        },
-
-        credentials:"include",
-
-        body:
-          JSON.stringify(payload)
-      }
-    );
+$("signupButton").addEventListener(
+  "click",
+  openAuth
+);
 
 
-  let data;
+/* =========================================================
+   DISCONNECT
+========================================================= */
 
+$("logoutButton").addEventListener(
+  "click",
+  async function(){
+
+    try{
+
+      await fetch(
+        "/auth?logout=1",
+        {
+          method:"GET",
+          credentials:"same-origin",
+          cache:"no-store"
+        }
+      );
+
+    }catch(error){
+
+      console.error(
+        "Logout error:",
+        error
+      );
+
+    }
+
+    connectedAccount = false;
+    accountBalance = 0;
+    accountId = "";
+
+    updateAccountDisplay();
+
+  }
+);
+
+
+/* =========================================================
+   CONNECTION / BALANCE CHECK
+========================================================= */
+
+async function checkConnection(){
 
   try{
 
-    data =
-      await response.json();
+    const response =
+      await fetch(
+        "/trading",
+        {
+          method:"POST",
 
-  }catch{
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-    throw new Error(
-      "Trading server returned an invalid response."
-    );
+          credentials:"same-origin",
 
-  }
+          cache:"no-store",
 
+          body:JSON.stringify({
 
-  if(
-    !response.ok ||
-    data.ok === false
-  ){
+            action:"balance",
 
-    throw new Error(
-      data.error ||
-      "Trading request failed."
-    );
+            account_type:
+              accountMode
 
-  }
+          })
 
+        }
+      );
 
-  return data;
-
-}
-
-
-/* =====================================================
-   ACCOUNT
-===================================================== */
-
-async function loadAccount(){
-
-  try{
 
     const data =
-      await trading({
-        action:
-          "select_account",
-
-        account_type:
-          state.accountType
-      });
+      await response.json();
 
 
-    state.connected =
-      true;
+    if(
+      !response.ok ||
+      !data ||
+      !data.ok
+    ){
+
+      connectedAccount = false;
+
+      accountBalance = 0;
+
+      updateAccountDisplay();
+
+      return;
+
+    }
 
 
-    updateConnection(true);
+    connectedAccount = true;
 
 
-    updateAccount(
-      data.account,
-      data.account?.balance
-    );
+    accountBalance =
+      Number(
+        data.balance ??
+        data.account?.balance ??
+        0
+      );
+
+
+    accountCurrency =
+      data.currency ??
+      data.account?.currency ??
+      "USD";
+
+
+    accountId =
+      data.account_id ??
+      data.account?.account_id ??
+      data.loginid ??
+      data.account?.loginid ??
+      "";
+
+
+    updateAccountDisplay();
 
 
   }catch(error){
 
-    state.connected =
-      false;
-
-    updateConnection(false);
-
-    setMessage(
-      error.message
+    console.error(
+      "Connection check:",
+      error
     );
+
+    connectedAccount = false;
+
+    updateAccountDisplay();
 
   }
 
 }
 
 
-async function selectAccount(type){
-
-  if(state.activeTrade){
-
-    setMessage(
-      "Finish the active trade before changing account."
-    );
-
-    return;
-
-  }
-
-
-  state.accountType =
-    type;
-
-
-  $("demoBtn")
-    .classList.toggle(
-      "active",
-      type === "demo"
-    );
-
-
-  $("realBtn")
-    .classList.toggle(
-      "active",
-      type === "real"
-    );
-
-
-  $("demoBtn")
-    .classList.toggle(
-      "secondary",
-      type !== "demo"
-    );
-
-
-  $("realBtn")
-    .classList.toggle(
-      "secondary",
-      type !== "real"
-    );
-
-
-  await loadAccount();
-
-}
-
-
-function updateConnection(ok){
-
-  const el =
-    $("connectionStatus");
-
-
-  el.textContent =
-    ok
-      ? `${state.accountType.toUpperCase()} CONNECTED`
-      : "NOT CONNECTED";
-
-}
-
-
-/* =====================================================
+/* =========================================================
    BALANCE
-===================================================== */
+========================================================= */
 
-async function refreshBalance(){
+async function updateBalance(){
 
   try{
 
+    const response =
+      await fetch(
+        "/trading",
+        {
+          method:"POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          credentials:"same-origin",
+
+          cache:"no-store",
+
+          body:JSON.stringify({
+
+            action:"balance",
+
+            account_type:
+              accountMode
+
+          })
+
+        }
+      );
+
+
     const data =
-      await trading({
-        action:
-          "balance",
-
-        account_type:
-          state.accountType
-      });
+      await response.json();
 
 
-    $("balance").textContent =
-      money(data.balance);
+    if(
+      !response.ok ||
+      !data ||
+      !data.ok
+    ){
 
+      connectedAccount = false;
 
-    if(data.account){
+      updateAccountDisplay();
 
-      $("accountInfo").textContent =
-        `${data.account.account_id} • ${
-          String(
-            data.account.account_type
-          ).toUpperCase()
-        } • ${
-          data.currency || "USD"
-        }`;
+      return;
 
     }
 
-  }catch{}
 
-}
-
-
-function updateAccount(
-  account,
-  balance
-){
-
-  $("balance").textContent =
-    money(
-      balance ??
-      account?.balance ??
-      0
-    );
+    connectedAccount = true;
 
 
-  $("accountInfo").textContent =
-    `${account?.account_id || ""} • ${
-      String(
-        account?.account_type ||
-        state.accountType
-      ).toUpperCase()
-    } • ${
-      account?.currency ||
-      "USD"
-    }`;
-
-}
-
-
-/* =====================================================
-   DIGIT STATISTICS
-===================================================== */
-
-function resetStatistics(){
-
-  state.digits =
-    [];
-
-  state.counts =
-    Array(10).fill(0);
-
-  state.touched =
-    [];
-
-  state.previousPercentages =
-    Array(10).fill(0);
-
-
-  renderDigits();
-
-  renderBars();
-
-  updateStrategies();
-
-}
-
-
-function addDigit(digit){
-
-  digit =
-    Number(digit);
-
-
-  if(
-    !Number.isInteger(digit) ||
-    digit < 0 ||
-    digit > 9
-  ){
-
-    return;
-
-  }
-
-
-  state.previousPercentages =
-    getPercentages();
-
-
-  state.digits.push(
-    digit
-  );
-
-
-  state.counts[digit]++;
-
-
-  if(
-    !state.touched.includes(digit)
-  ){
-
-    state.touched.push(
-      digit
-    );
-
-  }
-
-
-  if(
-    state.digits.length >
-    MAX_DIGITS
-  ){
-
-    const removed =
-      state.digits.shift();
-
-
-    state.counts[removed] =
-      Math.max(
-        0,
-        state.counts[removed] - 1
+    accountBalance =
+      Number(
+        data.balance ??
+        data.account?.balance ??
+        0
       );
 
+
+    accountCurrency =
+      data.currency ??
+      data.account?.currency ??
+      "USD";
+
+
+    accountId =
+      data.account_id ??
+      data.account?.account_id ??
+      data.loginid ??
+      data.account?.loginid ??
+      accountId;
+
+
+    updateAccountDisplay();
+
+
+  }catch(error){
+
+    console.error(
+      "Balance error:",
+      error
+    );
+
   }
-
-
-  renderDigits();
-
-  renderBars();
-
-  updateStrategies();
 
 }
 
 
-function getPercentages(){
+/* =========================================================
+   MARKETS
+========================================================= */
+
+const MARKETS = [
+
+  {
+    symbol:"1HZ100V",
+    name:"Volatility 100 (1s)"
+  },
+
+  {
+    symbol:"1HZ75V",
+    name:"Volatility 75 (1s)"
+  },
+
+  {
+    symbol:"1HZ50V",
+    name:"Volatility 50 (1s)"
+  },
+
+  {
+    symbol:"1HZ25V",
+    name:"Volatility 25 (1s)"
+  },
+
+  {
+    symbol:"1HZ10V",
+    name:"Volatility 10 (1s)"
+  },
+
+  {
+    symbol:"R_100",
+    name:"Volatility 100"
+  },
+
+  {
+    symbol:"R_75",
+    name:"Volatility 75"
+  },
+
+  {
+    symbol:"R_50",
+    name:"Volatility 50"
+  },
+
+  {
+    symbol:"R_25",
+    name:"Volatility 25"
+  },
+
+  {
+    symbol:"R_10",
+    name:"Volatility 10"
+  }
+
+];
+
+
+const marketNames = {};
+
+MARKETS.forEach(market => {
+
+  marketNames[
+    market.symbol
+  ] = market.name;
+
+});
+
+
+/* =========================================================
+   MARKET STATES
+========================================================= */
+
+const marketStates = {};
+
+
+MARKETS.forEach(market => {
+
+  marketStates[
+    market.symbol
+  ] = {
+
+    ws:null,
+
+    history:[],
+
+    latestDigit:null,
+
+    lastQuote:null,
+
+    pipSize:null,
+
+    connected:false,
+
+    loading:false,
+
+    error:false,
+
+    movingSequence:[],
+
+    previousPercentages:null
+
+  };
+
+});
+
+
+/* =========================================================
+   DIGIT EXTRACTION
+========================================================= */
+
+function getLastDigit(
+  quote,
+  pipSize
+){
+
+  const number =
+    Number(quote);
+
+
+  if(!Number.isFinite(number))
+    return null;
+
+
+  const size =
+    Number(pipSize);
+
+
+  if(
+    Number.isFinite(size) &&
+    size >= 0 &&
+    size <= 10
+  ){
+
+    const factor =
+      10 ** size;
+
+
+    return Math.abs(
+      Math.round(
+        number * factor
+      )
+    ) % 10;
+
+  }
+
+
+  const text =
+    String(quote);
+
+
+  const decimal =
+    text.split(".")[1];
+
+
+  if(decimal){
+
+    const digits =
+      decimal.replace(
+        /[^0-9]/g,
+        ""
+      );
+
+
+    if(digits.length){
+
+      return Number(
+        digits.charAt(
+          digits.length - 1
+        )
+      );
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+function getCounts(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  const counts =
+    Array(10).fill(0);
+
+
+  if(!state)
+    return counts;
+
+
+  state.history.forEach(digit => {
+
+    if(
+      Number.isInteger(digit) &&
+      digit >= 0 &&
+      digit <= 9
+    ){
+
+      counts[digit]++;
+
+    }
+
+  });
+
+
+  return counts;
+
+}
+
+
+/* =========================================================
+   PERCENTAGES
+========================================================= */
+
+function getPercentages(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  const counts =
+    getCounts(symbol);
+
 
   const total =
-    state.counts.reduce(
-      (a,b) => a+b,
-      0
-    );
+    state?.history?.length || 0;
 
 
-  const result = {};
+  if(!total)
+    return Array(10).fill(0);
+
+
+  return counts.map(
+    value =>
+      value / total * 100
+  );
+
+}
+
+
+/* =========================================================
+   MOST / LEAST
+========================================================= */
+
+function findMostDigit(symbol){
+
+  const counts =
+    getCounts(symbol);
+
+
+  let digit = 0;
 
 
   for(
-    let d=0;
-    d<=9;
-    d++
+    let i=1;
+    i<10;
+    i++
   ){
 
-    result[d] =
-      total
-        ? (
-            state.counts[d] /
-            total
-          ) * 100
-        : 0;
+    if(
+      counts[i] >
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
 
   }
 
 
-  return result;
+  return digit;
 
 }
 
 
-/* =====================================================
-   DIGIT DISPLAY
-===================================================== */
+function findLeastDigit(symbol){
 
-function renderDigits(){
-
-  const total =
-    state.counts.reduce(
-      (a,b) => a+b,
-      0
-    );
+  const counts =
+    getCounts(symbol);
 
 
-  $("digits").innerHTML =
-    Array.from(
-      {length:10},
-      (_,d) => {
-
-        const pct =
-          total
-            ? (
-                state.counts[d] /
-                total
-              ) * 100
-            : 0;
+  let digit = 0;
 
 
-        return `
-          <div class="digit">
-            <strong>${d}</strong>
-            <span>${pct.toFixed(1)}%</span>
-          </div>
-        `;
+  for(
+    let i=1;
+    i<10;
+    i++
+  ){
 
-      }
-    ).join("");
+    if(
+      counts[i] <
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
+
+  }
+
+
+  return digit;
 
 }
 
 
-/* =====================================================
-   GREEN / RED FREQUENCY BARS
-===================================================== */
+/* =========================================================
+   LAST POSITION
+========================================================= */
 
-function getBarDigits(){
+function findLastPosition(
+  array,
+  value
+){
 
-  const ranked =
-    Array.from(
-      {length:10},
-      (_,d) => ({
-        digit:d,
-        count:
-          state.counts[d]
-      })
-    )
-    .sort(
-      (a,b) =>
-        b.count - a.count ||
-        b.digit - a.digit
-    );
+  for(
+    let i=array.length-1;
+    i>=0;
+    i--
+  ){
+
+    if(
+      array[i] === value
+    ){
+
+      return i;
+
+    }
+
+  }
 
 
-  return {
+  return -1;
 
-    green:
-      ranked[0]?.digit ?? 0,
+}
 
-    red:
-      ranked[1]?.digit ?? 0,
 
-    greenPosition:
-      0,
+/* =========================================================
+   STRATEGIES
+========================================================= */
 
-    redPosition:
-      1
+const STRATEGIES = {
+
+  UNDER7:"UNDER7",
+
+  OVER5:"OVER5",
+
+  OVER7:"OVER7",
+
+  OVER6:"OVER6",
+
+  UNDER4:"UNDER4"
+
+};
+
+
+function strategyName(strategy){
+
+  const names = {
+
+    UNDER7:"UNDER 7",
+
+    OVER5:"OVER 5",
+
+    OVER7:"OVER 7",
+
+    OVER6:"OVER 6",
+
+    UNDER4:"UNDER 4"
 
   };
 
-}
 
-
-function renderBars(){
-
-  const max =
-    Math.max(
-      ...state.counts,
-      1
-    );
-
-
-  const ranked =
-    Array.from(
-      {length:10},
-      (_,d) => ({
-        digit:d,
-        count:
-          state.counts[d]
-      })
-    )
-    .sort(
-      (a,b) =>
-        b.count - a.count ||
-        b.digit - a.digit
-    );
-
-
-  const greenDigit =
-    ranked[0]?.digit;
-
-
-  const redDigit =
-    ranked[1]?.digit;
-
-
-  $("bars").innerHTML =
-    Array.from(
-      {length:10},
-      (_,d) => {
-
-        const height =
-          Math.max(
-            3,
-            (
-              state.counts[d] /
-              max
-            ) * 80
-          );
-
-
-        let className =
-          "bar neutral";
-
-
-        if(d === greenDigit){
-
-          className =
-            "bar green";
-
-        }else if(
-          d === redDigit
-        ){
-
-          className =
-            "bar red";
-
-        }
-
-
-        return `
-          <div class="bar-wrap">
-
-            <div
-              class="${className}"
-              style="height:${height}px">
-            </div>
-
-            <div class="bar-number">
-              ${d}
-            </div>
-
-          </div>
-        `;
-
-      }
-    ).join("");
+  return names[strategy] ||
+    strategy ||
+    "Unknown";
 
 }
 
 
-/* =====================================================
-   STRATEGY DATA
-===================================================== */
+/* =========================================================
+   UNDER 7
+========================================================= */
 
-function makeStrategyData(){
+function checkUnder7(symbol){
 
-  const percentages =
-    getPercentages();
+  const state =
+    marketStates[symbol];
 
-
-  const bars =
-    getBarDigits();
-
-
-  return {
-
-    percentages,
-
-    previous_percentages:
-      state.previousPercentages,
-
-    green_digit:
-      bars.green,
-
-    red_digit:
-      bars.red,
-
-    green_position:
-      bars.greenPosition,
-
-    red_position:
-      bars.redPosition,
-
-    moving_digit:
-      state.tick,
-
-    touched_digits:
-      [...state.touched]
-
-  };
-
-}
-
-
-/* =====================================================
-   LOCAL STRATEGY VALIDATION
-===================================================== */
-
-function validateUnder7(data){
 
   const green =
-    Number(data.green_digit);
+    findMostDigit(symbol);
+
 
   const red =
-    Number(data.red_digit);
+    findLeastDigit(symbol);
+
 
   if(
-    green < 0 ||
     green >= 7 ||
-    red < 0 ||
     red >= 7
   ){
 
@@ -1409,9 +2253,24 @@ function validateUnder7(data){
   }
 
 
+  const greenPosition =
+    findLastPosition(
+      state.movingSequence,
+      green
+    );
+
+
+  const redPosition =
+    findLastPosition(
+      state.movingSequence,
+      red
+    );
+
+
   if(
-    Number(data.green_position) >=
-    Number(data.red_position)
+    greenPosition === -1 ||
+    redPosition === -1 ||
+    greenPosition >= redPosition
   ){
 
     return false;
@@ -1419,40 +2278,34 @@ function validateUnder7(data){
   }
 
 
-  const tick =
-    Number(data.moving_digit);
-
-
-  if(
-    tick !== 8 &&
-    tick !== 9
-  ){
-
-    return false;
-
-  }
-
-
-  return true;
+  return (
+    state.latestDigit === 8 ||
+    state.latestDigit === 9
+  );
 
 }
 
 
-function validateOver5(data){
+/* =========================================================
+   OVER 5
+========================================================= */
+
+function checkOver5(symbol){
+
+  const state =
+    marketStates[symbol];
+
 
   const green =
-    Number(data.green_digit);
+    findMostDigit(symbol);
+
 
   const red =
-    Number(data.red_digit);
-
-  const tick =
-    Number(data.moving_digit);
+    findLeastDigit(symbol);
 
 
   if(
-    red !== 0 &&
-    red !== 1
+    !(red === 0 || red === 1)
   ){
 
     return false;
@@ -1461,8 +2314,7 @@ function validateOver5(data){
 
 
   if(
-    green !== 8 &&
-    green !== 9
+    !(green === 8 || green === 9)
   ){
 
     return false;
@@ -1470,51 +2322,47 @@ function validateOver5(data){
   }
 
 
-  if(
-    tick !== 0 &&
-    tick !== 1
-  ){
-
-    return false;
-
-  }
-
-
-  return true;
+  return (
+    state.latestDigit === 0 ||
+    state.latestDigit === 1
+  );
 
 }
 
 
-function validateOver7(data){
+/* =========================================================
+   OVER 7
+========================================================= */
 
-  const p =
-    data.percentages || {};
+function checkOver7(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  const percentages =
+    getPercentages(symbol);
 
 
   const green =
-    Number(data.green_digit);
+    findMostDigit(symbol);
+
 
   const red =
-    Number(data.red_digit);
+    findLeastDigit(symbol);
 
 
-  if(green !== 9){
-
+  if(green !== 9)
     return false;
 
-  }
 
-
-  if(red !== 0){
-
+  if(red !== 0)
     return false;
-
-  }
 
 
   if(
-    Number(p[8] || 0) <= 12.5 ||
-    Number(p[9] || 0) <= 12.5
+    percentages[8] <= 12.5 ||
+    percentages[9] <= 12.5
   ){
 
     return false;
@@ -1523,13 +2371,13 @@ function validateOver7(data){
 
 
   for(
-    let d=0;
-    d<7;
-    d++
+    let i=0;
+    i<7;
+    i++
   ){
 
     if(
-      Number(p[d] || 0) >= 10
+      percentages[i] >= 10
     ){
 
       return false;
@@ -1539,61 +2387,76 @@ function validateOver7(data){
   }
 
 
-  const touched =
-    Array.isArray(
-      data.touched_digits
-    )
-      ? data.touched_digits
-      : [];
+  const unique =
+    new Set(
+      state.movingSequence
+    );
 
 
-  if(
-    touched.length < 4
-  ){
-
+  if(unique.size < 4)
     return false;
-
-  }
 
 
   const current =
-    Number(data.moving_digit);
+    state.latestDigit;
+
+
+  const previousUnique =
+    new Set(
+      state.movingSequence.slice(
+        0,
+        -1
+      )
+    );
 
 
   if(
-    Number(touched[3]) !==
-    current
+    previousUnique.size === 3 &&
+    !previousUnique.has(current)
   ){
 
-    return false;
+    return true;
 
   }
 
 
-  return true;
+  return false;
 
 }
 
 
-function validateOver6(data){
+/* =========================================================
+   OVER 6
+========================================================= */
 
-  const p =
-    data.percentages || {};
+function checkOver6(symbol){
 
-  const previous =
-    data.previous_percentages || {};
+  const state =
+    marketStates[symbol];
+
+
+  const percentages =
+    getPercentages(symbol);
 
 
   const green =
-    Number(data.green_digit);
+    findMostDigit(symbol);
+
 
   const red =
-    Number(data.red_digit);
+    findLeastDigit(symbol);
+
+
+  if(green !== 9)
+    return false;
+
+
+  if(red !== 0)
+    return false;
 
 
   if(
-    green !== 9 ||
-    red !== 0
+    percentages[9] <= 12.5
   ){
 
     return false;
@@ -1602,16 +2465,7 @@ function validateOver6(data){
 
 
   if(
-    Number(p[9] || 0) <= 12.5
-  ){
-
-    return false;
-
-  }
-
-
-  if(
-    Number(p[0] || 0) > 8.5
+    percentages[0] > 8.5
   ){
 
     return false;
@@ -1624,8 +2478,7 @@ function validateOver6(data){
   ){
 
     if(
-      Number(p[digit] || 0) <=
-      10.5
+      percentages[digit] <= 10.5
     ){
 
       return false;
@@ -1635,38 +2488,42 @@ function validateOver6(data){
   }
 
 
-  for(
-    const digit of [6,7,8,9]
-  ){
+  if(state.previousPercentages){
 
-    if(
-      Number(p[digit] || 0) <
-      Number(previous[digit] || 0)
+    for(
+      const digit of [6,7,8,9]
     ){
 
-      return false;
+      if(
+        percentages[digit] <
+        state.previousPercentages[digit]
+      ){
+
+        return false;
+
+      }
 
     }
 
   }
 
 
-  const touched =
-    Array.isArray(
-      data.touched_digits
-    )
-      ? data.touched_digits
-      : [];
-
-
-  const below6 =
-    touched.filter(
-      d => Number(d) < 6
+  const belowSix =
+    state.movingSequence.filter(
+      digit => digit < 6
     );
 
 
+  const unique =
+    [...new Set(belowSix)];
+
+
+  if(unique.length < 3)
+    return false;
+
+
   if(
-    below6.length < 3
+    state.latestDigit !== 1
   ){
 
     return false;
@@ -1674,26 +2531,25 @@ function validateOver6(data){
   }
 
 
-  const last =
-    touched.length
-      ? Number(
-          touched[
-            touched.length - 1
-          ]
+  const beforeCurrent =
+    state.movingSequence.slice(
+      0,
+      -1
+    );
+
+
+  const beforeUnique =
+    [
+      ...new Set(
+        beforeCurrent.filter(
+          digit => digit < 6
         )
-      : null;
-
-
-  if(last !== 1){
-
-    return false;
-
-  }
+      )
+    ];
 
 
   if(
-    Number(data.moving_digit) !==
-    1
+    beforeUnique.length < 2
   ){
 
     return false;
@@ -1706,31 +2562,42 @@ function validateOver6(data){
 }
 
 
-function validateUnder4(data){
+/* =========================================================
+   UNDER 4
+========================================================= */
 
-  const p =
-    data.percentages || {};
+function checkUnder4(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  const percentages =
+    getPercentages(symbol);
 
 
   const green =
-    Number(data.green_digit);
+    findMostDigit(symbol);
+
 
   const red =
-    Number(data.red_digit);
+    findLeastDigit(symbol);
 
 
-  const validBars =
-    (
-      green === 0 &&
-      red === 9
-    ) ||
-    (
-      green === 0 &&
-      red === 1
-    );
+  const setupA =
+    green === 0 &&
+    red === 9;
 
 
-  if(!validBars){
+  const setupB =
+    green === 0 &&
+    red === 1;
+
+
+  if(
+    !setupA &&
+    !setupB
+  ){
 
     return false;
 
@@ -1738,13 +2605,13 @@ function validateUnder4(data){
 
 
   for(
-    let d=5;
-    d<=9;
-    d++
+    let i=5;
+    i<=9;
+    i++
   ){
 
     if(
-      Number(p[d] || 0) >= 10
+      percentages[i] >= 10
     ){
 
       return false;
@@ -1755,13 +2622,13 @@ function validateUnder4(data){
 
 
   for(
-    let d=0;
-    d<=4;
-    d++
+    let i=0;
+    i<=4;
+    i++
   ){
 
     if(
-      Number(p[d] || 0) <= 10.5
+      percentages[i] <= 10.5
     ){
 
       return false;
@@ -1771,1038 +2638,634 @@ function validateUnder4(data){
   }
 
 
-  const touched =
-    Array.isArray(
-      data.touched_digits
-    )
-      ? data.touched_digits
-      : [];
-
-
-  const above4 =
-    touched.filter(
-      d => Number(d) > 4
+  const aboveFour =
+    state.movingSequence.filter(
+      digit => digit > 4
     );
 
 
-  if(
-    above4.length < 4
-  ){
+  const unique =
+    [...new Set(aboveFour)];
 
+
+  if(unique.length < 4)
     return false;
 
-  }
+
+  const current =
+    state.latestDigit;
 
 
-  return true;
-
-}
-
-
-function strategyAllowsTrade(
-  strategy,
-  data
-){
-
-  switch(
-    String(strategy)
-      .toUpperCase()
-  ){
-
-    case "UNDER7":
-      return validateUnder7(data);
-
-    case "OVER5":
-      return validateOver5(data);
-
-    case "OVER7":
-      return validateOver7(data);
-
-    case "OVER6":
-      return validateOver6(data);
-
-    case "UNDER4":
-      return validateUnder4(data);
-
-    default:
-      return false;
-
-  }
-
-}
+  if(current <= 4)
+    return false;
 
 
-/* =====================================================
-   STRATEGY DISPLAY
-===================================================== */
-
-function updateStrategies(){
-
-  const data =
-    makeStrategyData();
-
-
-  for(
-    const strategy of
-    Object.keys(STRATEGIES)
-  ){
-
-    const el =
-      $("s" + strategy);
-
-
-    if(!el) continue;
-
-
-    const allowed =
-      strategyAllowsTrade(
-        strategy,
-        data
-      );
-
-
-    el.classList.toggle(
-      "ready",
-      allowed
+  const before =
+    state.movingSequence.slice(
+      0,
+      -1
     );
 
 
-    const small =
-      el.querySelector(
-        "small"
-      );
-
-
-    if(small){
-
-      small.textContent =
-        allowed
-          ? "READY"
-          : "Waiting";
-
-    }
-
-  }
-
-
-  if(
-    state.auto &&
-    !state.activeTrade &&
-    !state.autoBusy
-  ){
-
-    autoTrade();
-
-  }
-
-}
-
-
-/* =====================================================
-   AUTO TRADE
-===================================================== */
-
-async function autoTrade(){
-
-  if(
-    !state.auto ||
-    state.activeTrade ||
-    state.autoBusy
-  ){
-
-    return;
-
-  }
-
-
-  state.autoBusy =
-    true;
-
-
-  try{
-
-    const data =
-      makeStrategyData();
-
-
-    for(
-      const strategy of
-      Object.keys(STRATEGIES)
-    ){
-
-      if(
-        !strategyAllowsTrade(
-          strategy,
-          data
-        )
-      ){
-
-        continue;
-
-      }
-
-
-      await executeTrade({
-        strategy,
-        strategyData:
-          data
-      });
-
-
-      break;
-
-    }
-
-  }finally{
-
-    state.autoBusy =
-      false;
-
-  }
-
-}
-
-
-/* =====================================================
-   AUTO TOGGLE
-===================================================== */
-
-function toggleAuto(){
-
-  state.auto =
-    !state.auto;
-
-
-  $("autoToggle").textContent =
-    state.auto
-      ? "STOP AUTO TRADING"
-      : "START AUTO TRADING";
-
-
-  if(!state.auto){
-
-    return;
-
-  }
-
-
-  if(
-    !state.activeTrade
-  ){
-
-    autoTrade();
-
-  }
-
-}
-
-
-/* =====================================================
-   MANUAL TRADE
-===================================================== */
-
-async function manualTrade(
-  direction
-){
-
-  if(state.activeTrade){
-
-    return;
-
-  }
-
-
-  const barrier =
-    Number(
-      $("manualBarrier").value
-    );
-
-
-  await executeTrade({
-
-    contractType:
-      direction === "over"
-        ? "DIGITOVER"
-        : "DIGITUNDER",
-
-    barrier,
-
-    strategy:
-      null,
-
-    strategyData:
-      null
-
-  });
-
-}
-
-
-/* =====================================================
-   EXECUTE TRADE
-===================================================== */
-
-async function executeTrade({
-
-  strategy = null,
-
-  contractType = null,
-
-  barrier = null,
-
-  strategyData = null
-
-}){
-
-  if(state.activeTrade){
-
-    return;
-
-  }
-
-
-  const market =
-    $("market").value;
-
-
-  const stake =
-    Number(
-      $("stake").value
-    );
-
-
-  const duration =
-    Number(
-      $("duration").value
-    );
-
-
-  if(
-    !Number.isFinite(stake) ||
-    stake <= 0
-  ){
-
-    setMessage(
-      "Enter a valid stake."
-    );
-
-    return;
-
-  }
-
-
-  state.activeTrade = {
-
-    strategy,
-
-    market
-
-  };
-
-
-  disableTrading(true);
-
-
-  try{
-
-    const payload = {
-
-      action:
-        "buy",
-
-      account_type:
-        state.accountType,
-
-      market,
-
-      stake,
-
-      duration,
-
-      duration_unit:
-        $("durationUnit").value
-
-    };
-
-
-    if(strategy){
-
-      payload.strategy =
-        strategy;
-
-      payload.strategy_data =
-        strategyData ||
-        makeStrategyData();
-
-    }else{
-
-      payload.contract_type =
-        contractType;
-
-      payload.barrier =
-        barrier;
-
-    }
-
-
-    const result =
-      await trading(payload);
-
-
-    if(
-      !result.contract ||
-      !result.contract.contract_id
-    ){
-
-      throw new Error(
-        "No contract was returned."
-      );
-
-    }
-
-
-    state.activeTrade = {
-
-      ...state.activeTrade,
-
-      ...result.contract,
-
-      startedAt:
-        Date.now()
-
-    };
-
-
-    if(result.account){
-
-      updateAccount(
-        result.account,
-        result.account.balance
-      );
-
-    }
-
-
-    addHistory({
-
-      ...result.contract,
-
-      strategy:
-        strategy
-          ? STRATEGIES[strategy]?.name
-          : "Manual",
-
-      time:
-        Date.now()
-
-    });
-
-
-    pollContract(
-      result.contract.contract_id
-    );
-
-
-  }catch(error){
-
-    state.activeTrade =
-      null;
-
-
-    setMessage(
-      error.message ||
-      "Trade failed."
-    );
-
-
-    disableTrading(false);
-
-  }
-
-}
-
-
-/* =====================================================
-   CONTRACT POLLING
-===================================================== */
-
-async function pollContract(
-  contractId
-){
-
-  if(!state.activeTrade){
-
-    return;
-
-  }
-
-
-  try{
-
-    const result =
-      await trading({
-
-        action:
-          "contract_status",
-
-        account_type:
-          state.accountType,
-
-        contract_id:
-          contractId
-
-      });
-
-
-    const contract =
-      result.contract;
-
-
-    if(
-      contract &&
-      state.activeTrade
-    ){
-
-      updateHistoryTrade(
-        contractId,
-        contract
-      );
-
-
-      if(
-        contract.status === "WON" ||
-        contract.status === "LOST" ||
-        contract.is_sold === true
-      ){
-
-        finishTrade(
-          contract
-        );
-
-        return;
-
-      }
-
-    }
-
-  }catch{}
-
-
-  setTimeout(
-    () =>
-      pollContract(contractId),
-    600
-  );
-
-}
-
-
-/* =====================================================
-   FINISH TRADE
-===================================================== */
-
-function finishTrade(
-  contract
-){
-
-  if(!state.activeTrade){
-
-    return;
-
-  }
-
-
-  updateHistoryTrade(
-    contract.contract_id,
-    contract
-  );
-
-
-  state.activeTrade =
-    null;
-
-
-  disableTrading(false);
-
-
-  refreshBalance();
-
-
-  if(
-    state.auto
-  ){
-
-    setTimeout(
-      () => autoTrade(),
-      100
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   DISABLE TRADE CONTROLS
-===================================================== */
-
-function disableTrading(
-  disabled
-){
-
-  $("manualOver").disabled =
-    disabled;
-
-  $("manualUnder").disabled =
-    disabled;
-
-  $("stake").disabled =
-    disabled;
-
-  $("duration").disabled =
-    disabled;
-
-  $("market").disabled =
-    disabled;
-
-  $("manualBarrier").disabled =
-    disabled;
-
-}
-
-
-/* =====================================================
-   HISTORY
-===================================================== */
-
-function addHistory(trade){
-
-  state.history.unshift({
-    ...trade
-  });
-
-
-  if(
-    state.history.length > 50
-  ){
-
-    state.history.length =
-      50;
-
-  }
-
-
-  renderHistory();
-
-}
-
-
-function updateHistoryTrade(
-  contractId,
-  update
-){
-
-  const item =
-    state.history.find(
-      h =>
-        Number(
-          h.contract_id
-        ) ===
-        Number(contractId)
-    );
-
-
-  if(!item){
-
-    return;
-
-  }
-
-
-  Object.assign(
-    item,
-    update
-  );
-
-
-  renderHistory();
-
-}
-
-
-function renderHistory(){
-
-  const body =
-    $("historyBody");
-
-
-  if(
-    !state.history.length
-  ){
-
-    body.innerHTML = `
-      <tr>
-        <td
-          colspan="9"
-          class="empty">
-          No trades yet
-        </td>
-      </tr>
-    `;
-
-    return;
-
-  }
-
-
-  body.innerHTML =
-    state.history
-      .map(
-        trade => {
-
-          const status =
-            String(
-              trade.status ||
-              "OPEN"
-            ).toUpperCase();
-
-
-          const cls =
-            status === "WON"
-              ? "win"
-              : status === "LOST"
-                ? "loss"
-                : "open";
-
-
-          return `
-
-            <tr>
-
-              <td>
-                ${
-                  new Date(
-                    trade.time ||
-                    Date.now()
-                  ).toLocaleTimeString()
-                }
-              </td>
-
-              <td>
-                ${
-                  trade.strategy ||
-                  "Manual"
-                }
-              </td>
-
-              <td>
-                ${
-                  trade.contract_type ||
-                  "-"
-                }
-
-                ${
-                  trade.barrier != null
-                    ? " " +
-                      trade.barrier
-                    : ""
-                }
-              </td>
-
-              <td>
-                ${
-                  trade.underlying_symbol ||
-                  trade.market ||
-                  "-"
-                }
-              </td>
-
-              <td>
-                ${
-                  money(
-                    trade.buy_price
-                  )
-                }
-              </td>
-
-              <td>
-                ${
-                  trade.entry_spot ??
-                  "-"
-                }
-              </td>
-
-              <td>
-                ${
-                  trade.exit_spot ??
-                  "-"
-                }
-              </td>
-
-              <td class="${cls}">
-                ${status}
-              </td>
-
-              <td class="${cls}">
-                ${
-                  money(
-                    trade.profit
-                  )
-                }
-              </td>
-
-            </tr>
-
-          `;
-
-        }
+  const beforeUnique =
+    new Set(
+      before.filter(
+        digit => digit > 4
       )
-      .join("");
+    );
+
+
+  if(
+    beforeUnique.size === 3 &&
+    !beforeUnique.has(current)
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
 
 }
 
 
-/* =====================================================
-   DERIV PUBLIC TICKS
-===================================================== */
+/* =========================================================
+   FIND STRATEGY
+========================================================= */
 
-function connectTicks(){
+function findStrategy(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  if(
+    !state ||
+    state.history.length < MAX_TICKS
+  ){
+
+    return null;
+
+  }
+
+
+  const checks = [
+
+    [
+      STRATEGIES.UNDER7,
+      checkUnder7
+    ],
+
+    [
+      STRATEGIES.OVER5,
+      checkOver5
+    ],
+
+    [
+      STRATEGIES.OVER7,
+      checkOver7
+    ],
+
+    [
+      STRATEGIES.OVER6,
+      checkOver6
+    ],
+
+    [
+      STRATEGIES.UNDER4,
+      checkUnder4
+    ]
+
+  ];
+
+
+  for(
+    const [
+      strategy,
+      checker
+    ] of checks
+  ){
+
+    if(
+      checker(symbol)
+    ){
+
+      return strategy;
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+/* =========================================================
+   SCANNER DISPLAY
+========================================================= */
+
+function renderScanner(){
+
+  $("scanGrid").innerHTML =
+    MARKETS.map(market => {
+
+      const state =
+        marketStates[
+          market.symbol
+        ];
+
+
+      let status =
+        "WAITING";
+
+
+      let cls = "";
+
+
+      if(state.error){
+
+        status = "ERROR";
+
+        cls = "error";
+
+      }else if(
+        currentMarketSymbol ===
+        market.symbol &&
+        tradeActive
+      ){
+
+        status = "TRADE";
+
+        cls = "ready";
+
+      }else if(
+        currentMarketSymbol ===
+        market.symbol
+      ){
+
+        status = "ANALYSING";
+
+        cls = "active";
+
+      }else if(
+        state.connected
+      ){
+
+        status = "LIVE";
+
+      }else if(
+        state.loading
+      ){
+
+        status = "CONNECTING";
+
+      }
+
+
+      return `
+
+        <div class="scanItem ${cls}">
+
+          <span>
+            ${market.name}
+          </span>
+
+          <b>
+            ${status}
+          </b>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+}
+
+
+/* =========================================================
+   RENDER DIGITS
+========================================================= */
+
+function renderDigits(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  if(!state){
+
+    $("digits").innerHTML = "";
+
+    return;
+
+  }
+
+
+  const counts =
+    getCounts(symbol);
+
+
+  const most =
+    findMostDigit(symbol);
+
+
+  const least =
+    findLeastDigit(symbol);
+
+
+  const latest =
+    state.latestDigit;
+
+
+  $("digits").innerHTML =
+    counts.map(
+      (count,digit) => {
+
+        let classes =
+          "digit";
+
+
+        if(digit === most)
+          classes += " most";
+
+
+        if(digit === least)
+          classes += " least";
+
+
+        if(digit === latest)
+          classes += " latest";
+
+
+        const percent =
+          state.history.length
+            ? (
+                count /
+                state.history.length *
+                100
+              ).toFixed(1)
+            : "0.0";
+
+
+        return `
+
+          <div class="${classes}">
+
+            ${
+              digit === latest
+                ? '<div class="pointer"></div>'
+                : ''
+            }
+
+            <strong>
+              ${digit}
+            </strong>
+
+            <small>
+              ${count} • ${percent}%
+            </small>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+
+  $("most").textContent =
+    most;
+
+
+  $("least").textContent =
+    least;
+
+
+  $("over5").textContent =
+    state.history.length
+      ? (
+          (
+            counts[6] +
+            counts[7] +
+            counts[8] +
+            counts[9]
+          ) /
+          state.history.length *
+          100
+        ).toFixed(1) + "%"
+      : "—";
+
+
+  $("under7").textContent =
+    state.history.length
+      ? (
+          (
+            counts[0] +
+            counts[1] +
+            counts[2] +
+            counts[3] +
+            counts[4] +
+            counts[5] +
+            counts[6]
+          ) /
+          state.history.length *
+          100
+        ).toFixed(1) + "%"
+      : "—";
+
+}
+
+
+/* =========================================================
+   PUBLIC MARKET WEBSOCKET
+========================================================= */
+
+const WS_URL =
+  "wss://api.derivws.com/trading/v1/options/ws/public";
+
+
+function connectMarket(symbol){
+
+  const state =
+    marketStates[symbol];
+
+
+  if(!state)
+    return;
+
 
   if(state.ws){
 
     try{
-
       state.ws.close();
-
-    }catch{}
+    }catch(e){}
 
   }
 
 
-  const ws =
-    new WebSocket(
-      "wss://ws.derivws.com/websockets/v3?app_id=1089"
-    );
+  state.loading = true;
+
+  state.error = false;
+
+  renderScanner();
 
 
-  state.ws =
-    ws;
+  try{
+
+    const ws =
+      new WebSocket(
+        WS_URL
+      );
 
 
-  ws.onopen = () => {
-
-    $("tickMarket").textContent =
-      `Live ${state.market}`;
+    state.ws = ws;
 
 
-    ws.send(
-      JSON.stringify({
+    ws.onopen = function(){
 
-        ticks:
-          state.market,
+      state.loading = false;
 
-        subscribe:
-          1
+      state.connected = true;
 
-      })
-    );
-
-  };
+      state.error = false;
 
 
-  ws.onmessage =
-    event => {
+      ws.send(
+        JSON.stringify({
 
-      let data;
+          ticks:{
+            symbol:symbol,
+            subscribe:1
 
+          }
 
-      try{
-
-        data =
-          JSON.parse(
-            event.data
-          );
-
-      }catch{
-
-        return;
-
-      }
+        })
+      );
 
 
-      if(
-        data.tick &&
-        data.tick.quote != null
-      ){
-
-        processTick(
-          data.tick.quote
-        );
-
-      }
+      renderScanner();
 
     };
 
 
-  ws.onerror = () => {
+    ws.onmessage =
+      function(event){
 
-    $("tickMarket").textContent =
-      "Tick connection error";
+        try{
 
-  };
-
-
-  ws.onclose = () => {
-
-    $("tickMarket").textContent =
-      "Reconnecting...";
+          const data =
+            JSON.parse(
+              event.data
+            );
 
 
-    clearTimeout(
-      state.reconnectTimer
-    );
+          const tick =
+            data.tick ||
+            data;
 
 
-    state.reconnectTimer =
-      setTimeout(
-        connectTicks,
-        2000
-      );
+          if(!tick)
+            return;
 
-  };
+
+          const quote =
+            Number(
+              tick.quote
+            );
+
+
+          if(
+            !Number.isFinite(
+              quote
+            )
+          ){
+
+            return;
+
+          }
+
+
+          const pipSize =
+            Number(
+              tick.pip_size ??
+              tick.pipSize ??
+              state.pipSize
+            );
+
+
+          if(
+            Number.isFinite(
+              pipSize
+            )
+          ){
+
+            state.pipSize =
+              pipSize;
+
+          }
+
+
+          state.lastQuote =
+            quote;
+
+
+          const digit =
+            getLastDigit(
+              quote,
+              state.pipSize
+            );
+
+
+          if(
+            digit === null
+          ){
+
+            return;
+
+          }
+
+
+          state.latestDigit =
+            digit;
+
+
+          state.history.push(
+            digit
+          );
+
+
+          if(
+            state.history.length >
+            MAX_TICKS
+          ){
+
+            state.history.shift();
+
+          }
+
+
+          state.movingSequence.push(
+            digit
+          );
+
+
+          if(
+            state.movingSequence.length >
+            MAX_TICKS
+          ){
+
+            state.movingSequence.shift();
+
+          }
+
+
+          $("quote").textContent =
+            "Quote: " +
+            quote +
+            " | Last digit: " +
+            digit;
+
+
+          if(
+            currentMarketSymbol ===
+            symbol
+          ){
+
+            renderDigits(symbol);
+
+            evaluateBot(symbol);
+
+          }
+
+        }catch(error){
+
+          console.error(
+            "Tick error:",
+            error
+          );
+
+        }
+
+      };
+
+
+    ws.onerror =
+      function(){
+
+        state.error = true;
+
+        state.connected = false;
+
+        state.loading = false;
+
+        renderScanner();
+
+      };
+
+
+    ws.onclose =
+      function(){
+
+        state.connected = false;
+
+        state.loading = false;
+
+        renderScanner();
+
+        if(
+          botRunning &&
+          !tradeActive
+        ){
+
+          setTimeout(
+            () => {
+
+              if(
+                botRunning &&
+                !state.connected
+              ){
+
+                connectMarket(
+                  symbol
+                );
+
+              }
+
+            },
+            3000
+          );
+
+        }
+
+      };
+
+
+  }catch(error){
+
+    state.error = true;
+
+    state.loading = false;
+
+    state.connected = false;
+
+    renderScanner();
+
+  }
 
 }
 
 
-/* =====================================================
-   PROCESS TICK
-===================================================== */
+/* =========================================================
+   START MARKET FEEDS
+========================================================= */
 
-function processTick(
-  quote
-){
+function startMarketFeeds(){
 
-  const text =
-    String(quote);
-
-
-  const parts =
-    text.split(".");
-
-
-  let lastChar;
-
-
-  if(
-    parts.length > 1
-  ){
-
-    const decimals =
-      parts[1];
-
-    lastChar =
-      decimals[
-        decimals.length - 1
-      ];
-
-  }else{
-
-    lastChar =
-      text[
-        text.length - 1
-      ];
-
-  }
-
-
-  const digit =
-    Number(lastChar);
-
-
-  if(
-    !Number.isInteger(digit) ||
-    digit < 0 ||
-    digit > 9
-  ){
-
-    return;
-
-  }
-
-
-  state.tick =
-    digit;
-
-
-  $("tick").textContent =
-    digit;
-
-
-  addDigit(
-    digit
-  );
-
-}
-
-
-/* =====================================================
-   MARKET CHANGE
-===================================================== */
-
-$("market").addEventListener(
-  "change",
-  () => {
-
-    if(state.activeTrade){
-
-      return;
-
-    }
-
-
-    state.market =
-      $("market").value;
-
-
-    resetStatistics();
-
-
-    connectTicks();
-
-  }
-);
-
-
-/* =====================================================
-   START
-===================================================== */
-
-function start(){
-
-  renderDigits();
-
-  renderBars();
-
-  updateStrategies();
-
-  loadAccount();
-
-  connectTicks();
-
-  refreshBalance();
-
-
-  setInterval(
-    refreshBalance,
-    5000
-  );
-
-}
-
-
-start();
-
-</script>
-
-</body>
-  </html>
+  MARKETS.forEach(
+    market =>
+      connectMarket(
+        market
