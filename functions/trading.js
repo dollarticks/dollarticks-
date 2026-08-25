@@ -2,94 +2,37 @@ const CLIENT_ID = "347btQbpUS2La9uhcLb2X";
 const DERIV_API = "https://api.derivws.com";
 
 /* =====================================================
-   DOLLARTICKS - MULTI STRATEGY ENGINE
-   =====================================================
-
-   STRATEGIES
-
-   UNDER 7
-   - green < 7
-   - red < 7
-   - green appears before red
-   - trigger: moving tick touches 8 or 9
-   - contract: DIGITUNDER barrier 7
-
-   OVER 5
-   - red = 0 or 1
-   - green = 8 or 9
-   - trigger: moving tick touches 0 or 1
-   - contract: DIGITOVER barrier 5
-
-   OVER 7
-   - green = 9
-   - red = 0
-   - 8 and 9 > 12.5%
-   - 0-6 < 10%
-   - trigger after minimum 4 qualifying digit touches
-   - enter on 4th
-
-   OVER 6
-   - green = 9
-   - red = 0
-   - 9 > 12.5%
-   - 0 <= 8.5%
-   - 6,7,8 > 10.5%
-   - 6,7,8,9 must not decrease by 0.1%
-   - minimum 3 digits below 6 touched
-   - 1 must be last
-   - enter on 1
-
-   UNDER 4
-   - green = 0
-   - red = 9 OR 1
-   - digits 5-9 < 10%
-   - digits 0-4 > 10.5%
-   - minimum 4 digits above 4 touched
-   - enter on 4th qualifying touch
-
-   ===================================================== */
-
-
-/* =====================================================
    RESPONSE
 ===================================================== */
 
 function json(data, status = 200) {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "no-store"
-      }
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store"
     }
-  );
+  });
 }
-
 
 /* =====================================================
    COOKIE
 ===================================================== */
 
 function getCookie(request, name) {
-  const cookies =
-    request.headers.get("Cookie") || "";
+  const cookies = request.headers.get("Cookie") || "";
 
   for (const part of cookies.split(";")) {
     const i = part.indexOf("=");
 
     if (i === -1) continue;
 
-    const key =
-      part.slice(0, i).trim();
+    const key = part.slice(0, i).trim();
 
     if (key !== name) continue;
 
     try {
-      return decodeURIComponent(
-        part.slice(i + 1).trim()
-      );
+      return decodeURIComponent(part.slice(i + 1).trim());
     } catch {
       return part.slice(i + 1).trim();
     }
@@ -97,7 +40,6 @@ function getCookie(request, name) {
 
   return null;
 }
-
 
 /* =====================================================
    ACCOUNTS
@@ -109,27 +51,20 @@ async function getAccounts(token) {
     {
       method: "GET",
       headers: {
-        Authorization:
-          `Bearer ${token}`,
-
-        "Deriv-App-ID":
-          CLIENT_ID,
-
-        Accept:
-          "application/json"
+        Authorization: `Bearer ${token}`,
+        "Deriv-App-ID": CLIENT_ID,
+        Accept: "application/json"
       },
       cache: "no-store"
     }
   );
 
-  const raw =
-    await response.text();
+  const raw = await response.text();
 
   let data;
 
   try {
-    data =
-      JSON.parse(raw);
+    data = JSON.parse(raw);
   } catch {
     throw new Error(
       "Trading service returned an invalid account response."
@@ -163,7 +98,6 @@ async function getAccounts(token) {
   return [];
 }
 
-
 function getAccountId(account) {
   return (
     account?.account_id ||
@@ -173,32 +107,26 @@ function getAccountId(account) {
   );
 }
 
-
 function getAccountType(account) {
   return String(
     account?.account_type || "demo"
   ).toLowerCase();
 }
 
-
 function getAccountBalance(account) {
-  const value =
-    Number(account?.balance ?? 0);
+  const value = Number(
+    account?.balance ?? 0
+  );
 
   return Number.isFinite(value)
     ? value
     : 0;
 }
 
-
-function findAccount(
-  accounts,
-  requestedType
-) {
-  const wanted =
-    String(
-      requestedType || "demo"
-    ).toLowerCase();
+function findAccount(accounts, requestedType) {
+  const wanted = String(
+    requestedType || "demo"
+  ).toLowerCase();
 
   return (
     accounts.find(
@@ -208,13 +136,11 @@ function findAccount(
   );
 }
 
-
 async function getSelectedAccount(
   token,
   requestedType
 ) {
-  const accounts =
-    await getAccounts(token);
+  const accounts = await getAccounts(token);
 
   if (!accounts.length) {
     throw new Error(
@@ -222,11 +148,10 @@ async function getSelectedAccount(
     );
   }
 
-  const account =
-    findAccount(
-      accounts,
-      requestedType
-    );
+  const account = findAccount(
+    accounts,
+    requestedType
+  );
 
   if (!account) {
     throw new Error(
@@ -236,8 +161,7 @@ async function getSelectedAccount(
     );
   }
 
-  const accountId =
-    getAccountId(account);
+  const accountId = getAccountId(account);
 
   if (!accountId) {
     throw new Error(
@@ -248,55 +172,38 @@ async function getSelectedAccount(
   return {
     account,
     accountId,
-    accountType:
-      getAccountType(account),
-    balance:
-      getAccountBalance(account),
-    currency:
-      account.currency || "USD"
+    accountType: getAccountType(account),
+    balance: getAccountBalance(account),
+    currency: account.currency || "USD"
   };
 }
-
 
 /* =====================================================
    OTP
 ===================================================== */
 
-async function getOTP(
-  token,
-  accountId
-) {
-  const response =
-    await fetch(
-      `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(
-        accountId
-      )}/otp`,
-      {
-        method: "POST",
+async function getOTP(token, accountId) {
+  const response = await fetch(
+    `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(
+      accountId
+    )}/otp`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Deriv-App-ID": CLIENT_ID,
+        Accept: "application/json"
+      },
+      cache: "no-store"
+    }
+  );
 
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-
-          "Deriv-App-ID":
-            CLIENT_ID,
-
-          Accept:
-            "application/json"
-        },
-
-        cache: "no-store"
-      }
-    );
-
-  const raw =
-    await response.text();
+  const raw = await response.text();
 
   let data;
 
   try {
-    data =
-      JSON.parse(raw);
+    data = JSON.parse(raw);
   } catch {
     throw new Error(
       `Trading session returned HTTP ${response.status}.`
@@ -323,9 +230,7 @@ async function getOTP(
     );
   }
 
-  if (
-    !String(wsUrl).startsWith("wss://")
-  ) {
+  if (!String(wsUrl).startsWith("wss://")) {
     throw new Error(
       "Invalid trading WebSocket URL."
     );
@@ -334,72 +239,60 @@ async function getOTP(
   return wsUrl;
 }
 
-
 /* =====================================================
    WEBSOCKET
 ===================================================== */
 
 function openWebSocket(wsUrl) {
-  return new Promise(
-    (resolve, reject) => {
-      let ws;
+  return new Promise((resolve, reject) => {
+    let ws;
 
-      const timeout =
-        setTimeout(() => {
-          try {
-            ws?.close();
-          } catch {}
+    const timeout = setTimeout(() => {
+      try {
+        ws?.close();
+      } catch {}
 
-          reject(
-            new Error(
-              "Trading connection timed out."
-            )
-          );
-        }, 10000);
+      reject(
+        new Error(
+          "Trading connection timed out."
+        )
+      );
+    }, 8000);
+
+    try {
+      ws = new WebSocket(wsUrl);
+    } catch {
+      clearTimeout(timeout);
+
+      reject(
+        new Error(
+          "Could not open trading connection."
+        )
+      );
+
+      return;
+    }
+
+    ws.addEventListener("open", () => {
+      clearTimeout(timeout);
+      resolve(ws);
+    });
+
+    ws.addEventListener("error", () => {
+      clearTimeout(timeout);
 
       try {
-        ws =
-          new WebSocket(wsUrl);
-      } catch {
-        clearTimeout(timeout);
+        ws?.close();
+      } catch {}
 
-        reject(
-          new Error(
-            "Could not open trading connection."
-          )
-        );
-
-        return;
-      }
-
-      ws.addEventListener(
-        "open",
-        () => {
-          clearTimeout(timeout);
-          resolve(ws);
-        }
+      reject(
+        new Error(
+          "Trading connection failed."
+        )
       );
-
-      ws.addEventListener(
-        "error",
-        () => {
-          clearTimeout(timeout);
-
-          try {
-            ws?.close();
-          } catch {}
-
-          reject(
-            new Error(
-              "Trading connection failed."
-            )
-          );
-        }
-      );
-    }
-  );
+    });
+  });
 }
-
 
 function closeWebSocket(ws) {
   try {
@@ -415,7 +308,6 @@ function closeWebSocket(ws) {
   } catch {}
 }
 
-
 /* =====================================================
    REQUEST
 ===================================================== */
@@ -424,1154 +316,129 @@ function sendRequest(
   ws,
   payload,
   wantedMsgType,
-  timeoutMs = 10000
+  timeoutMs = 8000
 ) {
-  return new Promise(
-    (resolve, reject) => {
-      let finished = false;
+  return new Promise((resolve, reject) => {
+    let finished = false;
 
-      const timeout =
-        setTimeout(() => {
-          if (finished) return;
+    const timeout = setTimeout(() => {
+      if (finished) return;
 
-          finished = true;
-          cleanup();
+      finished = true;
+      cleanup();
 
-          reject(
-            new Error(
-              `Trading service timed out waiting for ${wantedMsgType}.`
-            )
-          );
-        }, timeoutMs);
+      reject(
+        new Error(
+          `Trading service timed out waiting for ${wantedMsgType}.`
+        )
+      );
+    }, timeoutMs);
 
-      function cleanup() {
-        clearTimeout(timeout);
+    function cleanup() {
+      clearTimeout(timeout);
 
-        ws.removeEventListener(
-          "message",
-          onMessage
-        );
+      ws.removeEventListener(
+        "message",
+        onMessage
+      );
 
-        ws.removeEventListener(
-          "error",
-          onError
-        );
+      ws.removeEventListener(
+        "error",
+        onError
+      );
 
-        ws.removeEventListener(
-          "close",
-          onClose
-        );
+      ws.removeEventListener(
+        "close",
+        onClose
+      );
+    }
+
+    function fail(message) {
+      if (finished) return;
+
+      finished = true;
+      cleanup();
+
+      reject(
+        new Error(message)
+      );
+    }
+
+    function onMessage(event) {
+      let data;
+
+      try {
+        data = JSON.parse(event.data);
+      } catch {
+        return;
       }
 
-      function fail(message) {
+      if (data.error) {
+        fail(
+          data.error.message ||
+          data.error?.detail?.message ||
+          "Deriv rejected the request."
+        );
+
+        return;
+      }
+
+      if (
+        data.msg_type === wantedMsgType
+      ) {
         if (finished) return;
 
         finished = true;
         cleanup();
 
-        reject(
-          new Error(message)
-        );
-      }
-
-      function onMessage(event) {
-        let data;
-
-        try {
-          data =
-            JSON.parse(event.data);
-        } catch {
-          return;
-        }
-
-        if (data.error) {
-          fail(
-            data.error.message ||
-            data.error?.detail?.message ||
-            "Deriv rejected the request."
-          );
-
-          return;
-        }
-
-        if (
-          data.msg_type ===
-          wantedMsgType
-        ) {
-          if (finished) return;
-
-          finished = true;
-          cleanup();
-
-          resolve(data);
-        }
-      }
-
-      function onError() {
-        fail(
-          "Trading connection failed."
-        );
-      }
-
-      function onClose() {
-        fail(
-          "Trading connection closed."
-        );
-      }
-
-      ws.addEventListener(
-        "message",
-        onMessage
-      );
-
-      ws.addEventListener(
-        "error",
-        onError
-      );
-
-      ws.addEventListener(
-        "close",
-        onClose
-      );
-
-      try {
-        ws.send(
-          JSON.stringify(payload)
-        );
-      } catch {
-        fail(
-          "Could not send trading request."
-        );
+        resolve(data);
       }
     }
-  );
-}
 
-
-/* =====================================================
-   VOLATILITY MARKETS
-===================================================== */
-
-const VOLATILITY_SYMBOLS = [
-  "R_10",
-  "R_25",
-  "R_50",
-  "R_75",
-  "R_100",
-
-  "1HZ10V",
-  "1HZ25V",
-  "1HZ50V",
-  "1HZ75V",
-  "1HZ100V",
-
-  "JD10",
-  "JD25",
-  "JD50",
-  "JD75",
-  "JD100"
-];
-
-
-/* =====================================================
-   DIGIT
-===================================================== */
-
-function getLastDigit(quote) {
-  const text =
-    String(quote);
-
-  const clean =
-    text.replace(
-      /[^0-9]/g,
-      ""
-    );
-
-  if (!clean.length) {
-    return null;
-  }
-
-  return Number(
-    clean.charAt(
-      clean.length - 1
-    )
-  );
-}
-
-
-/* =====================================================
-   DIGIT STATISTICS
-===================================================== */
-
-function makeDigitStats(
-  digits
-) {
-  const counts =
-    Array(10).fill(0);
-
-  for (const digit of digits) {
-    if (
-      Number.isInteger(digit) &&
-      digit >= 0 &&
-      digit <= 9
-    ) {
-      counts[digit]++;
-    }
-  }
-
-  const total =
-    digits.length;
-
-  const percentages =
-    counts.map(count =>
-      total > 0
-        ? (count / total) * 100
-        : 0
-    );
-
-  return {
-    counts,
-    percentages,
-    total
-  };
-}
-
-
-/* =====================================================
-   GREEN / RED
-===================================================== */
-
-function getGreenRed(
-  percentages
-) {
-  let green = 0;
-  let red = 0;
-
-  for (
-    let i = 1;
-    i < percentages.length;
-    i++
-  ) {
-    if (
-      percentages[i] >
-      percentages[green]
-    ) {
-      green = i;
-    }
-
-    if (
-      percentages[i] <
-      percentages[red]
-    ) {
-      red = i;
-    }
-  }
-
-  return {
-    green,
-    red
-  };
-}
-
-
-/* =====================================================
-   MOVING TOUCH SEQUENCE
-===================================================== */
-
-function uniqueTouchSequence(
-  digits,
-  predicate
-) {
-  const result = [];
-
-  for (const digit of digits) {
-    if (
-      !predicate(digit)
-    ) {
-      continue;
-    }
-
-    if (
-      !result.includes(digit)
-    ) {
-      result.push(digit);
-    }
-  }
-
-  return result;
-}
-
-
-/* =====================================================
-   UNDER 7
-===================================================== */
-
-function checkUnder7(
-  stats,
-  digits
-) {
-  const {
-    percentages
-  } = stats;
-
-  const {
-    green,
-    red
-  } =
-    getGreenRed(
-      percentages
-    );
-
-  if (
-    green >= 7 ||
-    red >= 7
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * Green must appear before red
-   * in the recent moving sequence.
-   */
-  const recent =
-    digits.slice(-50);
-
-  const greenIndex =
-    recent.lastIndexOf(green);
-
-  const redIndex =
-    recent.lastIndexOf(red);
-
-  if (
-    greenIndex === -1 ||
-    redIndex === -1 ||
-    greenIndex >= redIndex
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  const trigger =
-    digits[digits.length - 1];
-
-  if (
-    trigger !== 8 &&
-    trigger !== 9
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  return {
-    valid: true,
-    strategy: "UNDER 7",
-    contract_type:
-      "DIGITUNDER",
-    barrier: 7,
-    trigger_digit:
-      trigger
-  };
-}
-
-
-/* =====================================================
-   OVER 5
-===================================================== */
-
-function checkOver5(
-  stats,
-  digits
-) {
-  const {
-    green,
-    red
-  } =
-    getGreenRed(
-      stats.percentages
-    );
-
-  if (
-    red !== 0 &&
-    red !== 1
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  if (
-    green !== 8 &&
-    green !== 9
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  const trigger =
-    digits[digits.length - 1];
-
-  if (
-    trigger !== 0 &&
-    trigger !== 1
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  return {
-    valid: true,
-    strategy: "OVER 5",
-    contract_type:
-      "DIGITOVER",
-    barrier: 5,
-    trigger_digit:
-      trigger
-  };
-}
-
-
-/* =====================================================
-   OVER 7
-===================================================== */
-
-function checkOver7(
-  stats,
-  digits
-) {
-  const {
-    green,
-    red
-  } =
-    getGreenRed(
-      stats.percentages
-    );
-
-  const p =
-    stats.percentages;
-
-  if (green !== 9) {
-    return {
-      valid: false
-    };
-  }
-
-  if (red !== 0) {
-    return {
-      valid: false
-    };
-  }
-
-  if (
-    p[8] <= 12.5 ||
-    p[9] <= 12.5
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  for (
-    let i = 0;
-    i <= 6;
-    i++
-  ) {
-    if (p[i] >= 10) {
-      return {
-        valid: false
-      };
-    }
-  }
-
-  const sequence =
-    uniqueTouchSequence(
-      digits.slice(-100),
-      d => d >= 0 && d <= 6
-    );
-
-  /*
-   * User requires a minimum
-   * of 4 digits touched.
-   */
-  if (
-    sequence.length < 4
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * Enter when moving tick is
-   * touching the 4th qualifying
-   * number.
-   */
-  const fourth =
-    sequence[3];
-
-  const current =
-    digits[digits.length - 1];
-
-  if (
-    current !== fourth
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  return {
-    valid: true,
-    strategy: "OVER 7",
-    contract_type:
-      "DIGITOVER",
-    barrier: 7,
-    trigger_digit:
-      current,
-    touch_count:
-      sequence.length
-  };
-}
-
-
-/* =====================================================
-   OVER 6
-===================================================== */
-
-function checkOver6(
-  stats,
-  digits,
-  previousPercentages
-) {
-  const {
-    green,
-    red
-  } =
-    getGreenRed(
-      stats.percentages
-    );
-
-  const p =
-    stats.percentages;
-
-  if (green !== 9) {
-    return {
-      valid: false
-    };
-  }
-
-  if (red !== 0) {
-    return {
-      valid: false
-    };
-  }
-
-  if (p[9] <= 12.5) {
-    return {
-      valid: false
-    };
-  }
-
-  if (p[0] > 8.5) {
-    return {
-      valid: false
-    };
-  }
-
-  if (
-    p[6] <= 10.5 ||
-    p[7] <= 10.5 ||
-    p[8] <= 10.5
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * Reject if any of 6,7,8,9
-   * has decreased by even 0.1%.
-   */
-  if (
-    previousPercentages
-  ) {
-    for (
-      const digit of [6, 7, 8, 9]
-    ) {
-      if (
-        p[digit] <
-        previousPercentages[digit] - 0.000001
-      ) {
-        return {
-          valid: false,
-          reason:
-            "6-9 percentage decreased"
-        };
-      }
-    }
-  }
-
-  /*
-   * At least 3 unique digits
-   * below 6 must be touched.
-   */
-  const belowSix =
-    uniqueTouchSequence(
-      digits.slice(-100),
-      d =>
-        d >= 0 &&
-        d < 6
-    );
-
-  if (
-    belowSix.length < 3
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * 1 must ALWAYS be the last
-   * qualifying digit touched.
-   */
-  const current =
-    digits[digits.length - 1];
-
-  if (current !== 1) {
-    return {
-      valid: false
-    };
-  }
-
-  const lastThree =
-    belowSix.slice(-3);
-
-  if (
-    lastThree[lastThree.length - 1] !== 1
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  return {
-    valid: true,
-    strategy: "OVER 6",
-    contract_type:
-      "DIGITOVER",
-    barrier: 6,
-    trigger_digit:
-      1,
-    touch_count:
-      belowSix.length
-  };
-}
-
-
-/* =====================================================
-   UNDER 4
-===================================================== */
-
-function checkUnder4(
-  stats,
-  digits
-) {
-  const {
-    green,
-    red
-  } =
-    getGreenRed(
-      stats.percentages
-    );
-
-  const p =
-    stats.percentages;
-
-  /*
-   * Required:
-   * green = 0
-   * red = 9 OR 1
-   */
-  if (green !== 0) {
-    return {
-      valid: false
-    };
-  }
-
-  if (
-    red !== 9 &&
-    red !== 1
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * Above 4 = 5,6,7,8,9
-   */
-  for (
-    let i = 5;
-    i <= 9;
-    i++
-  ) {
-    if (p[i] >= 10) {
-      return {
-        valid: false
-      };
-    }
-  }
-
-  /*
-   * 0-4 must all be > 10.5%
-   */
-  for (
-    let i = 0;
-    i <= 4;
-    i++
-  ) {
-    if (p[i] <= 10.5) {
-      return {
-        valid: false
-      };
-    }
-  }
-
-  /*
-   * At least 4 different digits
-   * above 4 must have been touched.
-   */
-  const aboveFour =
-    uniqueTouchSequence(
-      digits.slice(-100),
-      d => d > 4
-    );
-
-  if (
-    aboveFour.length < 4
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  /*
-   * Enter on the 4th number.
-   */
-  const fourth =
-    aboveFour[3];
-
-  const current =
-    digits[digits.length - 1];
-
-  if (
-    current !== fourth
-  ) {
-    return {
-      valid: false
-    };
-  }
-
-  return {
-    valid: true,
-    strategy: "UNDER 4",
-    contract_type:
-      "DIGITUNDER",
-    barrier: 4,
-    trigger_digit:
-      current,
-    touch_count:
-      aboveFour.length
-  };
-}
-
-
-/* =====================================================
-   ALL STRATEGIES
-===================================================== */
-
-function analyseStrategies(
-  digits,
-  previousPercentages = null
-) {
-  if (
-    !Array.isArray(digits) ||
-    digits.length < 20
-  ) {
-    return {
-      ready: false,
-      reason:
-        "Not enough tick data.",
-      signals: []
-    };
-  }
-
-  const stats =
-    makeDigitStats(
-      digits
-    );
-
-  const signals = [];
-
-  const strategies = [
-    checkUnder7(
-      stats,
-      digits
-    ),
-
-    checkOver5(
-      stats,
-      digits
-    ),
-
-    checkOver7(
-      stats,
-      digits
-    ),
-
-    checkOver6(
-      stats,
-      digits,
-      previousPercentages
-    ),
-
-    checkUnder4(
-      stats,
-      digits
-    )
-  ];
-
-  for (
-    const signal of strategies
-  ) {
-    if (signal.valid) {
-      signals.push(signal);
-    }
-  }
-
-  return {
-    ready: true,
-
-    stats: {
-      counts:
-        stats.counts,
-
-      percentages:
-        stats.percentages,
-
-      total:
-        stats.total,
-
-      greenRed:
-        getGreenRed(
-          stats.percentages
-        )
-    },
-
-    current_digit:
-      digits[digits.length - 1],
-
-    signals
-  };
-}
-
-
-/* =====================================================
-   MARKET HISTORY
-===================================================== */
-
-async function getPublicTicks(
-  symbol,
-  count = 100
-) {
-  return new Promise(
-    (resolve, reject) => {
-      const ws =
-        new WebSocket(
-          "wss://api.derivws.com/trading/v1/options/ws/public"
-        );
-
-      let finished =
-        false;
-
-      const timeout =
-        setTimeout(() => {
-          if (finished) return;
-
-          finished = true;
-
-          try {
-            ws.close();
-          } catch {}
-
-          reject(
-            new Error(
-              `Timed out fetching ticks for ${symbol}.`
-            )
-          );
-        }, 10000);
-
-      function finish(
-        callback
-      ) {
-        if (finished) return;
-
-        finished = true;
-        clearTimeout(timeout);
-
-        try {
-          ws.close();
-        } catch {}
-
-        callback();
-      }
-
-      ws.addEventListener(
-        "open",
-        () => {
-          ws.send(
-            JSON.stringify({
-              ticks_history:
-                symbol,
-
-              count:
-                Math.min(
-                  Math.max(
-                    Number(count) || 100,
-                    20
-                  ),
-                  1000
-                ),
-
-              end:
-                "latest",
-
-              style:
-                "ticks",
-
-              req_id:
-                7101
-            })
-          );
-        }
-      );
-
-      ws.addEventListener(
-        "message",
-        event => {
-          let data;
-
-          try {
-            data =
-              JSON.parse(
-                event.data
-              );
-          } catch {
-            return;
-          }
-
-          if (data.error) {
-            finish(() => {
-              reject(
-                new Error(
-                  data.error.message ||
-                  "Could not retrieve market ticks."
-                )
-              );
-            });
-
-            return;
-          }
-
-          if (
-            data.msg_type !==
-            "history"
-          ) {
-            return;
-          }
-
-          const prices =
-            data?.history?.prices ||
-            [];
-
-          const digits =
-            prices
-              .map(
-                getLastDigit
-              )
-              .filter(
-                d =>
-                  Number.isInteger(d)
-              );
-
-          finish(() => {
-            resolve({
-              symbol,
-              digits,
-              prices,
-              total:
-                digits.length
-            });
-          });
-        }
-      );
-
-      ws.addEventListener(
-        "error",
-        () => {
-          finish(() => {
-            reject(
-              new Error(
-                `Market data connection failed for ${symbol}.`
-              )
-            );
-          });
-        }
+    function onError() {
+      fail(
+        "Trading connection failed."
       );
     }
-  );
-}
 
+    function onClose() {
+      fail(
+        "Trading connection closed."
+      );
+    }
 
-/* =====================================================
-   ANALYSE ONE MARKET
-===================================================== */
-
-async function analyseMarket(
-  symbol,
-  count = 100
-) {
-  const data =
-    await getPublicTicks(
-      symbol,
-      count
+    ws.addEventListener(
+      "message",
+      onMessage
     );
 
-  const analysis =
-    analyseStrategies(
-      data.digits
+    ws.addEventListener(
+      "error",
+      onError
     );
 
-  return {
-    symbol,
-    ...analysis
-  };
+    ws.addEventListener(
+      "close",
+      onClose
+    );
+
+    try {
+      ws.send(
+        JSON.stringify(payload)
+      );
+    } catch {
+      fail(
+        "Could not send trading request."
+      );
+    }
+  });
 }
 
-
 /* =====================================================
-   ANALYSE ALL VOLATILITY MARKETS
+   CONTRACT TYPES
 ===================================================== */
 
-async function analyseAllMarkets(
-  count = 100
-) {
-  /*
-   * Do not make hundreds of requests.
-   * Analyse the supported volatility
-   * markets in small batches.
-   */
-
-  const results = [];
-
-  for (
-    let i = 0;
-    i < VOLATILITY_SYMBOLS.length;
-    i += 5
-  ) {
-    const batch =
-      VOLATILITY_SYMBOLS.slice(
-        i,
-        i + 5
-      );
-
-    const batchResults =
-      await Promise.allSettled(
-        batch.map(
-          symbol =>
-            analyseMarket(
-              symbol,
-              count
-            )
-        )
-      );
-
-    for (
-      const result of batchResults
-    ) {
-      if (
-        result.status ===
-        "fulfilled"
-      ) {
-        results.push(
-          result.value
-        );
-      }
-    }
-  }
-
-  /*
-   * Flatten all valid strategy
-   * signals.
-   */
-  const opportunities = [];
-
-  for (
-    const market of results
-  ) {
-    if (
-      Array.isArray(
-        market.signals
-      )
-    ) {
-      for (
-        const signal of market.signals
-      ) {
-        opportunities.push({
-          market:
-            market.symbol,
-
-          ...signal,
-
-          percentages:
-            market.stats
-              ?.percentages ||
-            [],
-
-          counts:
-            market.stats
-              ?.counts ||
-            [],
-
-          current_digit:
-            market.current_digit
-        });
-      }
-    }
-  }
-
-  return {
-    ok: true,
-
-    markets:
-      results,
-
-    opportunities
-  };
-}
-
-
-/* =====================================================
-   PROPOSAL
-===================================================== */
-
-const DIGIT_CONTRACTS =
+const SUPPORTED_CONTRACTS =
   new Set([
     "DIGITOVER",
     "DIGITUNDER",
@@ -1579,6 +446,463 @@ const DIGIT_CONTRACTS =
     "DIGITDIFF"
   ]);
 
+const DIGIT_BARRIER_CONTRACTS =
+  new Set([
+    "DIGITOVER",
+    "DIGITUNDER",
+    "DIGITMATCH",
+    "DIGITDIFF"
+  ]);
+
+/* =====================================================
+   DIGIT STRATEGIES
+===================================================== */
+
+const STRATEGIES = {
+  UNDER7: {
+    name: "Under 7",
+    contract_type: "DIGITUNDER",
+    barrier: 7
+  },
+
+  OVER5: {
+    name: "Over 5",
+    contract_type: "DIGITOVER",
+    barrier: 5
+  },
+
+  OVER7: {
+    name: "Over 7",
+    contract_type: "DIGITOVER",
+    barrier: 7
+  },
+
+  OVER6: {
+    name: "Over 6",
+    contract_type: "DIGITOVER",
+    barrier: 6
+  },
+
+  UNDER4: {
+    name: "Under 4",
+    contract_type: "DIGITUNDER",
+    barrier: 4
+  }
+};
+
+/* =====================================================
+   STRATEGY VALIDATION
+===================================================== */
+
+function numberValue(value) {
+  const n = Number(value);
+
+  return Number.isFinite(n)
+    ? n
+    : null;
+}
+
+function normalisePercentages(percentages) {
+  const result = {};
+
+  for (let i = 0; i <= 9; i++) {
+    result[i] =
+      numberValue(
+        percentages?.[i] ??
+        percentages?.String?.(i) ??
+        0
+      ) ?? 0;
+  }
+
+  return result;
+}
+
+function validateUnder7(data) {
+  const p =
+    normalisePercentages(
+      data.percentages
+    );
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  /*
+   * Both bars must be below 7.
+   */
+  if (
+    green < 0 ||
+    green >= 7 ||
+    red < 0 ||
+    red >= 7
+  ) {
+    return false;
+  }
+
+  /*
+   * Green must appear before red.
+   */
+  if (
+    Number(data.green_position) >=
+    Number(data.red_position)
+  ) {
+    return false;
+  }
+
+  /*
+   * Moving tick must currently touch 8 or 9.
+   */
+  const tick =
+    Number(data.moving_digit);
+
+  if (
+    tick !== 8 &&
+    tick !== 9
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function validateOver5(data) {
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  const tick =
+    Number(data.moving_digit);
+
+  /*
+   * Red must be 0 or 1.
+   */
+  if (
+    red !== 0 &&
+    red !== 1
+  ) {
+    return false;
+  }
+
+  /*
+   * Green must be 8 or 9.
+   */
+  if (
+    green !== 8 &&
+    green !== 9
+  ) {
+    return false;
+  }
+
+  /*
+   * Entry when moving tick touches 0 or 1.
+   */
+  if (
+    tick !== 0 &&
+    tick !== 1
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function validateOver7(data) {
+  const p =
+    normalisePercentages(
+      data.percentages
+    );
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  /*
+   * Green must be 9.
+   */
+  if (green !== 9) {
+    return false;
+  }
+
+  /*
+   * Red must be 0.
+   */
+  if (red !== 0) {
+    return false;
+  }
+
+  /*
+   * 8 and 9 must be above 12.5%.
+   */
+  if (
+    p[8] <= 12.5 ||
+    p[9] <= 12.5
+  ) {
+    return false;
+  }
+
+  /*
+   * Every number below 7 must be below 10%.
+   */
+  for (let d = 0; d < 7; d++) {
+    if (p[d] >= 10) {
+      return false;
+    }
+  }
+
+  /*
+   * Moving tick must have touched
+   * at least 4 digits.
+   */
+  const touched =
+    Array.isArray(data.touched_digits)
+      ? data.touched_digits
+      : [];
+
+  if (touched.length < 4) {
+    return false;
+  }
+
+  /*
+   * Enter while touching the 4th
+   * number.
+   */
+  const current =
+    Number(data.moving_digit);
+
+  if (
+    Number(touched[3]) !== current
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function validateOver6(data) {
+  const p =
+    normalisePercentages(
+      data.percentages
+    );
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  /*
+   * Green = 9
+   * Red = 0
+   */
+  if (
+    green !== 9 ||
+    red !== 0
+  ) {
+    return false;
+  }
+
+  /*
+   * 9 > 12.5%
+   */
+  if (p[9] <= 12.5) {
+    return false;
+  }
+
+  /*
+   * 0 = 8.5% or below.
+   */
+  if (p[0] > 8.5) {
+    return false;
+  }
+
+  /*
+   * 6,7,8 > 10.5%
+   */
+  if (
+    p[6] <= 10.5 ||
+    p[7] <= 10.5 ||
+    p[8] <= 10.5
+  ) {
+    return false;
+  }
+
+  /*
+   * Reject if 6,7,8,9 is decreasing
+   * by even 0.1%.
+   */
+  const previous =
+    normalisePercentages(
+      data.previous_percentages
+    );
+
+  for (
+    const digit of [6, 7, 8, 9]
+  ) {
+    if (
+      p[digit] <
+      previous[digit]
+    ) {
+      return false;
+    }
+  }
+
+  /*
+   * At least 3 numbers below 6
+   * must have been touched.
+   */
+  const touched =
+    Array.isArray(data.touched_digits)
+      ? data.touched_digits
+      : [];
+
+  const below6 =
+    touched.filter(
+      d => Number(d) < 6
+    );
+
+  if (below6.length < 3) {
+    return false;
+  }
+
+  /*
+   * 1 must always be the LAST
+   * digit touched.
+   */
+  const last =
+    touched.length
+      ? Number(
+          touched[touched.length - 1]
+        )
+      : null;
+
+  if (last !== 1) {
+    return false;
+  }
+
+  /*
+   * Enter while moving tick
+   * is touching 1.
+   */
+  if (
+    Number(data.moving_digit) !== 1
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+function validateUnder4(data) {
+  const p =
+    normalisePercentages(
+      data.percentages
+    );
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  /*
+   * Valid bar arrangements:
+   *
+   * green = 0, red = 9
+   *
+   * OR
+   *
+   * green = 0, red = 1
+   */
+  const validBars =
+    (
+      green === 0 &&
+      red === 9
+    ) ||
+    (
+      green === 0 &&
+      red === 1
+    );
+
+  if (!validBars) {
+    return false;
+  }
+
+  /*
+   * Every number above 4 < 10%.
+   */
+  for (let d = 5; d <= 9; d++) {
+    if (p[d] >= 10) {
+      return false;
+    }
+  }
+
+  /*
+   * 0,1,2,3,4 > 10.5%.
+   */
+  for (let d = 0; d <= 4; d++) {
+    if (p[d] <= 10.5) {
+      return false;
+    }
+  }
+
+  /*
+   * At least 4 numbers above 4
+   * must have been touched.
+   */
+  const touched =
+    Array.isArray(data.touched_digits)
+      ? data.touched_digits
+      : [];
+
+  const above4 =
+    touched.filter(
+      d => Number(d) > 4
+    );
+
+  if (above4.length < 4) {
+    return false;
+  }
+
+  return true;
+}
+
+function strategyAllowsTrade(
+  strategy,
+  data
+) {
+  switch (
+    String(strategy)
+      .toUpperCase()
+  ) {
+    case "UNDER7":
+      return validateUnder7(data);
+
+    case "OVER5":
+      return validateOver5(data);
+
+    case "OVER7":
+      return validateOver7(data);
+
+    case "OVER6":
+      return validateOver6(data);
+
+    case "UNDER4":
+      return validateUnder4(data);
+
+    default:
+      return false;
+  }
+}
+
+/* =====================================================
+   PROPOSAL
+===================================================== */
 
 function buildProposalPayload({
   market,
@@ -1592,11 +916,9 @@ function buildProposalPayload({
   const payload = {
     proposal: 1,
 
-    amount:
-      stake,
+    amount: stake,
 
-    basis:
-      "stake",
+    basis: "stake",
 
     contract_type:
       contractType,
@@ -1611,12 +933,11 @@ function buildProposalPayload({
     underlying_symbol:
       market,
 
-    req_id:
-      4001
+    req_id: 4001
   };
 
   if (
-    DIGIT_CONTRACTS.has(
+    DIGIT_BARRIER_CONTRACTS.has(
       contractType
     )
   ) {
@@ -1640,9 +961,8 @@ function buildProposalPayload({
   return payload;
 }
 
-
 /* =====================================================
-   NORMALIZE CONTRACT
+   CONTRACT NORMALIZER
 ===================================================== */
 
 function normalizeContract(
@@ -1667,8 +987,7 @@ function normalizeContract(
       source?.profit ?? 0
     );
 
-  let status =
-    rawStatus;
+  let status = rawStatus;
 
   if (
     isSold &&
@@ -1691,6 +1010,22 @@ function normalizeContract(
           )
         : "OPEN";
   }
+
+  const entrySpot =
+    source?.entry_spot ??
+    source?.entry_tick ??
+    source?.entry_tick_display_value ??
+    source?.start_spot ??
+    source?.spot_entry ??
+    null;
+
+  const exitSpot =
+    source?.exit_spot ??
+    source?.sell_spot ??
+    source?.exit_tick ??
+    source?.exit_tick_display_value ??
+    source?.spot_exit ??
+    null;
 
   return {
     contract_id:
@@ -1722,20 +1057,10 @@ function normalizeContract(
         : 0,
 
     entry_spot:
-      source?.entry_spot ??
-      source?.entry_tick ??
-      source?.entry_tick_display_value ??
-      source?.start_spot ??
-      source?.spot_entry ??
-      null,
+      entrySpot,
 
     exit_spot:
-      source?.exit_spot ??
-      source?.sell_spot ??
-      source?.exit_tick ??
-      source?.exit_tick_display_value ??
-      source?.spot_exit ??
-      null,
+      exitSpot,
 
     sell_price:
       Number(
@@ -1775,7 +1100,6 @@ function normalizeContract(
   };
 }
 
-
 /* =====================================================
    CONTRACT RESULT
 ===================================================== */
@@ -1801,17 +1125,14 @@ async function getContractResult(
 
     return await new Promise(
       (resolve, reject) => {
-        let finished =
-          false;
+        let finished = false;
 
         const timeout =
           setTimeout(() => {
             finish({
               contract: {
                 contract_id:
-                  Number(
-                    contractId
-                  ),
+                  Number(contractId),
 
                 status:
                   "OPEN",
@@ -1829,12 +1150,10 @@ async function getContractResult(
                   null
               }
             });
-          }, 8000);
+          }, 5000);
 
         function cleanup() {
-          clearTimeout(
-            timeout
-          );
+          clearTimeout(timeout);
 
           ws.removeEventListener(
             "message",
@@ -1852,9 +1171,7 @@ async function getContractResult(
           );
         }
 
-        function finish(
-          result
-        ) {
+        function finish(result) {
           if (finished) return;
 
           finished = true;
@@ -1866,9 +1183,7 @@ async function getContractResult(
           resolve(result);
         }
 
-        function fail(
-          error
-        ) {
+        function fail(error) {
           if (finished) return;
 
           finished = true;
@@ -1880,15 +1195,11 @@ async function getContractResult(
           reject(
             error instanceof Error
               ? error
-              : new Error(
-                  String(error)
-                )
+              : new Error(String(error))
           );
         }
 
-        function onMessage(
-          event
-        ) {
+        function onMessage(event) {
           let data;
 
           try {
@@ -1924,10 +1235,13 @@ async function getContractResult(
 
           if (!raw) return;
 
-          if (
+          const returnedContractId =
             Number(
               raw.contract_id
-            ) !==
+            );
+
+          if (
+            returnedContractId !==
             Number(contractId)
           ) {
             return;
@@ -1939,12 +1253,12 @@ async function getContractResult(
               contractId
             );
 
-          const complete =
+          const finishedContract =
             contract.is_sold ||
             contract.status === "WON" ||
             contract.status === "LOST";
 
-          if (complete) {
+          if (finishedContract) {
             finish({
               contract
             });
@@ -1991,9 +1305,7 @@ async function getContractResult(
                 1,
 
               contract_id:
-                Number(
-                  contractId
-                ),
+                Number(contractId),
 
               subscribe:
                 1,
@@ -2002,7 +1314,7 @@ async function getContractResult(
                 9001
             })
           );
-        } catch(error) {
+        } catch (error) {
           fail(error);
         }
       }
@@ -2011,184 +1323,6 @@ async function getContractResult(
     closeWebSocket(ws);
   }
 }
-
-
-/* =====================================================
-   BUY
-===================================================== */
-
-async function buyContract({
-  token,
-  accountId,
-  accountType,
-  currency,
-  market,
-  contractType,
-  stake,
-  duration,
-  durationUnit,
-  barrier
-}) {
-  let ws;
-
-  try {
-    const wsUrl =
-      await getOTP(
-        token,
-        accountId
-      );
-
-    ws =
-      await openWebSocket(
-        wsUrl
-      );
-
-    const proposalPayload =
-      buildProposalPayload({
-        market,
-        contractType,
-        stake,
-        duration,
-        durationUnit,
-        currency,
-        barrier
-      });
-
-    const proposalResponse =
-      await sendRequest(
-        ws,
-        proposalPayload,
-        "proposal",
-        10000
-      );
-
-    const proposal =
-      proposalResponse?.proposal;
-
-    if (!proposal?.id) {
-      throw new Error(
-        "Deriv did not return a valid proposal."
-      );
-    }
-
-    const askPrice =
-      Number(
-        proposal.ask_price ??
-        proposal.display_value ??
-        stake
-      );
-
-    if (
-      !Number.isFinite(
-        askPrice
-      ) ||
-      askPrice <= 0
-    ) {
-      throw new Error(
-        "Deriv returned an invalid contract price."
-      );
-    }
-
-    const buyResponse =
-      await sendRequest(
-        ws,
-
-        {
-          buy:
-            String(
-              proposal.id
-            ),
-
-          price:
-            askPrice,
-
-          req_id:
-            4002
-        },
-
-        "buy",
-
-        10000
-      );
-
-    const buy =
-      buyResponse?.buy;
-
-    if (
-      !buy?.contract_id
-    ) {
-      throw new Error(
-        "Deriv did not return a contract ID."
-      );
-    }
-
-    return {
-      contract_id:
-        Number(
-          buy.contract_id
-        ),
-
-      buy_price:
-        Number(
-          buy.buy_price ??
-          askPrice
-        ),
-
-      payout:
-        Number(
-          buy.payout ??
-          proposal.payout ??
-          0
-        ),
-
-      profit:
-        Number(
-          buy.profit ??
-          0
-        ),
-
-      status:
-        String(
-          buy.status ||
-          "OPEN"
-        ).toUpperCase(),
-
-      account_type:
-        accountType,
-
-      account_id:
-        accountId,
-
-      market,
-
-      underlying_symbol:
-        market,
-
-      contract_type:
-        contractType,
-
-      barrier:
-        DIGIT_CONTRACTS.has(
-          contractType
-        )
-          ? String(barrier)
-          : null,
-
-      entry_spot:
-        buy.entry_spot ??
-        buy.entry_tick ??
-        buy.start_spot ??
-        proposal.spot ??
-        null,
-
-      exit_spot:
-        null
-    };
-  } finally {
-    closeWebSocket(ws);
-  }
-}
-
 
 /* =====================================================
    MAIN
@@ -2320,7 +1454,6 @@ export async function onRequest(
     currency
   } = selected;
 
-
   /* =====================================================
      GET
   ===================================================== */
@@ -2340,9 +1473,11 @@ export async function onRequest(
         account_type:
           accountType,
 
-        balance,
+        balance:
+          balance,
 
-        currency,
+        currency:
+          currency,
 
         status:
           account.status ||
@@ -2350,73 +1485,6 @@ export async function onRequest(
       }
     });
   }
-
-
-  /* =====================================================
-     BALANCE
-  ===================================================== */
-
-  if (
-    body.action ===
-    "balance"
-  ) {
-    try {
-      const accounts =
-        await getAccounts(
-          token
-        );
-
-      const fresh =
-        findAccount(
-          accounts,
-          accountType
-        );
-
-      if (fresh) {
-        return json({
-          ok: true,
-
-          account: {
-            account_id:
-              getAccountId(
-                fresh
-              ),
-
-            account_type:
-              getAccountType(
-                fresh
-              )
-          },
-
-          balance:
-            getAccountBalance(
-              fresh
-            ),
-
-          currency:
-            fresh.currency ||
-            currency
-        });
-      }
-    } catch {}
-
-    return json({
-      ok: true,
-
-      account: {
-        account_id:
-          accountId,
-
-        account_type:
-          accountType
-      },
-
-      balance,
-
-      currency
-    });
-  }
-
 
   /* =====================================================
      SELECT ACCOUNT
@@ -2438,9 +1506,11 @@ export async function onRequest(
         account_type:
           accountType,
 
-        balance,
+        balance:
+          balance,
 
-        currency,
+        currency:
+          currency,
 
         status:
           account.status ||
@@ -2449,355 +1519,132 @@ export async function onRequest(
     });
   }
 
-
   /* =====================================================
-     SESSION
+     BALANCE
   ===================================================== */
 
   if (
     body.action ===
-      "session" ||
-    body.action ===
-      "trading_session"
+    "balance"
   ) {
-    let ws;
-
     try {
-      const wsUrl =
-        await getOTP(
-          token,
-          accountId
+      const accounts =
+        await getAccounts(
+          token
         );
 
-      ws =
-        await openWebSocket(
-          wsUrl
+      const freshAccount =
+        findAccount(
+          accounts,
+          accountType
         );
 
-      const result =
-        await sendRequest(
-          ws,
+      if (freshAccount) {
+        return json({
+          ok: true,
 
-          {
-            balance: 1,
+          account: {
+            account_id:
+              getAccountId(
+                freshAccount
+              ),
 
-            req_id:
-              3001
+            account_type:
+              getAccountType(
+                freshAccount
+              )
           },
 
-          "balance",
+          balance:
+            getAccountBalance(
+              freshAccount
+            ),
 
-          10000
-        );
-
-      return json({
-        ok: true,
-
-        connected: true,
-
-        trading_ready:
-          true,
-
-        balance:
-          result?.balance?.balance ??
-          balance,
-
-        currency:
-          result?.balance?.currency ??
-          currency,
-
-        account: {
-          account_id:
-            accountId,
-
-          account_type:
-            accountType
-        }
-      });
-    } catch(error) {
-      return json(
-        {
-          ok: false,
-
-          connected: true,
-
-          trading_ready:
-            false,
-
-          error:
-            error.message ||
-            "Trading session failed."
-        },
-        502
-      );
-    } finally {
-      closeWebSocket(ws);
-    }
-  }
-
-
-  /* =====================================================
-     STRATEGY ANALYSE
-  ===================================================== */
-
-  if (
-    body.action ===
-    "analyse"
-  ) {
-    const count =
-      Math.min(
-        Math.max(
-          Number(
-            body.count || 100
-          ),
-          20
-        ),
-        1000
-      );
-
-    try {
-      const result =
-        await analyseAllMarkets(
-          count
-        );
-
-      return json({
-        ok: true,
-
-        engine:
-          "DollarTicks Multi Strategy",
-
-        strategies: [
-          "UNDER 7",
-          "OVER 5",
-          "OVER 7",
-          "OVER 6",
-          "UNDER 4"
-        ],
-
-        ...result
-      });
-    } catch(error) {
-      return json(
-        {
-          ok: false,
-
-          error:
-            error.message ||
-            "Market analysis failed."
-        },
-        502
-      );
-    }
-  }
-
-
-  /* =====================================================
-     ANALYSE ONE MARKET
-  ===================================================== */
-
-  if (
-    body.action ===
-    "analyse_market"
-  ) {
-    const market =
-      String(
-        body.market ||
-        ""
-      ).trim();
-
-    if (!market) {
-      return json(
-        {
-          ok: false,
-
-          error:
-            "No market supplied."
-        },
-        400
-      );
-    }
-
-    try {
-      const result =
-        await analyseMarket(
-          market,
-          Number(
-            body.count || 100
-          )
-        );
-
-      return json({
-        ok: true,
-
-        ...result
-      });
-    } catch(error) {
-      return json(
-        {
-          ok: false,
-
-          error:
-            error.message ||
-            "Market analysis failed."
-        },
-        502
-      );
-    }
-  }
-
-
-  /* =====================================================
-     BUY
-  ===================================================== */
-
-  if (
-    body.action ===
-    "buy"
-  ) {
-    try {
-      const market =
-        String(
-          body.market ||
-          body.underlying_symbol ||
-          body.symbol ||
-          ""
-        ).trim();
-
-      if (!market) {
-        throw new Error(
-          "No trading market was selected."
-        );
-      }
-
-      const contractType =
-        String(
-          body.contract_type ||
-          ""
-        )
-          .trim()
-          .toUpperCase();
-
-      if (
-        contractType !==
-          "DIGITOVER" &&
-        contractType !==
-          "DIGITUNDER"
-      ) {
-        throw new Error(
-          "DollarTicks strategy trades must use DIGITOVER or DIGITUNDER."
-        );
-      }
-
-      const stake =
-        Number(
-          body.stake
-        );
-
-      if (
-        !Number.isFinite(
-          stake
-        ) ||
-        stake <= 0
-      ) {
-        throw new Error(
-          "Enter a valid stake greater than 0."
-        );
-      }
-
-      const duration =
-        Number(
-          body.duration || 1
-        );
-
-      if (
-        !Number.isFinite(
-          duration
-        ) ||
-        duration < 1
-      ) {
-        throw new Error(
-          "Enter a valid duration."
-        );
-      }
-
-      const barrier =
-        Number(
-          body.barrier
-        );
-
-      if (
-        !Number.isInteger(
-          barrier
-        ) ||
-        barrier < 0 ||
-        barrier > 9
-      ) {
-        throw new Error(
-          "Invalid digit barrier."
-        );
-      }
-
-      const contract =
-        await buyContract({
-          token,
-
-          accountId,
-
-          accountType,
-
-          currency,
-
-          market,
-
-          contractType,
-
-          stake,
-
-          duration,
-
-          durationUnit:
-            "t",
-
-          barrier
+          currency:
+            freshAccount.currency ||
+            currency
         });
-
-      return json({
-        ok: true,
-
-        contract,
-
-        account: {
-          account_id:
-            accountId,
-
-          account_type:
-            accountType,
-
-          currency
-        }
-      });
+      }
     } catch(error) {
       console.error(
-        "DollarTicks BUY ERROR:",
+        "Fast balance error:",
         error
       );
+    }
 
+    return json({
+      ok: true,
+
+      account: {
+        account_id:
+          accountId,
+
+        account_type:
+          accountType
+      },
+
+      balance:
+        balance,
+
+      currency:
+        currency
+    });
+  }
+
+  /* =====================================================
+     STRATEGY CHECK
+  ===================================================== */
+
+  if (
+    body.action ===
+    "strategy_check"
+  ) {
+    const strategy =
+      String(
+        body.strategy || ""
+      )
+        .trim()
+        .toUpperCase();
+
+    if (
+      !STRATEGIES[strategy]
+    ) {
       return json(
         {
           ok: false,
 
-          connected: true,
-
           error:
-            error.message ||
-            "Purchase failed."
+            "Unknown strategy."
         },
         400
       );
     }
-  }
 
+    const allowed =
+      strategyAllowsTrade(
+        strategy,
+        body
+      );
+
+    return json({
+      ok: true,
+
+      strategy,
+
+      strategy_name:
+        STRATEGIES[strategy].name,
+
+      allowed,
+
+      contract_type:
+        STRATEGIES[strategy]
+          .contract_type,
+
+      barrier:
+        STRATEGIES[strategy]
+          .barrier
+    });
+  }
 
   /* =====================================================
      CONTRACT STATUS
@@ -2821,7 +1668,6 @@ export async function onRequest(
       return json(
         {
           ok: false,
-
           error:
             "Invalid contract ID."
         },
@@ -2856,7 +1702,8 @@ export async function onRequest(
         {
           ok: false,
 
-          connected: true,
+          connected:
+            true,
 
           error:
             error.message ||
@@ -2867,9 +1714,424 @@ export async function onRequest(
     }
   }
 
+  /* =====================================================
+     SESSION
+  ===================================================== */
+
+  if (
+    body.action === "session" ||
+    body.action === "trading_session"
+  ) {
+    let ws;
+
+    try {
+      const wsUrl =
+        await getOTP(
+          token,
+          accountId
+        );
+
+      ws =
+        await openWebSocket(
+          wsUrl
+        );
+
+      const result =
+        await sendRequest(
+          ws,
+
+          {
+            balance: 1,
+            req_id: 3001
+          },
+
+          "balance",
+
+          8000
+        );
+
+      return json({
+        ok: true,
+
+        connected: true,
+
+        trading_ready:
+          true,
+
+        balance:
+          result?.balance?.balance ??
+          balance,
+
+        currency:
+          result?.balance?.currency ??
+          currency,
+
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            accountType
+        }
+      });
+    } catch(error) {
+      return json(
+        {
+          ok: false,
+
+          connected:
+            true,
+
+          trading_ready:
+            false,
+
+          error:
+            error.message ||
+            "Trading session failed."
+        },
+        502
+      );
+    } finally {
+      closeWebSocket(ws);
+    }
+  }
 
   /* =====================================================
-     UNKNOWN
+     BUY
+  ===================================================== */
+
+  if (
+    body.action ===
+    "buy"
+  ) {
+    let ws;
+
+    try {
+      const market =
+        String(
+          body.market ||
+          body.underlying_symbol ||
+          body.symbol ||
+          ""
+        ).trim();
+
+      if (!market) {
+        throw new Error(
+          "No trading market was selected."
+        );
+      }
+
+      /*
+       * Strategy can determine the
+       * contract automatically.
+       */
+      const strategy =
+        String(
+          body.strategy || ""
+        )
+          .trim()
+          .toUpperCase();
+
+      let contractType =
+        String(
+          body.contract_type ||
+          ""
+        )
+          .trim()
+          .toUpperCase();
+
+      let barrier =
+        body.barrier ??
+        null;
+
+      /*
+       * If a strategy is supplied,
+       * use its exact contract.
+       */
+      if (
+        strategy &&
+        STRATEGIES[strategy]
+      ) {
+        contractType =
+          STRATEGIES[strategy]
+            .contract_type;
+
+        barrier =
+          STRATEGIES[strategy]
+            .barrier;
+      }
+
+      if (!contractType) {
+        throw new Error(
+          "No contract type was selected."
+        );
+      }
+
+      if (
+        !SUPPORTED_CONTRACTS.has(
+          contractType
+        )
+      ) {
+        throw new Error(
+          `Unsupported contract type: ${contractType}`
+        );
+      }
+
+      const stake =
+        Number(
+          body.stake
+        );
+
+      if (
+        !Number.isFinite(stake) ||
+        stake <= 0
+      ) {
+        throw new Error(
+          "Enter a valid stake greater than 0."
+        );
+      }
+
+      const duration =
+        Number(
+          body.duration || 1
+        );
+
+      if (
+        !Number.isFinite(duration) ||
+        duration < 1
+      ) {
+        throw new Error(
+          "Enter a valid duration."
+        );
+      }
+
+      const durationUnit =
+        String(
+          body.duration_unit ||
+          "t"
+        ).trim();
+
+      /* -----------------------------------------------
+         AUTHENTICATED CONNECTION
+      ----------------------------------------------- */
+
+      const wsUrl =
+        await getOTP(
+          token,
+          accountId
+        );
+
+      ws =
+        await openWebSocket(
+          wsUrl
+        );
+
+      /* -----------------------------------------------
+         PROPOSAL
+      ----------------------------------------------- */
+
+      const proposalPayload =
+        buildProposalPayload({
+          market,
+          contractType,
+          stake,
+          duration,
+          durationUnit,
+          currency,
+          barrier
+        });
+
+      const proposalResponse =
+        await sendRequest(
+          ws,
+          proposalPayload,
+          "proposal",
+          8000
+        );
+
+      const proposal =
+        proposalResponse?.proposal;
+
+      if (!proposal?.id) {
+        throw new Error(
+          "Deriv did not return a valid proposal."
+        );
+      }
+
+      const askPrice =
+        Number(
+          proposal.ask_price ??
+          proposal.display_value ??
+          stake
+        );
+
+      if (
+        !Number.isFinite(askPrice) ||
+        askPrice <= 0
+      ) {
+        throw new Error(
+          "Deriv returned an invalid contract price."
+        );
+      }
+
+      /* -----------------------------------------------
+         PURCHASE
+      ----------------------------------------------- */
+
+      const buyResponse =
+        await sendRequest(
+          ws,
+
+          {
+            buy:
+              String(
+                proposal.id
+              ),
+
+            price:
+              askPrice,
+
+            req_id:
+              4002
+          },
+
+          "buy",
+
+          8000
+        );
+
+      const buy =
+        buyResponse?.buy;
+
+      if (
+        !buy?.contract_id
+      ) {
+        throw new Error(
+          "Deriv did not return a contract ID."
+        );
+      }
+
+      const balanceAfter =
+        Number(
+          buy.balance_after
+        );
+
+      const entrySpot =
+        buy.entry_spot ??
+        buy.entry_tick ??
+        buy.start_spot ??
+        null;
+
+      return json({
+        ok: true,
+
+        strategy:
+          strategy || null,
+
+        contract: {
+          contract_id:
+            Number(
+              buy.contract_id
+            ),
+
+          buy_price:
+            Number(
+              buy.buy_price ??
+              askPrice
+            ),
+
+          payout:
+            Number(
+              buy.payout ??
+              proposal.payout ??
+              0
+            ),
+
+          profit:
+            Number(
+              buy.profit ??
+              0
+            ),
+
+          status:
+            String(
+              buy.status ||
+              "OPEN"
+            ).toUpperCase(),
+
+          account_type:
+            accountType,
+
+          account_id:
+            accountId,
+
+          market:
+            market,
+
+          underlying_symbol:
+            market,
+
+          contract_type:
+            contractType,
+
+          barrier:
+            DIGIT_BARRIER_CONTRACTS.has(
+              contractType
+            )
+              ? String(barrier)
+              : null,
+
+          entry_spot:
+            entrySpot,
+
+          exit_spot:
+            null
+        },
+
+        account: {
+          account_id:
+            accountId,
+
+          account_type:
+            accountType,
+
+          balance:
+            Number.isFinite(
+              balanceAfter
+            )
+              ? balanceAfter
+              : balance,
+
+          currency:
+            currency
+        }
+      });
+    } catch(error) {
+      console.error(
+        "DollarTicks BUY ERROR:",
+        error
+      );
+
+      return json(
+        {
+          ok: false,
+
+          connected:
+            true,
+
+          error:
+            error.message ||
+            "Purchase failed."
+        },
+        400
+      );
+    } finally {
+      closeWebSocket(ws);
+    }
+  }
+
+  /* =====================================================
+     UNKNOWN ACTION
   ===================================================== */
 
   return json(
@@ -2883,4 +2145,4 @@ export async function onRequest(
     },
     400
   );
-   }
+}
