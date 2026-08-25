@@ -227,12 +227,19 @@ button.danger{
 .bar{
   width:70%;
   min-height:2px;
-  background:#21e58b;
   border-radius:4px 4px 0 0;
+}
+
+.bar.green{
+  background:#21e58b;
 }
 
 .bar.red{
   background:#ff4f67;
+}
+
+.bar.neutral{
+  background:#385147;
 }
 
 .bar-number{
@@ -328,7 +335,9 @@ th{
 
 <header>
   <div class="logo">DollarTicks</div>
-  <div id="connectionStatus" class="status">Checking connection...</div>
+  <div id="connectionStatus" class="status">
+    Checking connection...
+  </div>
 </header>
 
 <!-- ACCOUNT -->
@@ -336,20 +345,37 @@ th{
   <h2>Account</h2>
 
   <div class="account-buttons">
-    <button id="demoBtn" class="active" onclick="selectAccount('demo')">
+
+    <button
+      id="demoBtn"
+      class="active"
+      onclick="selectAccount('demo')">
       DEMO
     </button>
 
-    <button id="realBtn" class="secondary" onclick="selectAccount('real')">
+    <button
+      id="realBtn"
+      class="secondary"
+      onclick="selectAccount('real')">
       REAL
     </button>
+
   </div>
 
   <div style="margin-top:14px">
-    <div class="balance" id="balance">$0.00</div>
-    <div class="account-info" id="accountInfo">
+
+    <div
+      class="balance"
+      id="balance">
+      $0.00
+    </div>
+
+    <div
+      class="account-info"
+      id="accountInfo">
       Loading account...
     </div>
+
   </div>
 </div>
 
@@ -358,126 +384,257 @@ th{
   <h2>Market</h2>
 
   <div class="grid">
+
     <div>
       <label>Volatility Market</label>
+
       <select id="market">
-        <option value="1HZ10V">Volatility 10 (1s)</option>
-        <option value="1HZ25V">Volatility 25 (1s)</option>
-        <option value="1HZ50V">Volatility 50 (1s)</option>
-        <option value="1HZ75V">Volatility 75 (1s)</option>
-        <option value="1HZ100V">Volatility 100 (1s)</option>
+
+        <option value="1HZ10V">
+          Volatility 10 (1s)
+        </option>
+
+        <option value="1HZ25V">
+          Volatility 25 (1s)
+        </option>
+
+        <option value="1HZ50V">
+          Volatility 50 (1s)
+        </option>
+
+        <option value="1HZ75V">
+          Volatility 75 (1s)
+        </option>
+
+        <option value="1HZ100V">
+          Volatility 100 (1s)
+        </option>
+
       </select>
     </div>
 
     <div>
       <label>Stake</label>
-      <input id="stake" type="number" min="0.35" step="0.01" value="1">
+
+      <input
+        id="stake"
+        type="number"
+        min="0.35"
+        step="0.01"
+        value="1">
     </div>
 
     <div>
       <label>Duration</label>
-      <input id="duration" type="number" min="1" step="1" value="1">
+
+      <input
+        id="duration"
+        type="number"
+        min="1"
+        step="1"
+        value="1">
     </div>
 
     <div>
       <label>Duration Unit</label>
+
       <select id="durationUnit">
-        <option value="t">Ticks</option>
+        <option value="t">
+          Ticks
+        </option>
       </select>
     </div>
+
   </div>
 </div>
 
 <!-- LIVE DIGITS -->
 <div class="card">
+
   <h2>Live Digits</h2>
 
-  <div id="tick" class="tick">-</div>
-  <div id="tickMarket" class="tick-market">Not connected to tick stream</div>
+  <div
+    id="tick"
+    class="tick">
+    -
+  </div>
 
-  <div id="digits" class="digits"></div>
-  <div id="bars" class="bars"></div>
+  <div
+    id="tickMarket"
+    class="tick-market">
+    Not connected to tick stream
+  </div>
+
+  <div
+    id="digits"
+    class="digits">
+  </div>
+
+  <div
+    id="bars"
+    class="bars">
+  </div>
+
 </div>
 
 <!-- MANUAL -->
 <div class="card">
+
   <h2>Manual Over / Under</h2>
 
   <div class="grid">
+
     <div>
       <label>Manual Barrier</label>
+
       <select id="manualBarrier">
-        <option value="5">Over 5 / Under 5</option>
-        <option value="6">Over 6 / Under 6</option>
-        <option value="7">Over 7 / Under 7</option>
-        <option value="4">Over 4 / Under 4</option>
+
+        <option value="5">
+          Over 5 / Under 5
+        </option>
+
+        <option value="6">
+          Over 6 / Under 6
+        </option>
+
+        <option value="7">
+          Over 7 / Under 7
+        </option>
+
+        <option value="4">
+          Over 4 / Under 4
+        </option>
+
       </select>
     </div>
+
   </div>
 
   <div class="trade-buttons">
-    <button id="manualOver" class="over" onclick="manualTrade('over')">
+
+    <button
+      id="manualOver"
+      class="over"
+      onclick="manualTrade('over')">
       OVER
     </button>
 
-    <button id="manualUnder" class="under" onclick="manualTrade('under')">
+    <button
+      id="manualUnder"
+      class="under"
+      onclick="manualTrade('under')">
       UNDER
     </button>
+
   </div>
 </div>
 
 <!-- AUTOMATIC -->
 <div class="card">
+
   <h2>Automatic Strategies</h2>
 
   <div class="strategy-grid">
-    <div id="sUNDER7" class="strategy">
+
+    <div
+      id="sUNDER7"
+      class="strategy">
+
       UNDER 7
-      <small>Waiting</small>
+
+      <small>
+        Waiting
+      </small>
+
     </div>
 
-    <div id="sOVER5" class="strategy">
+    <div
+      id="sOVER5"
+      class="strategy">
+
       OVER 5
-      <small>Waiting</small>
+
+      <small>
+        Waiting
+      </small>
+
     </div>
 
-    <div id="sOVER7" class="strategy">
+    <div
+      id="sOVER7"
+      class="strategy">
+
       OVER 7
-      <small>Waiting</small>
+
+      <small>
+        Waiting
+      </small>
+
     </div>
 
-    <div id="sOVER6" class="strategy">
+    <div
+      id="sOVER6"
+      class="strategy">
+
       OVER 6
-      <small>Waiting</small>
+
+      <small>
+        Waiting
+      </small>
+
     </div>
 
-    <div id="sUNDER4" class="strategy">
+    <div
+      id="sUNDER4"
+      class="strategy">
+
       UNDER 4
-      <small>Waiting</small>
+
+      <small>
+        Waiting
+      </small>
+
     </div>
+
   </div>
 
-  <div class="grid" style="margin-top:12px">
-    <button id="autoToggle" onclick="toggleAuto()">
+  <div
+    class="grid"
+    style="margin-top:12px">
+
+    <button
+      id="autoToggle"
+      onclick="toggleAuto()">
       START AUTO TRADING
     </button>
 
-    <button class="secondary" onclick="resetStatistics()">
+    <button
+      class="secondary"
+      onclick="resetStatistics()">
       RESET DIGITS
     </button>
+
   </div>
+
 </div>
 
 <!-- TRADE MESSAGE -->
-<div id="message" class="message"></div>
+<div
+  id="message"
+  class="message">
+</div>
 
 <!-- HISTORY -->
 <div class="card">
+
   <h2>Trading History</h2>
 
   <div class="history">
+
     <table>
+
       <thead>
+
         <tr>
           <th>Time</th>
           <th>Strategy</th>
@@ -489,220 +646,381 @@ th{
           <th>Result</th>
           <th>Profit</th>
         </tr>
+
       </thead>
 
       <tbody id="historyBody">
+
         <tr>
-          <td colspan="9" class="empty">
+
+          <td
+            colspan="9"
+            class="empty">
             No trades yet
           </td>
+
         </tr>
+
       </tbody>
+
     </table>
+
   </div>
+
 </div>
 
 </div>
 
 <script>
+
 /* =====================================================
    STATE
 ===================================================== */
 
 const state = {
-  accountType: "demo",
-  connected: false,
-  auto: false,
-  activeTrade: null,
 
-  tick: null,
-  market: "1HZ10V",
+  accountType:
+    "demo",
 
-  digits: [],
-  counts: Array(10).fill(0),
-  touched: [],
+  connected:
+    false,
 
-  previousPercentages: Array(10).fill(0),
+  auto:
+    false,
 
-  history: [],
+  activeTrade:
+    null,
 
-  ws: null,
-  reconnectTimer: null
+  tick:
+    null,
+
+  market:
+    "1HZ10V",
+
+  digits:
+    [],
+
+  counts:
+    Array(10).fill(0),
+
+  touched:
+    [],
+
+  previousPercentages:
+    Array(10).fill(0),
+
+  history:
+    [],
+
+  ws:
+    null,
+
+  reconnectTimer:
+    null,
+
+  strategyTimer:
+    null,
+
+  autoBusy:
+    false
 };
+
+
+/* =====================================================
+   STRATEGIES
+===================================================== */
 
 const STRATEGIES = {
-  UNDER7: {
-    name: "Under 7",
-    contract_type: "DIGITUNDER",
-    barrier: 7
+
+  UNDER7:{
+    name:"Under 7",
+    contract_type:"DIGITUNDER",
+    barrier:7
   },
 
-  OVER5: {
-    name: "Over 5",
-    contract_type: "DIGITOVER",
-    barrier: 5
+  OVER5:{
+    name:"Over 5",
+    contract_type:"DIGITOVER",
+    barrier:5
   },
 
-  OVER7: {
-    name: "Over 7",
-    contract_type: "DIGITOVER",
-    barrier: 7
+  OVER7:{
+    name:"Over 7",
+    contract_type:"DIGITOVER",
+    barrier:7
   },
 
-  OVER6: {
-    name: "Over 6",
-    contract_type: "DIGITOVER",
-    barrier: 6
+  OVER6:{
+    name:"Over 6",
+    contract_type:"DIGITOVER",
+    barrier:6
   },
 
-  UNDER4: {
-    name: "Under 4",
-    contract_type: "DIGITUNDER",
-    barrier: 4
+  UNDER4:{
+    name:"Under 4",
+    contract_type:"DIGITUNDER",
+    barrier:4
   }
+
 };
+
 
 const MAX_DIGITS = 100;
 
+
 /* =====================================================
-   ELEMENTS
+   ELEMENT HELPER
 ===================================================== */
 
-const $ = id => document.getElementById(id);
+const $ =
+  id =>
+    document.getElementById(id);
 
-function setMessage(text) {
-  $("message").textContent = text || "";
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+function setMessage(text){
+
+  $("message").textContent =
+    text || "";
+
 }
 
-function money(value) {
-  const n = Number(value);
+
+/* =====================================================
+   MONEY
+===================================================== */
+
+function money(value){
+
+  const n =
+    Number(value);
+
   return Number.isFinite(n)
     ? `$${n.toFixed(2)}`
     : "$0.00";
+
 }
+
 
 /* =====================================================
    BACKEND
 ===================================================== */
 
-async function trading(payload = {}) {
-  const response = await fetch("/trading", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    credentials: "include",
-    body: JSON.stringify(payload)
-  });
+async function trading(payload = {}){
+
+  const response =
+    await fetch(
+      "/trading",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        credentials:"include",
+
+        body:
+          JSON.stringify(payload)
+      }
+    );
+
 
   let data;
 
-  try {
-    data = await response.json();
-  } catch {
-    throw new Error("Trading server returned an invalid response.");
+
+  try{
+
+    data =
+      await response.json();
+
+  }catch{
+
+    throw new Error(
+      "Trading server returned an invalid response."
+    );
+
   }
 
-  if (!response.ok || data.ok === false) {
+
+  if(
+    !response.ok ||
+    data.ok === false
+  ){
+
     throw new Error(
-      data.error || "Trading request failed."
+      data.error ||
+      "Trading request failed."
     );
+
   }
+
 
   return data;
+
 }
+
 
 /* =====================================================
    ACCOUNT
 ===================================================== */
 
-async function loadAccount() {
-  try {
-    const data = await trading({
-      action: "select_account",
-      account_type: state.accountType
-    });
+async function loadAccount(){
 
-    state.connected = true;
+  try{
+
+    const data =
+      await trading({
+        action:
+          "select_account",
+
+        account_type:
+          state.accountType
+      });
+
+
+    state.connected =
+      true;
+
 
     updateConnection(true);
 
-    updateAccount(data.account, data.account?.balance);
 
-  } catch(error) {
-    state.connected = false;
+    updateAccount(
+      data.account,
+      data.account?.balance
+    );
+
+
+  }catch(error){
+
+    state.connected =
+      false;
 
     updateConnection(false);
 
-    setMessage(error.message);
+    setMessage(
+      error.message
+    );
+
   }
+
 }
 
-async function selectAccount(type) {
-  if (state.activeTrade) {
-    setMessage("Finish the active trade before changing account.");
+
+async function selectAccount(type){
+
+  if(state.activeTrade){
+
+    setMessage(
+      "Finish the active trade before changing account."
+    );
+
     return;
+
   }
 
-  state.accountType = type;
 
-  $("demoBtn").classList.toggle(
-    "active",
-    type === "demo"
-  );
+  state.accountType =
+    type;
 
-  $("realBtn").classList.toggle(
-    "active",
-    type === "real"
-  );
 
-  $("demoBtn").classList.toggle(
-    "secondary",
-    type !== "demo"
-  );
+  $("demoBtn")
+    .classList.toggle(
+      "active",
+      type === "demo"
+    );
 
-  $("realBtn").classList.toggle(
-    "secondary",
-    type !== "real"
-  );
+
+  $("realBtn")
+    .classList.toggle(
+      "active",
+      type === "real"
+    );
+
+
+  $("demoBtn")
+    .classList.toggle(
+      "secondary",
+      type !== "demo"
+    );
+
+
+  $("realBtn")
+    .classList.toggle(
+      "secondary",
+      type !== "real"
+    );
+
 
   await loadAccount();
+
 }
 
-function updateConnection(ok) {
-  const el = $("connectionStatus");
+
+function updateConnection(ok){
+
+  const el =
+    $("connectionStatus");
+
 
   el.textContent =
     ok
       ? `${state.accountType.toUpperCase()} CONNECTED`
       : "NOT CONNECTED";
+
 }
+
 
 /* =====================================================
    BALANCE
 ===================================================== */
 
-async function refreshBalance() {
-  try {
-    const data = await trading({
-      action: "balance",
-      account_type: state.accountType
-    });
+async function refreshBalance(){
+
+  try{
+
+    const data =
+      await trading({
+        action:
+          "balance",
+
+        account_type:
+          state.accountType
+      });
+
 
     $("balance").textContent =
       money(data.balance);
 
-    if (data.account) {
+
+    if(data.account){
+
       $("accountInfo").textContent =
-        `${data.account.account_id} • ${String(
-          data.account.account_type
-        ).toUpperCase()} • ${data.currency || "USD"}`;
+        `${data.account.account_id} • ${
+          String(
+            data.account.account_type
+          ).toUpperCase()
+        } • ${
+          data.currency || "USD"
+        }`;
+
     }
 
-  } catch {}
+  }catch{}
+
 }
 
-function updateAccount(account, balance) {
+
+function updateAccount(
+  account,
+  balance
+){
+
   $("balance").textContent =
     money(
       balance ??
@@ -710,102 +1028,176 @@ function updateAccount(account, balance) {
       0
     );
 
+
   $("accountInfo").textContent =
     `${account?.account_id || ""} • ${
       String(
         account?.account_type ||
         state.accountType
       ).toUpperCase()
-    } • ${account?.currency || "USD"}`;
+    } • ${
+      account?.currency ||
+      "USD"
+    }`;
+
 }
+
 
 /* =====================================================
    DIGIT STATISTICS
 ===================================================== */
 
-function resetStatistics() {
-  state.digits = [];
-  state.counts = Array(10).fill(0);
-  state.touched = [];
-  state.previousPercentages = Array(10).fill(0);
+function resetStatistics(){
+
+  state.digits =
+    [];
+
+  state.counts =
+    Array(10).fill(0);
+
+  state.touched =
+    [];
+
+  state.previousPercentages =
+    Array(10).fill(0);
+
 
   renderDigits();
+
   renderBars();
+
   updateStrategies();
+
 }
 
-function addDigit(digit) {
-  digit = Number(digit);
 
-  if (
+function addDigit(digit){
+
+  digit =
+    Number(digit);
+
+
+  if(
     !Number.isInteger(digit) ||
     digit < 0 ||
     digit > 9
-  ) {
+  ){
+
     return;
+
   }
+
 
   state.previousPercentages =
     getPercentages();
 
-  state.digits.push(digit);
+
+  state.digits.push(
+    digit
+  );
+
 
   state.counts[digit]++;
 
-  if (!state.touched.includes(digit)) {
-    state.touched.push(digit);
+
+  if(
+    !state.touched.includes(digit)
+  ){
+
+    state.touched.push(
+      digit
+    );
+
   }
 
-  if (state.digits.length > MAX_DIGITS) {
+
+  if(
+    state.digits.length >
+    MAX_DIGITS
+  ){
+
     const removed =
       state.digits.shift();
+
 
     state.counts[removed] =
       Math.max(
         0,
         state.counts[removed] - 1
       );
+
   }
 
+
   renderDigits();
+
   renderBars();
+
   updateStrategies();
+
 }
 
-function getPercentages() {
+
+function getPercentages(){
+
   const total =
     state.counts.reduce(
       (a,b) => a+b,
       0
     );
+
 
   const result = {};
 
-  for(let d=0; d<=9; d++) {
+
+  for(
+    let d=0;
+    d<=9;
+    d++
+  ){
+
     result[d] =
       total
-        ? (state.counts[d] / total) * 100
+        ? (
+            state.counts[d] /
+            total
+          ) * 100
         : 0;
+
   }
 
+
   return result;
+
 }
 
-function renderDigits() {
+
+/* =====================================================
+   DIGIT DISPLAY
+===================================================== */
+
+function renderDigits(){
+
   const total =
     state.counts.reduce(
       (a,b) => a+b,
       0
     );
+
 
   $("digits").innerHTML =
     Array.from(
       {length:10},
       (_,d) => {
+
         const pct =
           total
-            ? state.counts[d] / total * 100
+            ? (
+                state.counts[d] /
+                total
+              ) * 100
             : 0;
+
 
         return `
           <div class="digit">
@@ -813,51 +1205,26 @@ function renderDigits() {
             <span>${pct.toFixed(1)}%</span>
           </div>
         `;
+
       }
     ).join("");
+
 }
 
-function renderBars() {
-  const max =
-    Math.max(
-      ...state.counts,
-      1
-    );
-
-  $("bars").innerHTML =
-    Array.from(
-      {length:10},
-      (_,d) => {
-        const height =
-          Math.max(
-            3,
-            state.counts[d] / max * 80
-          );
-
-        return `
-          <div class="bar-wrap">
-            <div
-              class="bar"
-              style="height:${height}px"
-            ></div>
-            <div class="bar-number">${d}</div>
-          </div>
-        `;
-      }
-    ).join("");
-}
 
 /* =====================================================
-   GREEN / RED BAR INFORMATION
+   GREEN / RED FREQUENCY BARS
 ===================================================== */
 
-function getBarDigits() {
+function getBarDigits(){
+
   const ranked =
     Array.from(
       {length:10},
       (_,d) => ({
         digit:d,
-        count:state.counts[d]
+        count:
+          state.counts[d]
       })
     )
     .sort(
@@ -866,26 +1233,130 @@ function getBarDigits() {
         b.digit - a.digit
     );
 
+
   return {
-    green: ranked[0]?.digit ?? 0,
-    red: ranked[1]?.digit ?? 0,
-    greenPosition: 0,
-    redPosition: 1
+
+    green:
+      ranked[0]?.digit ?? 0,
+
+    red:
+      ranked[1]?.digit ?? 0,
+
+    greenPosition:
+      0,
+
+    redPosition:
+      1
+
   };
+
 }
 
+
+function renderBars(){
+
+  const max =
+    Math.max(
+      ...state.counts,
+      1
+    );
+
+
+  const ranked =
+    Array.from(
+      {length:10},
+      (_,d) => ({
+        digit:d,
+        count:
+          state.counts[d]
+      })
+    )
+    .sort(
+      (a,b) =>
+        b.count - a.count ||
+        b.digit - a.digit
+    );
+
+
+  const greenDigit =
+    ranked[0]?.digit;
+
+
+  const redDigit =
+    ranked[1]?.digit;
+
+
+  $("bars").innerHTML =
+    Array.from(
+      {length:10},
+      (_,d) => {
+
+        const height =
+          Math.max(
+            3,
+            (
+              state.counts[d] /
+              max
+            ) * 80
+          );
+
+
+        let className =
+          "bar neutral";
+
+
+        if(d === greenDigit){
+
+          className =
+            "bar green";
+
+        }else if(
+          d === redDigit
+        ){
+
+          className =
+            "bar red";
+
+        }
+
+
+        return `
+          <div class="bar-wrap">
+
+            <div
+              class="${className}"
+              style="height:${height}px">
+            </div>
+
+            <div class="bar-number">
+              ${d}
+            </div>
+
+          </div>
+        `;
+
+      }
+    ).join("");
+
+}
+
+
 /* =====================================================
-   STRATEGY CHECK
+   STRATEGY DATA
 ===================================================== */
 
-function makeStrategyData() {
+function makeStrategyData(){
+
   const percentages =
     getPercentages();
+
 
   const bars =
     getBarDigits();
 
+
   return {
+
     percentages,
 
     previous_percentages:
@@ -908,155 +1379,647 @@ function makeStrategyData() {
 
     touched_digits:
       [...state.touched]
+
   };
+
 }
 
-async function checkStrategy(strategy) {
-  const data =
-    makeStrategyData();
-
-  try {
-    const result =
-      await trading({
-        action: "strategy_check",
-        account_type: state.accountType,
-        strategy,
-        ...data
-      });
-
-    return result.allowed === true;
-
-  } catch {
-    return false;
-  }
-}
 
 /* =====================================================
-   AUTOMATIC STRATEGIES
+   LOCAL STRATEGY VALIDATION
 ===================================================== */
 
-async function updateStrategies() {
+function validateUnder7(data){
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  if(
+    green < 0 ||
+    green >= 7 ||
+    red < 0 ||
+    red >= 7
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    Number(data.green_position) >=
+    Number(data.red_position)
+  ){
+
+    return false;
+
+  }
+
+
+  const tick =
+    Number(data.moving_digit);
+
+
+  if(
+    tick !== 8 &&
+    tick !== 9
+  ){
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+function validateOver5(data){
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+  const tick =
+    Number(data.moving_digit);
+
+
+  if(
+    red !== 0 &&
+    red !== 1
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    green !== 8 &&
+    green !== 9
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    tick !== 0 &&
+    tick !== 1
+  ){
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+function validateOver7(data){
+
+  const p =
+    data.percentages || {};
+
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+
+  if(green !== 9){
+
+    return false;
+
+  }
+
+
+  if(red !== 0){
+
+    return false;
+
+  }
+
+
+  if(
+    Number(p[8] || 0) <= 12.5 ||
+    Number(p[9] || 0) <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  for(
+    let d=0;
+    d<7;
+    d++
+  ){
+
+    if(
+      Number(p[d] || 0) >= 10
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  const touched =
+    Array.isArray(
+      data.touched_digits
+    )
+      ? data.touched_digits
+      : [];
+
+
+  if(
+    touched.length < 4
+  ){
+
+    return false;
+
+  }
+
+
+  const current =
+    Number(data.moving_digit);
+
+
+  if(
+    Number(touched[3]) !==
+    current
+  ){
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+function validateOver6(data){
+
+  const p =
+    data.percentages || {};
+
+  const previous =
+    data.previous_percentages || {};
+
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+
+  if(
+    green !== 9 ||
+    red !== 0
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    Number(p[9] || 0) <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    Number(p[0] || 0) > 8.5
+  ){
+
+    return false;
+
+  }
+
+
+  for(
+    const digit of [6,7,8]
+  ){
+
+    if(
+      Number(p[digit] || 0) <=
+      10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  for(
+    const digit of [6,7,8,9]
+  ){
+
+    if(
+      Number(p[digit] || 0) <
+      Number(previous[digit] || 0)
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  const touched =
+    Array.isArray(
+      data.touched_digits
+    )
+      ? data.touched_digits
+      : [];
+
+
+  const below6 =
+    touched.filter(
+      d => Number(d) < 6
+    );
+
+
+  if(
+    below6.length < 3
+  ){
+
+    return false;
+
+  }
+
+
+  const last =
+    touched.length
+      ? Number(
+          touched[
+            touched.length - 1
+          ]
+        )
+      : null;
+
+
+  if(last !== 1){
+
+    return false;
+
+  }
+
+
+  if(
+    Number(data.moving_digit) !==
+    1
+  ){
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+function validateUnder4(data){
+
+  const p =
+    data.percentages || {};
+
+
+  const green =
+    Number(data.green_digit);
+
+  const red =
+    Number(data.red_digit);
+
+
+  const validBars =
+    (
+      green === 0 &&
+      red === 9
+    ) ||
+    (
+      green === 0 &&
+      red === 1
+    );
+
+
+  if(!validBars){
+
+    return false;
+
+  }
+
+
+  for(
+    let d=5;
+    d<=9;
+    d++
+  ){
+
+    if(
+      Number(p[d] || 0) >= 10
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  for(
+    let d=0;
+    d<=4;
+    d++
+  ){
+
+    if(
+      Number(p[d] || 0) <= 10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  const touched =
+    Array.isArray(
+      data.touched_digits
+    )
+      ? data.touched_digits
+      : [];
+
+
+  const above4 =
+    touched.filter(
+      d => Number(d) > 4
+    );
+
+
+  if(
+    above4.length < 4
+  ){
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+function strategyAllowsTrade(
+  strategy,
+  data
+){
+
+  switch(
+    String(strategy)
+      .toUpperCase()
+  ){
+
+    case "UNDER7":
+      return validateUnder7(data);
+
+    case "OVER5":
+      return validateOver5(data);
+
+    case "OVER7":
+      return validateOver7(data);
+
+    case "OVER6":
+      return validateOver6(data);
+
+    case "UNDER4":
+      return validateUnder4(data);
+
+    default:
+      return false;
+
+  }
+
+}
+
+
+/* =====================================================
+   STRATEGY DISPLAY
+===================================================== */
+
+function updateStrategies(){
+
   const data =
     makeStrategyData();
 
-  for (
-    const strategy of Object.keys(STRATEGIES)
-  ) {
+
+  for(
+    const strategy of
+    Object.keys(STRATEGIES)
+  ){
+
     const el =
       $("s" + strategy);
 
-    if (!el) continue;
 
-    let allowed = false;
+    if(!el) continue;
 
-    try {
-      const result =
-        await trading({
-          action: "strategy_check",
-          account_type: state.accountType,
-          strategy,
-          ...data
-        });
 
-      allowed =
-        result.allowed === true;
+    const allowed =
+      strategyAllowsTrade(
+        strategy,
+        data
+      );
 
-    } catch {}
 
     el.classList.toggle(
       "ready",
       allowed
     );
 
-    const small =
-      el.querySelector("small");
 
-    if (small) {
+    const small =
+      el.querySelector(
+        "small"
+      );
+
+
+    if(small){
+
       small.textContent =
         allowed
           ? "READY"
           : "Waiting";
+
     }
+
   }
 
-  if (
+
+  if(
     state.auto &&
-    !state.activeTrade
-  ) {
-    await autoTrade();
+    !state.activeTrade &&
+    !state.autoBusy
+  ){
+
+    autoTrade();
+
   }
+
 }
 
-async function autoTrade() {
-  if (
+
+/* =====================================================
+   AUTO TRADE
+===================================================== */
+
+async function autoTrade(){
+
+  if(
     !state.auto ||
-    state.activeTrade
-  ) {
+    state.activeTrade ||
+    state.autoBusy
+  ){
+
     return;
+
   }
 
-  const data =
-    makeStrategyData();
 
-  for (
-    const strategy of Object.keys(STRATEGIES)
-  ) {
-    try {
-      const result =
-        await trading({
-          action: "strategy_check",
-          account_type: state.accountType,
+  state.autoBusy =
+    true;
+
+
+  try{
+
+    const data =
+      makeStrategyData();
+
+
+    for(
+      const strategy of
+      Object.keys(STRATEGIES)
+    ){
+
+      if(
+        !strategyAllowsTrade(
           strategy,
-          ...data
-        });
+          data
+        )
+      ){
 
-      if (
-        result.allowed === true
-      ) {
-        await executeTrade({
-          strategy
-        });
+        continue;
 
-        return;
       }
 
-    } catch {}
+
+      await executeTrade({
+        strategy,
+        strategyData:
+          data
+      });
+
+
+      break;
+
+    }
+
+  }finally{
+
+    state.autoBusy =
+      false;
+
   }
+
 }
 
-function toggleAuto() {
+
+/* =====================================================
+   AUTO TOGGLE
+===================================================== */
+
+function toggleAuto(){
+
   state.auto =
     !state.auto;
+
 
   $("autoToggle").textContent =
     state.auto
       ? "STOP AUTO TRADING"
       : "START AUTO TRADING";
 
-  if (
-    state.auto &&
-    !state.activeTrade
-  ) {
-    autoTrade();
+
+  if(!state.auto){
+
+    return;
+
   }
+
+
+  if(
+    !state.activeTrade
+  ){
+
+    autoTrade();
+
+  }
+
 }
+
 
 /* =====================================================
    MANUAL TRADE
 ===================================================== */
 
-async function manualTrade(direction) {
-  if (state.activeTrade) {
-    setMessage("There is already an active trade.");
+async function manualTrade(
+  direction
+){
+
+  if(state.activeTrade){
+
     return;
+
   }
+
 
   const barrier =
     Number(
       $("manualBarrier").value
     );
 
+
   await executeTrade({
+
     contractType:
       direction === "over"
         ? "DIGITOVER"
@@ -1065,54 +2028,87 @@ async function manualTrade(direction) {
     barrier,
 
     strategy:
+      null,
+
+    strategyData:
       null
+
   });
+
 }
+
 
 /* =====================================================
    EXECUTE TRADE
 ===================================================== */
 
 async function executeTrade({
+
   strategy = null,
+
   contractType = null,
-  barrier = null
-}) {
-  if (state.activeTrade) {
+
+  barrier = null,
+
+  strategyData = null
+
+}){
+
+  if(state.activeTrade){
+
     return;
+
   }
+
 
   const market =
     $("market").value;
+
 
   const stake =
     Number(
       $("stake").value
     );
 
+
   const duration =
     Number(
       $("duration").value
     );
 
-  if (
+
+  if(
     !Number.isFinite(stake) ||
     stake <= 0
-  ) {
-    setMessage("Enter a valid stake.");
+  ){
+
+    setMessage(
+      "Enter a valid stake."
+    );
+
     return;
+
   }
 
+
   state.activeTrade = {
+
     strategy,
+
     market
+
   };
+
 
   disableTrading(true);
 
-  try {
+
+  try{
+
     const payload = {
-      action: "buy",
+
+      action:
+        "buy",
 
       account_type:
         state.accountType,
@@ -1125,47 +2121,70 @@ async function executeTrade({
 
       duration_unit:
         $("durationUnit").value
+
     };
 
-    if (strategy) {
+
+    if(strategy){
+
       payload.strategy =
         strategy;
-    } else {
+
+      payload.strategy_data =
+        strategyData ||
+        makeStrategyData();
+
+    }else{
+
       payload.contract_type =
         contractType;
 
       payload.barrier =
         barrier;
+
     }
+
 
     const result =
       await trading(payload);
 
-    if (
+
+    if(
       !result.contract ||
       !result.contract.contract_id
-    ) {
+    ){
+
       throw new Error(
         "No contract was returned."
       );
+
     }
 
+
     state.activeTrade = {
+
       ...state.activeTrade,
+
       ...result.contract,
 
       startedAt:
         Date.now()
+
     };
 
-    if (result.account) {
+
+    if(result.account){
+
       updateAccount(
         result.account,
         result.account.balance
       );
+
     }
 
+
     addHistory({
+
       ...result.contract,
 
       strategy:
@@ -1175,99 +2194,162 @@ async function executeTrade({
 
       time:
         Date.now()
+
     });
+
 
     pollContract(
       result.contract.contract_id
     );
 
-  } catch(error) {
-    state.activeTrade = null;
+
+  }catch(error){
+
+    state.activeTrade =
+      null;
+
 
     setMessage(
       error.message ||
       "Trade failed."
     );
 
+
     disableTrading(false);
+
   }
+
 }
+
 
 /* =====================================================
    CONTRACT POLLING
 ===================================================== */
 
-async function pollContract(contractId) {
-  if (!state.activeTrade) {
+async function pollContract(
+  contractId
+){
+
+  if(!state.activeTrade){
+
     return;
+
   }
 
-  try {
+
+  try{
+
     const result =
       await trading({
-        action: "contract_status",
+
+        action:
+          "contract_status",
 
         account_type:
           state.accountType,
 
         contract_id:
           contractId
+
       });
+
 
     const contract =
       result.contract;
 
-    if (
+
+    if(
       contract &&
       state.activeTrade
-    ) {
+    ){
+
       updateHistoryTrade(
         contractId,
         contract
       );
 
-      if (
+
+      if(
         contract.status === "WON" ||
         contract.status === "LOST" ||
         contract.is_sold === true
-      ) {
+      ){
+
         finishTrade(
           contract
         );
 
         return;
+
       }
+
     }
 
-  } catch {}
+  }catch{}
+
 
   setTimeout(
-    () => pollContract(contractId),
-    900
+    () =>
+      pollContract(contractId),
+    600
   );
+
 }
 
-function finishTrade(contract) {
-  const current =
-    state.activeTrade;
 
-  if (!current) {
+/* =====================================================
+   FINISH TRADE
+===================================================== */
+
+function finishTrade(
+  contract
+){
+
+  if(!state.activeTrade){
+
     return;
+
   }
+
 
   updateHistoryTrade(
     contract.contract_id,
     contract
   );
 
-  state.activeTrade = null;
+
+  state.activeTrade =
+    null;
+
 
   disableTrading(false);
 
+
   refreshBalance();
+
+
+  if(
+    state.auto
+  ){
+
+    setTimeout(
+      () => autoTrade(),
+      100
+    );
+
+  }
+
 }
 
-function disableTrading(disabled) {
+
+/* =====================================================
+   DISABLE TRADE CONTROLS
+===================================================== */
+
+function disableTrading(
+  disabled
+){
+
   $("manualOver").disabled =
     disabled;
 
@@ -1282,239 +2364,386 @@ function disableTrading(disabled) {
 
   $("market").disabled =
     disabled;
+
+  $("manualBarrier").disabled =
+    disabled;
+
 }
+
 
 /* =====================================================
    HISTORY
 ===================================================== */
 
-function addHistory(trade) {
+function addHistory(trade){
+
   state.history.unshift({
     ...trade
   });
 
-  if (
+
+  if(
     state.history.length > 50
-  ) {
-    state.history.length = 50;
+  ){
+
+    state.history.length =
+      50;
+
   }
 
+
   renderHistory();
+
 }
+
 
 function updateHistoryTrade(
   contractId,
   update
-) {
+){
+
   const item =
     state.history.find(
       h =>
-        Number(h.contract_id) ===
+        Number(
+          h.contract_id
+        ) ===
         Number(contractId)
     );
 
-  if (!item) {
+
+  if(!item){
+
     return;
+
   }
+
 
   Object.assign(
     item,
     update
   );
 
+
   renderHistory();
+
 }
 
-function renderHistory() {
+
+function renderHistory(){
+
   const body =
     $("historyBody");
 
-  if (!state.history.length) {
+
+  if(
+    !state.history.length
+  ){
+
     body.innerHTML = `
       <tr>
-        <td colspan="9" class="empty">
+        <td
+          colspan="9"
+          class="empty">
           No trades yet
         </td>
       </tr>
     `;
 
     return;
+
   }
+
 
   body.innerHTML =
     state.history
-      .map(trade => {
-        const status =
-          String(
-            trade.status ||
-            "OPEN"
-          ).toUpperCase();
+      .map(
+        trade => {
 
-        const cls =
-          status === "WON"
-            ? "win"
-            : status === "LOST"
-              ? "loss"
-              : "open";
+          const status =
+            String(
+              trade.status ||
+              "OPEN"
+            ).toUpperCase();
 
-        return `
-          <tr>
-            <td>
-              ${new Date(
-                trade.time || Date.now()
-              ).toLocaleTimeString()}
-            </td>
 
-            <td>
-              ${trade.strategy || "Manual"}
-            </td>
+          const cls =
+            status === "WON"
+              ? "win"
+              : status === "LOST"
+                ? "loss"
+                : "open";
 
-            <td>
-              ${trade.contract_type || "-"}
-              ${trade.barrier != null
-                ? " " + trade.barrier
-                : ""}
-            </td>
 
-            <td>
-              ${trade.underlying_symbol ||
-                trade.market ||
-                "-"}
-            </td>
+          return `
 
-            <td>
-              ${money(
-                trade.buy_price
-              )}
-            </td>
+            <tr>
 
-            <td>
-              ${trade.entry_spot ?? "-"}
-            </td>
+              <td>
+                ${
+                  new Date(
+                    trade.time ||
+                    Date.now()
+                  ).toLocaleTimeString()
+                }
+              </td>
 
-            <td>
-              ${trade.exit_spot ?? "-"}
-            </td>
+              <td>
+                ${
+                  trade.strategy ||
+                  "Manual"
+                }
+              </td>
 
-            <td class="${cls}">
-              ${status}
-            </td>
+              <td>
+                ${
+                  trade.contract_type ||
+                  "-"
+                }
 
-            <td class="${cls}">
-              ${money(
-                trade.profit
-              )}
-            </td>
-          </tr>
-        `;
-      })
+                ${
+                  trade.barrier != null
+                    ? " " +
+                      trade.barrier
+                    : ""
+                }
+              </td>
+
+              <td>
+                ${
+                  trade.underlying_symbol ||
+                  trade.market ||
+                  "-"
+                }
+              </td>
+
+              <td>
+                ${
+                  money(
+                    trade.buy_price
+                  )
+                }
+              </td>
+
+              <td>
+                ${
+                  trade.entry_spot ??
+                  "-"
+                }
+              </td>
+
+              <td>
+                ${
+                  trade.exit_spot ??
+                  "-"
+                }
+              </td>
+
+              <td class="${cls}">
+                ${status}
+              </td>
+
+              <td class="${cls}">
+                ${
+                  money(
+                    trade.profit
+                  )
+                }
+              </td>
+
+            </tr>
+
+          `;
+
+        }
+      )
       .join("");
+
 }
 
+
 /* =====================================================
-   DERIV TICKS
+   DERIV PUBLIC TICKS
 ===================================================== */
 
-function connectTicks() {
-  if (state.ws) {
-    try {
+function connectTicks(){
+
+  if(state.ws){
+
+    try{
+
       state.ws.close();
-    } catch {}
+
+    }catch{}
+
   }
+
 
   const ws =
     new WebSocket(
       "wss://ws.derivws.com/websockets/v3?app_id=1089"
     );
 
-  state.ws = ws;
+
+  state.ws =
+    ws;
+
 
   ws.onopen = () => {
+
     $("tickMarket").textContent =
       `Live ${state.market}`;
 
+
     ws.send(
       JSON.stringify({
+
         ticks:
           state.market,
 
         subscribe:
           1
+
       })
     );
+
   };
 
-  ws.onmessage = event => {
-    let data;
 
-    try {
-      data =
-        JSON.parse(
-          event.data
+  ws.onmessage =
+    event => {
+
+      let data;
+
+
+      try{
+
+        data =
+          JSON.parse(
+            event.data
+          );
+
+      }catch{
+
+        return;
+
+      }
+
+
+      if(
+        data.tick &&
+        data.tick.quote != null
+      ){
+
+        processTick(
+          data.tick.quote
         );
-    } catch {
-      return;
-    }
 
-    if (
-      data.tick &&
-      data.tick.quote != null
-    ) {
-      processTick(
-        data.tick.quote
-      );
-    }
-  };
+      }
+
+    };
+
 
   ws.onerror = () => {
+
     $("tickMarket").textContent =
       "Tick connection error";
+
   };
 
+
   ws.onclose = () => {
+
     $("tickMarket").textContent =
       "Reconnecting...";
+
 
     clearTimeout(
       state.reconnectTimer
     );
+
 
     state.reconnectTimer =
       setTimeout(
         connectTicks,
         2000
       );
+
   };
+
 }
 
-function processTick(quote) {
+
+/* =====================================================
+   PROCESS TICK
+===================================================== */
+
+function processTick(
+  quote
+){
+
   const text =
     String(quote);
 
-  const digit =
-    Number(
-      text
-        .replace(
-          /\D/g,
-          ""
-        )
-        .slice(-1)
-    );
 
-  if (
-    !Number.isInteger(digit)
-  ) {
-    return;
+  const parts =
+    text.split(".");
+
+
+  let lastChar;
+
+
+  if(
+    parts.length > 1
+  ){
+
+    const decimals =
+      parts[1];
+
+    lastChar =
+      decimals[
+        decimals.length - 1
+      ];
+
+  }else{
+
+    lastChar =
+      text[
+        text.length - 1
+      ];
+
   }
+
+
+  const digit =
+    Number(lastChar);
+
+
+  if(
+    !Number.isInteger(digit) ||
+    digit < 0 ||
+    digit > 9
+  ){
+
+    return;
+
+  }
+
 
   state.tick =
     digit;
 
+
   $("tick").textContent =
     digit;
 
-  addDigit(digit);
+
+  addDigit(
+    digit
+  );
+
 }
+
 
 /* =====================================================
    MARKET CHANGE
@@ -1523,22 +2752,38 @@ function processTick(quote) {
 $("market").addEventListener(
   "change",
   () => {
+
+    if(state.activeTrade){
+
+      return;
+
+    }
+
+
     state.market =
       $("market").value;
 
+
     resetStatistics();
 
+
     connectTicks();
+
   }
 );
+
 
 /* =====================================================
    START
 ===================================================== */
 
-function start() {
+function start(){
+
   renderDigits();
+
   renderBars();
+
+  updateStrategies();
 
   loadAccount();
 
@@ -1546,14 +2791,18 @@ function start() {
 
   refreshBalance();
 
+
   setInterval(
     refreshBalance,
     5000
   );
+
 }
 
+
 start();
+
 </script>
 
 </body>
-</html>
+  </html>
