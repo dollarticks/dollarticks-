@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DollarTicks Bot</title>
+<title>DollarTicks</title>
 
 <style>
 *{box-sizing:border-box}
@@ -18,15 +18,22 @@ body{
 .wrap{
   max-width:760px;
   margin:auto;
-  padding:12px
+  padding:10px
 }
 
-.card{
+/* =========================
+   TOP NAVIGATION
+========================= */
+
+.header{
   background:#10151d;
   border:1px solid #202733;
   border-radius:16px;
-  padding:14px;
-  margin-bottom:12px
+  padding:12px;
+  margin-bottom:10px;
+  position:sticky;
+  top:8px;
+  z-index:100
 }
 
 .top{
@@ -63,6 +70,242 @@ body{
   background:#291317
 }
 
+.nav{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px
+}
+
+.nav button{
+  padding:10px 5px;
+  border-radius:10px;
+  border:1px solid #202733;
+  background:#0d1219;
+  color:#9da8b8;
+  font-size:12px;
+  font-weight:800
+}
+
+.nav button.active{
+  background:#18242b;
+  border-color:#18c6d8;
+  color:#18c6d8
+}
+
+/* =========================
+   ACCOUNT MODE
+========================= */
+
+.modeCard{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:12px;
+  margin-bottom:10px
+}
+
+.modeTitle{
+  color:#8f9aab;
+  font-size:11px;
+  text-align:center;
+  margin-bottom:8px
+}
+
+.modeSwitch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px
+}
+
+.modeSwitch button{
+  padding:11px;
+  border-radius:10px;
+  border:1px solid #2b3442;
+  background:#151b24;
+  color:#9da8b8;
+  font-weight:900
+}
+
+.modeSwitch button.active{
+  background:#18c6d8;
+  border-color:#18c6d8;
+  color:#061014
+}
+
+/* =========================
+   PAGES
+========================= */
+
+.page{
+  display:none
+}
+
+.page.active{
+  display:block
+}
+
+/* =========================
+   GENERAL CARDS
+========================= */
+
+.card{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:14px;
+  margin-bottom:12px
+}
+
+.sectionTitle{
+  font-size:12px;
+  color:#8f9aab
+}
+
+/* =========================
+   HOME
+========================= */
+
+.homeHero{
+  text-align:center;
+  padding:28px 10px
+}
+
+.homeHero h1{
+  margin:0;
+  font-size:30px
+}
+
+.homeHero h1 span{
+  color:#18c6d8
+}
+
+.homeHero p{
+  color:#8f9aab;
+  font-size:13px;
+  line-height:1.6
+}
+
+.authButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:18px
+}
+
+.authButtons button{
+  padding:13px;
+  border-radius:11px;
+  border:1px solid #2b3442;
+  background:#151b24;
+  color:#fff;
+  font-weight:900
+}
+
+.authButtons .login{
+  background:#18c6d8;
+  border-color:#18c6d8;
+  color:#061014
+}
+
+.accountBox{
+  background:#0d1219;
+  border-radius:12px;
+  padding:14px;
+  margin-top:12px;
+  text-align:center
+}
+
+.accountStatus{
+  color:#8f9aab;
+  font-size:12px
+}
+
+.accountName{
+  font-size:18px;
+  font-weight:900;
+  margin-top:5px
+}
+
+/* =========================
+   BALANCE
+========================= */
+
+.balanceCard{
+  background:#10151d;
+  border:1px solid #202733;
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+  text-align:center
+}
+
+.balanceLabel{
+  color:#8f9aab;
+  font-size:11px;
+  margin-bottom:5px
+}
+
+.balance{
+  font-size:29px;
+  font-weight:900
+}
+
+.currency{
+  color:#18c6d8;
+  font-size:13px
+}
+
+/* =========================
+   QUICK DASHBOARD
+========================= */
+
+.dashboardButtons{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+
+.dashboardButton{
+  background:#0d1219;
+  border:1px solid #202733;
+  border-radius:12px;
+  padding:16px 10px;
+  text-align:center;
+  cursor:pointer
+}
+
+.dashboardButton strong{
+  display:block;
+  font-size:15px
+}
+
+.dashboardButton small{
+  display:block;
+  color:#8f9aab;
+  margin-top:4px
+}
+
+/* =========================
+   MANUAL TRADING
+========================= */
+
+.manualBalance{
+  margin-bottom:10px
+}
+
+.manualTradeBox{
+  background:#0d1219;
+  border-radius:12px;
+  padding:13px
+}
+
+.manualRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-bottom:9px
+}
+
 label{
   display:block;
   color:#8f9aab;
@@ -71,6 +314,7 @@ label{
 }
 
 input,
+select,
 button{
   width:100%;
   padding:12px;
@@ -85,6 +329,32 @@ button{
   cursor:pointer;
   font-weight:800
 }
+
+.manualBuy{
+  background:#62e6a7;
+  border-color:#62e6a7;
+  color:#061014
+}
+
+.manualSell{
+  background:#ff4d5a;
+  border-color:#ff4d5a;
+  color:#fff
+}
+
+.manualMessage{
+  margin-top:10px;
+  background:#10151d;
+  border-radius:10px;
+  padding:10px;
+  color:#8f9aab;
+  font-size:12px;
+  text-align:center
+}
+
+/* =========================
+   BOT
+========================= */
 
 .controls{
   display:grid;
@@ -268,6 +538,10 @@ button:disabled{
   color:#b18cff
 }
 
+/* =========================
+   HISTORY
+========================= */
+
 .historyItem{
   background:#0d1219;
   border:1px solid #202733;
@@ -347,7 +621,16 @@ button:disabled{
 @media(max-width:430px){
 
   .wrap{
-    padding:9px
+    padding:8px
+  }
+
+  .brand{
+    font-size:23px
+  }
+
+  .nav button{
+    font-size:10px;
+    padding:9px 3px
   }
 
   .grid{
@@ -369,6 +652,7 @@ button:disabled{
   .scanGrid{
     grid-template-columns:1fr 1fr
   }
+
 }
 </style>
 </head>
@@ -377,79 +661,53 @@ button:disabled{
 
 <div class="wrap">
 
-<div class="top">
+<!-- =====================================================
+     HEADER / NAVIGATION
+===================================================== -->
 
-  <div class="brand">
-    Dollar<span>Ticks</span>
-  </div>
+<div class="header">
 
-  <div id="status" class="status stopped">
-    STOPPED
-  </div>
+  <div class="top">
 
-</div>
-
-
-<!-- BOT CONTROLS -->
-
-<div class="card">
-
-  <div style="font-size:12px;color:#8f9aab">
-    BOT CONTROLS
-  </div>
-
-  <div style="height:8px"></div>
-
-  <div class="controls">
-
-    <div>
-
-      <label>Stake</label>
-
-      <input
-        id="stake"
-        type="number"
-        min="0.01"
-        step="0.01"
-        value="1"
-      >
-
+    <div class="brand">
+      Dollar<span>Ticks</span>
     </div>
 
-    <div>
-
-      <label>Duration — ticks</label>
-
-      <input
-        id="duration"
-        type="number"
-        min="1"
-        max="10"
-        step="1"
-        value="1"
-      >
-
+    <div id="status" class="status stopped">
+      STOPPED
     </div>
 
   </div>
 
-  <div style="height:10px"></div>
-
-  <div class="controls">
+  <div class="nav">
 
     <button
-      id="startButton"
-      class="start"
+      id="navHome"
+      class="active"
+      onclick="showPage('home')"
     >
-      START BOT
+      🏠 HOME
     </button>
 
     <button
-      id="stopButton"
-      class="stop"
-      disabled
+      id="navManual"
+      onclick="showPage('manual')"
     >
-      STOP BOT
+      💹 MANUAL
+    </button>
+
+    <button
+      id="navBot"
+      onclick="showPage('bot')"
+    >
+      🤖 BOT
+    </button>
+
+    <button
+      id="navHistory"
+      onclick="showPage('history')"
+    >
+      📊 HISTORY
     </button>
 
   </div>
@@ -457,266 +715,754 @@ button:disabled{
 </div>
 
 
-<!-- BOT STATUS -->
+<!-- =====================================================
+     DEMO / REAL
+===================================================== -->
 
-<div class="card">
+<div class="modeCard">
 
-  <div style="font-size:12px;color:#8f9aab">
-    BOT STATUS
+  <div class="modeTitle">
+    ACCOUNT
   </div>
 
-  <div style="height:8px"></div>
+  <div class="modeSwitch">
 
-  <div class="botState">
+    <button
+      id="demoMode"
+      class="active"
+      onclick="setAccountMode('demo')"
+    >
+      DEMO
+    </button>
 
-    State:
-    <b id="botState">
-      Stopped
-    </b>
-
-    <br>
-
-    Market:
-    <b id="selectedMarket">
-      Waiting
-    </b>
-
-    <br>
-
-    Trade:
-    <b id="tradeState">
-      No active trade
-    </b>
-
-  </div>
-
-  <div class="marketScan">
-
-    <div class="scanTitle">
-      AUTOMATIC MARKET SCANNER
-    </div>
-
-    <div id="scanGrid" class="scanGrid"></div>
+    <button
+      id="realMode"
+      onclick="setAccountMode('real')"
+    >
+      REAL
+    </button>
 
   </div>
 
 </div>
 
 
-<!-- LIVE ANALYSIS -->
+<!-- =====================================================
+     HOME
+===================================================== -->
 
-<div class="card">
+<section
+  id="homePage"
+  class="page active"
+>
 
-  <div style="font-size:12px;color:#8f9aab">
-    LIVE MARKET ANALYSIS
+  <div class="card homeHero">
+
+    <h1>
+      Dollar<span>Ticks</span>
+    </h1>
+
+    <p>
+      Your trading dashboard
+    </p>
+
+    <div class="authButtons">
+
+      <button
+        class="login"
+        id="loginButton"
+      >
+        LOGIN
+      </button>
+
+      <button
+        id="signupButton"
+      >
+        SIGN UP
+      </button>
+
+    </div>
+
+    <div class="accountBox">
+
+      <div
+        id="accountStatus"
+        class="accountStatus"
+      >
+        Not connected
+      </div>
+
+      <div
+        id="accountName"
+        class="accountName"
+      >
+        Login to your Deriv account
+      </div>
+
+    </div>
+
   </div>
 
-  <div style="height:8px"></div>
 
-  <div
-    style="font-size:18px;font-weight:900"
-    id="marketName"
+  <div class="balanceCard">
+
+    <div class="balanceLabel">
+      BALANCE
+    </div>
+
+    <div
+      id="homeBalance"
+      class="balance"
+    >
+      0.00
+    </div>
+
+    <div
+      id="homeCurrency"
+      class="currency"
+    >
+      USD
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      DASHBOARD
+    </div>
+
+    <div style="height:9px"></div>
+
+    <div class="dashboardButtons">
+
+      <div
+        class="dashboardButton"
+        onclick="showPage('manual')"
+      >
+
+        <strong>
+          💹 MANUAL TRADING
+        </strong>
+
+        <small>
+          Trade manually
+        </small>
+
+      </div>
+
+      <div
+        class="dashboardButton"
+        onclick="showPage('bot')"
+      >
+
+        <strong>
+          🤖 BOT TRADING
+        </strong>
+
+        <small>
+          Automated strategies
+        </small>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     MANUAL TRADING
+===================================================== -->
+
+<section
+  id="manualPage"
+  class="page"
+>
+
+  <div class="balanceCard manualBalance">
+
+    <div class="balanceLabel">
+      BALANCE
+    </div>
+
+    <div
+      id="manualBalance"
+      class="balance"
+    >
+      0.00
+    </div>
+
+    <div
+      id="manualCurrency"
+      class="currency"
+    >
+      USD
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      MANUAL TRADING
+    </div>
+
+    <div style="height:9px"></div>
+
+    <div class="manualTradeBox">
+
+      <div class="manualRow">
+
+        <div>
+
+          <label>
+            Market
+          </label>
+
+          <select id="manualSymbol">
+
+            <option value="1HZ100V">
+              Volatility 100 (1s)
+            </option>
+
+            <option value="1HZ75V">
+              Volatility 75 (1s)
+            </option>
+
+            <option value="1HZ50V">
+              Volatility 50 (1s)
+            </option>
+
+            <option value="1HZ25V">
+              Volatility 25 (1s)
+            </option>
+
+            <option value="1HZ10V">
+              Volatility 10 (1s)
+            </option>
+
+          </select>
+
+        </div>
+
+        <div>
+
+          <label>
+            Stake
+          </label>
+
+          <input
+            id="manualStake"
+            type="number"
+            min="0.01"
+            step="0.01"
+            value="1"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div class="manualRow">
+
+        <div>
+
+          <label>
+            Contract
+          </label>
+
+          <select id="manualContract">
+
+            <option value="DIGITOVER">
+              Over
+            </option>
+
+            <option value="DIGITUNDER">
+              Under
+            </option>
+
+          </select>
+
+        </div>
+
+        <div>
+
+          <label>
+            Barrier
+          </label>
+
+          <input
+            id="manualBarrier"
+            type="number"
+            min="0"
+            max="9"
+            value="5"
+          >
+
+        </div>
+
+      </div>
+
+
+      <div>
+
+        <label>
+          Duration — ticks
+        </label>
+
+        <input
+          id="manualDuration"
+          type="number"
+          min="1"
+          max="10"
+          value="1"
+        >
+
+      </div>
+
+      <div style="height:10px"></div>
+
+      <div class="controls">
+
+        <button
+          id="manualBuy"
+          class="manualBuy"
+        >
+          BUY
+        </button>
+
+        <button
+          id="manualClear"
+          class="manualSell"
+        >
+          CLEAR
+        </button>
+
+      </div>
+
+      <div
+        id="manualMessage"
+        class="manualMessage"
+      >
+        Login to trade manually.
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     BOT PAGE
+===================================================== -->
+
+<section
+  id="botPage"
+  class="page"
+>
+
+  <div class="balanceCard">
+
+    <div class="balanceLabel">
+      BALANCE
+    </div>
+
+    <div
+      id="botBalance"
+      class="balance"
+    >
+      0.00
+    </div>
+
+    <div
+      id="botCurrency"
+      class="currency"
+    >
+      USD
+    </div>
+
+  </div>
+
+
+  <!-- BOT CONTROLS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      BOT CONTROLS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="controls">
+
+      <div>
+
+        <label>
+          Stake
+        </label>
+
+        <input
+          id="stake"
+          type="number"
+          min="0.01"
+          step="0.01"
+          value="1"
+        >
+
+      </div>
+
+      <div>
+
+        <label>
+          Duration — ticks
+        </label>
+
+        <input
+          id="duration"
+          type="number"
+          min="1"
+          max="10"
+          step="1"
+          value="1"
+        >
+
+      </div>
+
+    </div>
+
+    <div style="height:10px"></div>
+
+    <div class="controls">
+
+      <button
+        id="startButton"
+        class="start"
+      >
+        START BOT
+      </button>
+
+      <button
+        id="stopButton"
+        class="stop"
+        disabled
+      >
+        STOP BOT
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- BOT STATUS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      BOT STATUS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="botState">
+
+      State:
+      <b id="botState">
+        Stopped
+      </b>
+
+      <br>
+
+      Market:
+      <b id="selectedMarket">
+        Waiting
+      </b>
+
+      <br>
+
+      Trade:
+      <b id="tradeState">
+        No active trade
+      </b>
+
+    </div>
+
+    <div class="marketScan">
+
+      <div class="scanTitle">
+        AUTOMATIC MARKET SCANNER
+      </div>
+
+      <div
+        id="scanGrid"
+        class="scanGrid"
+      ></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- LIVE ANALYSIS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      LIVE MARKET ANALYSIS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div
+      style="font-size:18px;font-weight:900"
+      id="marketName"
+    >
+      Waiting for market
+    </div>
+
+    <div
+      id="quote"
+      style="color:#9da8b8;font-size:13px;margin-top:4px"
+    >
+      Start the bot to scan markets.
+    </div>
+
+  </div>
+
+
+  <!-- DIGIT ANALYSIS -->
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      LAST DIGIT FREQUENCY —
+      LAST <b id="countLabel">100</b> TICKS
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div
+      id="digits"
+      class="grid"
+    ></div>
+
+  </div>
+
+
+  <!-- METRICS -->
+
+  <div class="card">
+
+    <div class="metrics">
+
+      <div class="metric">
+
+        <label>
+          Green / Most frequent
+        </label>
+
+        <b id="most">
+          —
+        </b>
+
+      </div>
+
+      <div class="metric">
+
+        <label>
+          Red / Least frequent
+        </label>
+
+        <b id="least">
+          —
+        </b>
+
+      </div>
+
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="metrics">
+
+      <div class="metric">
+
+        <label>
+          Over 5
+        </label>
+
+        <b id="over5">
+          —
+        </b>
+
+      </div>
+
+      <div class="metric">
+
+        <label>
+          Under 7
+        </label>
+
+        <b id="under7">
+          —
+        </b>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- BOT NOTE -->
+
+  <div class="card">
+
+    <div class="note">
+
+      DollarTicks automatically scans all configured
+      Volatility markets and looks for valid strategy
+      conditions.
+
+      <br><br>
+
+      You only control the stake and duration.
+
+      <br><br>
+
+      🟢 Green = most frequent digit.
+
+      <br>
+
+      🔴 Red = least frequent digit.
+
+      <br>
+
+      🟣 Purple pointer = latest moving tick.
+
+      <br><br>
+
+      Only one trade can be active at a time.
+
+      <br><br>
+
+      Strategy details are recorded in Trade History
+      after a completed trade.
+
+      <br><br>
+
+      Trading involves risk. Automated strategy
+      conditions do not guarantee profit.
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     HISTORY PAGE
+===================================================== -->
+
+<section
+  id="historyPage"
+  class="page"
+>
+
+  <div class="card">
+
+    <div class="sectionTitle">
+      TRADE HISTORY
+    </div>
+
+    <div style="height:8px"></div>
+
+    <div class="summary">
+
+      <div class="summaryBox">
+
+        <small>
+          TRADES
+        </small>
+
+        <b id="totalTrades">
+          0
+        </b>
+
+      </div>
+
+      <div class="summaryBox">
+
+        <small>
+          WINS
+        </small>
+
+        <b id="totalWins">
+          0
+        </b>
+
+      </div>
+
+      <div class="summaryBox">
+
+        <small>
+          NET P/L
+        </small>
+
+        <b id="totalProfit">
+          0.00
+        </b>
+
+      </div>
+
+    </div>
+
+    <div id="tradeHistory">
+
+      <div class="empty">
+        No completed trades yet.
+      </div>
+
+    </div>
+
+    <button id="clearHistory">
+      Clear Trade History
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     BOTTOM HISTORY ACCESS
+===================================================== -->
+
+<div
+  class="card"
+  style="text-align:center"
+>
+
+  <button
+    onclick="showPage('history')"
+    style="
+      background:#0d1219;
+      border-color:#202733;
+      color:#18c6d8;
+    "
   >
-    Waiting for market
-  </div>
-
-  <div
-    id="quote"
-    style="color:#9da8b8;font-size:13px;margin-top:4px"
-  >
-    Start the bot to scan markets.
-  </div>
-
-</div>
-
-
-<!-- DIGIT ANALYSIS -->
-
-<div class="card">
-
-  <div style="font-size:12px;color:#8f9aab">
-    LAST DIGIT FREQUENCY —
-    LAST <b id="countLabel">100</b> TICKS
-  </div>
-
-  <div style="height:8px"></div>
-
-  <div id="digits" class="grid"></div>
-
-</div>
-
-
-<!-- METRICS -->
-
-<div class="card">
-
-  <div class="metrics">
-
-    <div class="metric">
-
-      <label>
-        Green / Most frequent
-      </label>
-
-      <b id="most">
-        —
-      </b>
-
-    </div>
-
-    <div class="metric">
-
-      <label>
-        Red / Least frequent
-      </label>
-
-      <b id="least">
-        —
-      </b>
-
-    </div>
-
-  </div>
-
-  <div style="height:8px"></div>
-
-  <div class="metrics">
-
-    <div class="metric">
-
-      <label>
-        Over 5
-      </label>
-
-      <b id="over5">
-        —
-      </b>
-
-    </div>
-
-    <div class="metric">
-
-      <label>
-        Under 7
-      </label>
-
-      <b id="under7">
-        —
-      </b>
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- TRADE HISTORY -->
-
-<div class="card">
-
-  <div style="font-size:12px;color:#8f9aab">
-    TRADE HISTORY
-  </div>
-
-  <div style="height:8px"></div>
-
-  <div class="summary">
-
-    <div class="summaryBox">
-
-      <small>
-        TRADES
-      </small>
-
-      <b id="totalTrades">
-        0
-      </b>
-
-    </div>
-
-    <div class="summaryBox">
-
-      <small>
-        WINS
-      </small>
-
-      <b id="totalWins">
-        0
-      </b>
-
-    </div>
-
-    <div class="summaryBox">
-
-      <small>
-        NET P/L
-      </small>
-
-      <b id="totalProfit">
-        0.00
-      </b>
-
-    </div>
-
-  </div>
-
-  <div id="tradeHistory">
-
-    <div class="empty">
-      No completed trades yet.
-    </div>
-
-  </div>
-
-  <button id="clearHistory">
-    Clear Trade History
+    📊 HISTORY
   </button>
-
-</div>
-
-
-<!-- NOTE -->
-
-<div class="card">
-
-  <div class="note">
-
-    DollarTicks automatically scans all configured
-    Volatility markets and looks for valid strategy
-    conditions.
-
-    <br><br>
-
-    You only control the stake and duration.
-
-    <br><br>
-
-    🟢 Green = most frequent digit.
-
-    <br>
-
-    🔴 Red = least frequent digit.
-
-    <br>
-
-    🟣 Purple pointer = latest moving tick.
-
-    <br><br>
-
-    Only one trade can be active at a time.
-
-    <br><br>
-
-    Strategy details are recorded in Trade History
-    after a completed trade.
-
-    <br><br>
-
-    Trading involves risk. Automated strategy
-    conditions do not guarantee profit.
-
-  </div>
 
 </div>
 
@@ -724,6 +1470,443 @@ button:disabled{
 
 
 <script>
+
+/* =====================================================
+   NAVIGATION
+===================================================== */
+
+function showPage(page){
+
+  const pages = [
+    "home",
+    "manual",
+    "bot",
+    "history"
+  ];
+
+  pages.forEach(
+    name => {
+
+      const element =
+        document.getElementById(
+          name + "Page"
+        );
+
+      if(element){
+
+        element.classList.toggle(
+          "active",
+          name === page
+        );
+
+      }
+
+    }
+  );
+
+
+  const navButtons = {
+    home:"navHome",
+    manual:"navManual",
+    bot:"navBot",
+    history:"navHistory"
+  };
+
+
+  Object.keys(navButtons).forEach(
+    name => {
+
+      const button =
+        document.getElementById(
+          navButtons[name]
+        );
+
+      if(button){
+
+        button.classList.toggle(
+          "active",
+          name === page
+        );
+
+      }
+
+    }
+  );
+
+
+  window.scrollTo({
+    top:0,
+    behavior:"smooth"
+  });
+
+}
+
+
+/* =====================================================
+   ACCOUNT MODE
+===================================================== */
+
+let accountMode = "demo";
+
+
+function setAccountMode(mode){
+
+  accountMode =
+    mode === "real"
+      ? "real"
+      : "demo";
+
+
+  document
+    .getElementById("demoMode")
+    .classList.toggle(
+      "active",
+      accountMode === "demo"
+    );
+
+
+  document
+    .getElementById("realMode")
+    .classList.toggle(
+      "active",
+      accountMode === "real"
+    );
+
+
+  /*
+   * Keep the account mode visible
+   * throughout the dashboard.
+   */
+
+  updateAccountDisplay();
+
+}
+
+
+/* =====================================================
+   ACCOUNT DISPLAY
+===================================================== */
+
+let accountBalance = 0;
+
+let accountCurrency = "USD";
+
+let connectedAccount = false;
+
+
+function updateAccountDisplay(){
+
+  const balance =
+    Number(accountBalance || 0)
+      .toFixed(2);
+
+
+  document.getElementById(
+    "homeBalance"
+  ).textContent =
+    balance;
+
+
+  document.getElementById(
+    "manualBalance"
+  ).textContent =
+    balance;
+
+
+  document.getElementById(
+    "botBalance"
+  ).textContent =
+    balance;
+
+
+  document.getElementById(
+    "homeCurrency"
+  ).textContent =
+    accountCurrency;
+
+
+  document.getElementById(
+    "manualCurrency"
+  ).textContent =
+    accountCurrency;
+
+
+  document.getElementById(
+    "botCurrency"
+  ).textContent =
+    accountCurrency;
+
+
+  if(connectedAccount){
+
+    document.getElementById(
+      "accountStatus"
+    ).textContent =
+      accountMode === "real"
+        ? "REAL ACCOUNT CONNECTED"
+        : "DEMO ACCOUNT CONNECTED";
+
+  }else{
+
+    document.getElementById(
+      "accountStatus"
+    ).textContent =
+      "Not connected";
+
+  }
+
+}
+
+
+/* =====================================================
+   LOGIN / SIGN UP
+===================================================== */
+
+document.getElementById(
+  "loginButton"
+).addEventListener(
+  "click",
+  function(){
+
+    /*
+     * Existing DollarTicks OAuth
+     * login route.
+     */
+
+    window.location.href =
+      "/auth";
+
+  }
+);
+
+
+document.getElementById(
+  "signupButton"
+).addEventListener(
+  "click",
+  function(){
+
+    /*
+     * Sign up / account connection
+     * uses the same existing OAuth
+     * connection flow.
+     */
+
+    window.location.href =
+      "/auth";
+
+  }
+);
+
+
+/* =====================================================
+   MANUAL DASHBOARD
+===================================================== */
+
+document.getElementById(
+  "manualClear"
+).addEventListener(
+  "click",
+  function(){
+
+    document.getElementById(
+      "manualMessage"
+    ).textContent =
+      "Login to trade manually.";
+
+  }
+);
+
+
+/* =====================================================
+   MANUAL BUY
+===================================================== */
+
+document.getElementById(
+  "manualBuy"
+).addEventListener(
+  "click",
+  async function(){
+
+    if(!connectedAccount){
+
+      document.getElementById(
+        "manualMessage"
+      ).textContent =
+        "Please login first.";
+
+      return;
+
+    }
+
+
+    const symbol =
+      document.getElementById(
+        "manualSymbol"
+      ).value;
+
+
+    const contractType =
+      document.getElementById(
+        "manualContract"
+      ).value;
+
+
+    const barrier =
+      document.getElementById(
+        "manualBarrier"
+      ).value;
+
+
+    const stake =
+      Number(
+        document.getElementById(
+          "manualStake"
+        ).value
+      );
+
+
+    const duration =
+      Number(
+        document.getElementById(
+          "manualDuration"
+        ).value
+      );
+
+
+    if(
+      !Number.isFinite(stake) ||
+      stake <= 0
+    ){
+
+      document.getElementById(
+        "manualMessage"
+      ).textContent =
+        "Enter a valid stake.";
+
+      return;
+
+    }
+
+
+    if(
+      !Number.isInteger(duration) ||
+      duration < 1
+    ){
+
+      document.getElementById(
+        "manualMessage"
+      ).textContent =
+        "Enter a valid duration.";
+
+      return;
+
+    }
+
+
+    document.getElementById(
+      "manualMessage"
+    ).textContent =
+      "Sending trade...";
+
+
+    try{
+
+      const response =
+        await fetch(
+          "/trading",
+          {
+
+            method:"POST",
+
+            headers:{
+              "Content-Type":
+                "application/json"
+            },
+
+            credentials:
+              "same-origin",
+
+            cache:
+              "no-store",
+
+            body:
+              JSON.stringify({
+
+                action:"buy",
+
+                account_type:
+                  accountMode,
+
+                symbol:
+                  symbol,
+
+                contract_type:
+                  contractType,
+
+                stake:
+                  stake,
+
+                duration:
+                  duration,
+
+                duration_unit:
+                  "t",
+
+                barrier:
+                  String(barrier),
+
+                currency:
+                  accountCurrency
+
+              })
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if(
+        !response.ok ||
+        !data.ok
+      ){
+
+        throw new Error(
+          data.error ||
+          data.message ||
+          "Trade failed."
+        );
+
+      }
+
+
+      document.getElementById(
+        "manualMessage"
+      ).textContent =
+        "Trade purchased successfully.";
+
+    }catch(error){
+
+      console.error(
+        "Manual trade error:",
+        error
+      );
+
+
+      document.getElementById(
+        "manualMessage"
+      ).textContent =
+        error.message ||
+        "Trade failed.";
+
+    }
+
+  }
+);
+
 
 /* =====================================================
    HELPERS
@@ -1829,895 +3012,221 @@ function findStrategy(
   return null;
 
 }
+  <script>
+
+/* =====================================================
+   DOLLARTICKS APP NAVIGATION
+===================================================== */
+
+let accountMode = "demo";
+
+const pages = {
+  home: document.getElementById("homePage"),
+  manual: document.getElementById("manualPage"),
+  bot: document.getElementById("botPage"),
+  history: document.getElementById("historyPage")
+};
+
+function showPage(page){
+
+  Object.values(pages).forEach(
+    section => {
+
+      if(section){
+        section.style.display = "none";
+      }
+
+    }
+  );
+
+  if(pages[page]){
+    pages[page].style.display = "block";
+  }
+
+  document.querySelectorAll(
+    ".navButton"
+  ).forEach(button => {
+
+    button.classList.remove("active");
+
+  });
+
+  const active =
+    document.querySelector(
+      `[data-page="${page}"]`
+    );
+
+  if(active){
+    active.classList.add("active");
+  }
+
+}
 
 
 /* =====================================================
-   ADD TICK
+   DEMO / REAL
 ===================================================== */
 
-function addTick(
-  symbol,
-  digit,
-  quote,
-  epoch
-){
+function setAccountMode(mode){
 
-  if(
-    digit === null ||
-    digit < 0 ||
-    digit > 9
-  ){
-
-    return;
-
-  }
+  accountMode =
+    mode === "real"
+      ? "real"
+      : "demo";
 
 
-  const state =
-    marketStates[
-      symbol
-    ];
-
-
-  if(!state)
-    return;
-
-
-  state.latestDigit =
-    digit;
-
-
-  state.history.push(
-    digit
-  );
-
-
-  if(
-    state.history.length >
-    MAX_TICKS
-  ){
-
-    state.history.shift();
-
-  }
-
-
-  if(
-    Number.isFinite(
-      Number(epoch)
-    )
-  ){
-
-    state.lastQuote =
-      `${quote} • ${new Date(
-        epoch * 1000
-      ).toLocaleTimeString()}`;
-
-  }else{
-
-    state.lastQuote =
-      String(quote);
-
-  }
-
-
-  /*
-   * Only the market currently being
-   * analysed gets its moving sequence
-   * updated for strategy detection.
-   */
-
-  if(
-    botRunning &&
-    !tradeActive &&
-    state.history.length >=
-    MAX_TICKS
-  ){
-
-    state.movingSequence.push(
-      digit
+  const demoButton =
+    document.getElementById(
+      "demoButton"
     );
+
+  const realButton =
+    document.getElementById(
+      "realButton"
+    );
+
+
+  if(demoButton){
+
+    demoButton.classList.toggle(
+      "selected",
+      accountMode === "demo"
+    );
+
+  }
+
+
+  if(realButton){
+
+    realButton.classList.toggle(
+      "selected",
+      accountMode === "real"
+    );
+
+  }
+
+
+  const accountLabel =
+    document.getElementById(
+      "accountModeLabel"
+    );
+
+
+  if(accountLabel){
+
+    accountLabel.textContent =
+      accountMode === "demo"
+        ? "DEMO"
+        : "REAL";
+
+  }
+
+
+  updateBalance();
+
+}
+
+
+/* =====================================================
+   BALANCE
+===================================================== */
+
+async function updateBalance(){
+
+  const balanceElement =
+    document.getElementById(
+      "balance"
+    );
+
+
+  if(!balanceElement)
+    return;
+
+
+  balanceElement.textContent =
+    "Loading...";
+
+
+  try{
+
+    const response =
+      await fetch(
+        "/trading",
+        {
+
+          method:
+            "POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store",
+
+          body:
+            JSON.stringify({
+
+              action:
+                "balance",
+
+              account_type:
+                accountMode
+
+            })
+
+        }
+      );
+
+
+    const data =
+      await response.json();
 
 
     if(
-      state.movingSequence.length >
-      100
+      !response.ok ||
+      !data.ok
     ){
 
-      state.movingSequence.shift();
-
-    }
-
-
-    evaluateAllMarkets();
-
-  }
-
-
-  if(
-    currentMarketSymbol ===
-    symbol
-  ){
-
-    renderCurrentMarket();
-
-  }
-
-}
-
-
-/* =====================================================
-   RENDER CURRENT MARKET
-===================================================== */
-
-function renderCurrentMarket(){
-
-  const symbol =
-    currentMarketSymbol;
-
-
-  if(!symbol){
-
-    $("marketName").textContent =
-      "Waiting for market";
-
-    $("quote").textContent =
-      "Start the bot to scan markets.";
-
-    return;
-
-  }
-
-
-  const state =
-    marketStates[
-      symbol
-    ];
-
-
-  $("marketName").textContent =
-    marketNames[symbol];
-
-
-  $("quote").textContent =
-    state.lastQuote ||
-    "Waiting for tick…";
-
-
-  const counts =
-    getCounts(symbol);
-
-
-  const percentages =
-    getPercentages(symbol);
-
-
-  $("countLabel").textContent =
-    state.history.length;
-
-
-  if(!state.history.length){
-
-    $("digits").innerHTML =
-      counts.map(
-        (x,digit) => `
-
-          <div class="digit">
-
-            <strong>
-              ${digit}
-            </strong>
-
-            <small>
-              0 • 0.0%
-            </small>
-
-          </div>
-
-        `
-      ).join("");
-
-    return;
-
-  }
-
-
-  const most =
-    findMostDigit(symbol);
-
-
-  const least =
-    findLeastDigit(symbol);
-
-
-  $("digits").innerHTML =
-    counts.map(
-      (count,digit) => {
-
-        const isMost =
-          digit === most &&
-          count > 0;
-
-
-        const isLeast =
-          digit === least;
-
-
-        const isLatest =
-          digit ===
-          state.latestDigit;
-
-
-        return `
-
-          <div class="digit
-            ${isMost ? "most" : ""}
-            ${isLeast ? "least" : ""}
-            ${isLatest ? "latest" : ""}
-          ">
-
-            ${
-              isLatest
-                ? '<div class="pointer"></div>'
-                : ""
-            }
-
-            <strong>
-              ${digit}
-            </strong>
-
-            <small>
-              ${count} •
-              ${percentages[digit].toFixed(1)}%
-            </small>
-
-          </div>
-
-        `;
-
-      }
-    ).join("");
-
-
-  $("most").textContent =
-    `${most} (${percentages[most].toFixed(1)}%)`;
-
-
-  $("least").textContent =
-    `${least} (${percentages[least].toFixed(1)}%)`;
-
-
-  const over5 =
-    counts[6] +
-    counts[7] +
-    counts[8] +
-    counts[9];
-
-
-  const under7 =
-    counts[0] +
-    counts[1] +
-    counts[2] +
-    counts[3] +
-    counts[4] +
-    counts[5] +
-    counts[6];
-
-
-  $("over5").textContent =
-    `${(
-      over5 /
-      state.history.length *
-      100
-    ).toFixed(1)}%`;
-
-
-  $("under7").textContent =
-    `${(
-      under7 /
-      state.history.length *
-      100
-    ).toFixed(1)}%`;
-
-}
-
-
-/* =====================================================
-   CONNECT ONE MARKET
-===================================================== */
-
-function connectOneMarket(
-  symbol
-){
-
-  const state =
-    marketStates[
-      symbol
-    ];
-
-
-  if(!state)
-    return;
-
-
-  if(state.reconnectTimer){
-
-    clearTimeout(
-      state.reconnectTimer
-    );
-
-    state.reconnectTimer =
-      null;
-
-  }
-
-
-  if(state.ws){
-
-    try{
-
-      state.ws.onclose =
-        null;
-
-      state.ws.close();
-
-    }catch(e){}
-
-    state.ws =
-      null;
-
-  }
-
-
-  state.connected =
-    false;
-
-  state.loading =
-    true;
-
-  state.error =
-    false;
-
-
-  renderScanner();
-
-
-  const socket =
-    new WebSocket(
-      WS_URL
-    );
-
-
-  state.ws =
-    socket;
-
-
-  socket.onopen =
-    function(){
-
-      if(
-        socket !== state.ws
-      ){
-
-        return;
-
-      }
-
-
-      state.connected =
-        true;
-
-      state.loading =
-        false;
-
-      state.error =
-        false;
-
-
-      renderScanner();
-
-
-      socket.send(
-        JSON.stringify({
-
-          ticks_history:
-            symbol,
-
-          count:
-            MAX_TICKS,
-
-          end:
-            "latest",
-
-          style:
-            "ticks",
-
-          subscribe:
-            1,
-
-          req_id:
-            Date.now()
-
-        })
-      );
-
-    };
-
-
-  socket.onmessage =
-    function(event){
-
-      if(
-        socket !== state.ws
-      ){
-
-        return;
-
-      }
-
-
-      try{
-
-        const data =
-          JSON.parse(
-            event.data
-          );
-
-
-        if(data.error){
-
-          console.error(
-            symbol,
-            data.error
-          );
-
-          state.error =
-            true;
-
-          renderScanner();
-
-          return;
-
-        }
-
-
-        if(
-          data.msg_type ===
-          "history"
-        ){
-
-          const prices =
-            data.history?.prices ||
-            [];
-
-
-          const times =
-            data.history?.times ||
-            [];
-
-
-          if(
-            Number.isFinite(
-              Number(
-                data.pip_size
-              )
-            )
-          ){
-
-            state.pipSize =
-              Number(
-                data.pip_size
-              );
-
-          }
-
-
-          state.history =
-            [];
-
-
-          for(
-            let i=0;
-            i<prices.length;
-            i++
-          ){
-
-            const digit =
-              getLastDigit(
-                prices[i],
-                state.pipSize
-              );
-
-
-            if(
-              digit !== null
-            ){
-
-              state.history.push(
-                digit
-              );
-
-            }
-
-          }
-
-
-          if(
-            state.history.length >
-            MAX_TICKS
-          ){
-
-            state.history =
-              state.history.slice(
-                -MAX_TICKS
-              );
-
-          }
-
-
-          if(state.history.length){
-
-            state.latestDigit =
-              state.history[
-                state.history.length - 1
-              ];
-
-          }
-
-
-          if(prices.length){
-
-            const price =
-              prices[
-                prices.length - 1
-              ];
-
-
-            const time =
-              times[
-                times.length - 1
-              ];
-
-
-            state.lastQuote =
-              Number.isFinite(
-                Number(time)
-              )
-                ? `${price} • ${new Date(
-                    time * 1000
-                  ).toLocaleTimeString()}`
-                : String(price);
-
-          }
-
-
-          state.movingSequence =
-            [];
-
-
-          state.previousPercentages =
-            null;
-
-
-          if(
-            currentMarketSymbol ===
-            symbol
-          ){
-
-            renderCurrentMarket();
-
-          }
-
-
-          renderScanner();
-
-
-          /*
-           * If the bot is already running,
-           * check this market immediately.
-           */
-
-          if(
-            botRunning &&
-            !tradeActive
-          ){
-
-            evaluateAllMarkets();
-
-          }
-
-
-          return;
-
-        }
-
-
-        if(
-          data.msg_type ===
-          "tick"
-        ){
-
-          const tick =
-            data.tick;
-
-
-          if(!tick)
-            return;
-
-
-          if(
-            Number.isFinite(
-              Number(
-                tick.pip_size
-              )
-            )
-          ){
-
-            state.pipSize =
-              Number(
-                tick.pip_size
-              );
-
-          }
-
-
-          const digit =
-            getLastDigit(
-              tick.quote,
-              state.pipSize
-            );
-
-
-          addTick(
-            symbol,
-            digit,
-            tick.quote,
-            tick.epoch
-          );
-
-        }
-
-      }catch(error){
-
-        console.error(
-          "Market tick error:",
-          symbol,
-          error
-        );
-
-      }
-
-    };
-
-
-  socket.onerror =
-    function(){
-
-      state.error =
-        true;
-
-      state.loading =
-        false;
-
-      renderScanner();
-
-    };
-
-
-  socket.onclose =
-    function(){
-
-      if(
-        socket !== state.ws
-      ){
-
-        return;
-
-      }
-
-
-      state.ws =
-        null;
-
-      state.connected =
-        false;
-
-
-      renderScanner();
-
-
-      if(
-        botRunning &&
-        !tradeActive
-      ){
-
-        state.reconnectTimer =
-          setTimeout(
-            () =>
-              connectOneMarket(
-                symbol
-              ),
-            1500
-          );
-
-      }
-
-    };
-
-}
-
-
-/* =====================================================
-   CONNECT ALL MARKETS
-===================================================== */
-
-function connectAllMarkets(){
-
-  MARKETS.forEach(
-    market =>
-      connectOneMarket(
-        market.symbol
-      )
-  );
-
-
-  renderScanner();
-
-}
-
-
-/* =====================================================
-   STOP ALL MARKET CONNECTIONS
-===================================================== */
-
-function stopAllMarkets(){
-
-  MARKETS.forEach(
-    market => {
-
-      const state =
-        marketStates[
-          market.symbol
-        ];
-
-
-      if(state.reconnectTimer){
-
-        clearTimeout(
-          state.reconnectTimer
-        );
-
-        state.reconnectTimer =
-          null;
-
-      }
-
-
-      if(state.ws){
-
-        try{
-
-          state.ws.onclose =
-            null;
-
-          state.ws.close();
-
-        }catch(e){}
-
-      }
-
-
-      state.ws =
-        null;
-
-      state.connected =
-        false;
-
-      state.loading =
-        false;
-
-    }
-  );
-
-
-  renderScanner();
-
-}
-
-
-/* =====================================================
-   EVALUATE ALL MARKETS
-===================================================== */
-
-function evaluateAllMarkets(){
-
-  if(
-    !botRunning ||
-    tradeActive
-  ){
-
-    return;
-
-  }
-
-
-  /*
-   * Search through every market.
-   * The first valid setup is selected.
-   */
-
-  for(
-    const market of MARKETS
-  ){
-
-    const symbol =
-      market.symbol;
-
-
-    const state =
-      marketStates[
-        symbol
-      ];
-
-
-    if(
-      !state ||
-      !state.connected ||
-      state.history.length <
-      MAX_TICKS
-    ){
-
-      continue;
-
-    }
-
-
-    const strategy =
-      findStrategy(
-        symbol
-      );
-
-
-    if(strategy){
-
-      currentMarketSymbol =
-        symbol;
-
-      currentStrategy =
-        strategy;
-
-
-      state.previousPercentages =
-        getPercentages(
-          symbol
-        ).slice();
-
-
-      renderCurrentMarket();
-
-      renderScanner();
-
-
-      executeStrategyTrade(
-        symbol,
-        strategy
-      );
-
+      balanceElement.textContent =
+        "$0.00";
 
       return;
 
     }
 
 
-    /*
-     * Keep percentage history updated
-     * for the Over 6 strategy.
-     */
+    const balance =
+      Number(
+        data.balance ??
+        data.account?.balance ??
+        0
+      );
 
-    state.previousPercentages =
-      getPercentages(
-        symbol
-      ).slice();
+
+    balanceElement.textContent =
+      "$" +
+      (
+        Number.isFinite(balance)
+          ? balance.toFixed(2)
+          : "0.00"
+      );
+
+
+  }catch(error){
+
+    console.error(
+      "Balance error:",
+      error
+    );
+
+
+    balanceElement.textContent =
+      "$0.00";
 
   }
 
@@ -2725,24 +3234,164 @@ function evaluateAllMarkets(){
 
 
 /* =====================================================
-   START BOT
+   LOGIN / SIGN UP
 ===================================================== */
 
-async function startBot(){
+function openLogin(){
 
-  if(botRunning)
-    return;
+  const login =
+    document.getElementById(
+      "loginBox"
+    );
+
+
+  if(login){
+
+    login.style.display =
+      "block";
+
+  }
+
+}
+
+
+function closeLogin(){
+
+  const login =
+    document.getElementById(
+      "loginBox"
+    );
+
+
+  if(login){
+
+    login.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* =====================================================
+   CONNECT DERIV ACCOUNT
+===================================================== */
+
+async function connectDeriv(){
+
+  try{
+
+    const response =
+      await fetch(
+        "/auth",
+        {
+
+          method:
+            "GET",
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store"
+
+        }
+      );
+
+
+    if(
+      response.redirected
+    ){
+
+      window.location.href =
+        response.url;
+
+      return;
+
+    }
+
+
+    const data =
+      await response.json();
+
+
+    if(
+      data &&
+      data.url
+    ){
+
+      window.location.href =
+        data.url;
+
+      return;
+
+    }
+
+
+    if(
+      data &&
+      data.redirect
+    ){
+
+      window.location.href =
+        data.redirect;
+
+      return;
+
+    }
+
+
+    alert(
+      "Please connect your Deriv account first."
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "Login error:",
+      error
+    );
+
+
+    alert(
+      "Unable to open Deriv login."
+    );
+
+  }
+
+}
+
+
+/* =====================================================
+   MANUAL TRADE
+===================================================== */
+
+async function manualTrade(
+  contractType,
+  barrier
+){
+
+  const stakeInput =
+    document.getElementById(
+      "manualStake"
+    );
+
+  const durationInput =
+    document.getElementById(
+      "manualDuration"
+    );
 
 
   const stake =
     Number(
-      $("stake").value
+      stakeInput?.value
     );
 
 
   const duration =
     Number(
-      $("duration").value
+      durationInput?.value
     );
 
 
@@ -2766,7 +3415,7 @@ async function startBot(){
   ){
 
     alert(
-      "Duration must be a whole number of ticks."
+      "Enter a valid duration."
     );
 
     return;
@@ -2774,145 +3423,387 @@ async function startBot(){
   }
 
 
-  botRunning =
-    true;
+  try{
+
+    const response =
+      await fetch(
+        "/trading",
+        {
+
+          method:
+            "POST",
+
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+
+          credentials:
+            "same-origin",
+
+          cache:
+            "no-store",
+
+          body:
+            JSON.stringify({
+
+              action:
+                "buy",
+
+              account_type:
+                accountMode,
+
+              symbol:
+                document.getElementById(
+                  "manualMarket"
+                )?.value ||
+                "1HZ100V",
+
+              contract_type:
+                contractType,
+
+              stake:
+                stake,
+
+              duration:
+                duration,
+
+              duration_unit:
+                "t",
+
+              barrier:
+                barrier,
+
+              currency:
+                "USD",
+
+              strategy:
+                "MANUAL"
+
+            })
+
+        }
+      );
 
 
-  tradeActive =
-    false;
+    const data =
+      await response.json();
 
 
-  currentMarketSymbol =
-    null;
+    if(
+      !response.ok ||
+      !data.ok
+    ){
+
+      throw new Error(
+        data.error ||
+        data.message ||
+        "Trade failed."
+      );
+
+    }
 
 
-  currentStrategy =
-    null;
+    alert(
+      "Trade purchased successfully."
+    );
 
 
-  $("startButton").disabled =
-    true;
+    updateBalance();
+
+    loadManualHistory();
 
 
-  $("stopButton").disabled =
-    false;
+  }catch(error){
+
+    console.error(
+      "Manual trade error:",
+      error
+    );
 
 
-  $("botState").textContent =
-    "Scanning all markets";
-
-
-  $("selectedMarket").textContent =
-    "Searching…";
-
-
-  $("tradeState").textContent =
-    "Waiting for setup";
-
-
-  setStatus(
-    "RUNNING",
-    true
-  );
-
-
-  connectAllMarkets();
-
-}
-
-
-/* =====================================================
-   STOP BOT
-===================================================== */
-
-function stopBot(){
-
-  botRunning =
-    false;
-
-
-  currentStrategy =
-    null;
-
-
-  $("startButton").disabled =
-    false;
-
-
-  $("stopButton").disabled =
-    true;
-
-
-  if(!tradeActive){
-
-    $("botState").textContent =
-      "Stopped";
-
-
-    $("selectedMarket").textContent =
-      "None";
-
-
-    $("tradeState").textContent =
-      "No active trade";
-
-  }else{
-
-    $("botState").textContent =
-      "Stopped — active trade continues";
+    alert(
+      error.message ||
+      "Trade failed."
+    );
 
   }
 
+}
 
-  setStatus(
-    "STOPPED"
+
+/* =====================================================
+   MANUAL OVER / UNDER BUTTONS
+===================================================== */
+
+const manualOver5 =
+  document.getElementById(
+    "manualOver5"
   );
 
 
-  stopAllMarkets();
+if(manualOver5){
+
+  manualOver5.addEventListener(
+    "click",
+    () =>
+      manualTrade(
+        "DIGITOVER",
+        "5"
+      )
+  );
 
 }
-  /* =====================================================
-   STRATEGY NAME
-===================================================== */
-
-function strategyName(
-  strategy
-){
-
-  const names = {
-
-    UNDER7:
-      "Under 7",
-
-    OVER5:
-      "Over 5",
-
-    OVER7:
-      "Over 7",
-
-    OVER6:
-      "Over 6",
-
-    UNDER4:
-      "Under 4"
-
-  };
 
 
-  return (
-    names[strategy] ||
-    strategy
+const manualOver6 =
+  document.getElementById(
+    "manualOver6"
+  );
+
+
+if(manualOver6){
+
+  manualOver6.addEventListener(
+    "click",
+    () =>
+      manualTrade(
+        "DIGITOVER",
+        "6"
+      )
+  );
+
+}
+
+
+const manualOver7 =
+  document.getElementById(
+    "manualOver7"
+  );
+
+
+if(manualOver7){
+
+  manualOver7.addEventListener(
+    "click",
+    () =>
+      manualTrade(
+        "DIGITOVER",
+        "7"
+      )
+  );
+
+}
+
+
+const manualUnder4 =
+  document.getElementById(
+    "manualUnder4"
+  );
+
+
+if(manualUnder4){
+
+  manualUnder4.addEventListener(
+    "click",
+    () =>
+      manualTrade(
+        "DIGITUNDER",
+        "4"
+      )
+  );
+
+}
+
+
+const manualUnder7 =
+  document.getElementById(
+    "manualUnder7"
+  );
+
+
+if(manualUnder7){
+
+  manualUnder7.addEventListener(
+    "click",
+    () =>
+      manualTrade(
+        "DIGITUNDER",
+        "7"
+      )
   );
 
 }
 
 
 /* =====================================================
-   AUTOMATIC TRADE
+   NAVIGATION BUTTONS
 ===================================================== */
 
-async function executeStrategyTrade(
+document.querySelectorAll(
+  ".navButton"
+).forEach(button => {
+
+  button.addEventListener(
+    "click",
+    function(){
+
+      const page =
+        this.dataset.page;
+
+      if(page){
+
+        showPage(page);
+
+      }
+
+    }
+  );
+
+});
+
+
+/* =====================================================
+   ACCOUNT BUTTONS
+===================================================== */
+
+const demoButton =
+  document.getElementById(
+    "demoButton"
+  );
+
+
+if(demoButton){
+
+  demoButton.addEventListener(
+    "click",
+    () =>
+      setAccountMode(
+        "demo"
+      )
+  );
+
+}
+
+
+const realButton =
+  document.getElementById(
+    "realButton"
+  );
+
+
+if(realButton){
+
+  realButton.addEventListener(
+    "click",
+    () =>
+      setAccountMode(
+        "real"
+      )
+  );
+
+}
+
+
+/* =====================================================
+   LOGIN BUTTON
+===================================================== */
+
+const loginButton =
+  document.getElementById(
+    "loginButton"
+  );
+
+
+if(loginButton){
+
+  loginButton.addEventListener(
+    "click",
+    openLogin
+  );
+
+}
+
+
+const closeLoginButton =
+  document.getElementById(
+    "closeLogin"
+  );
+
+
+if(closeLoginButton){
+
+  closeLoginButton.addEventListener(
+    "click",
+    closeLogin
+  );
+
+}
+
+
+const connectButton =
+  document.getElementById(
+    "connectDeriv"
+  );
+
+
+if(connectButton){
+
+  connectButton.addEventListener(
+    "click",
+    connectDeriv
+  );
+
+}
+
+
+/* =====================================================
+   BOT ACCOUNT MODE
+===================================================== */
+
+function syncBotAccountMode(){
+
+  const botAccount =
+    document.getElementById(
+      "botAccountMode"
+    );
+
+
+  if(botAccount){
+
+    botAccount.textContent =
+      accountMode === "demo"
+        ? "DEMO ACCOUNT"
+        : "REAL ACCOUNT";
+
+  }
+
+}
+
+
+/* =====================================================
+   PATCH BOT TRADE ACCOUNT
+===================================================== */
+
+/*
+ * Your original bot used:
+ *
+ * account_type: "demo"
+ *
+ * We replace that with the selected
+ * DEMO / REAL account.
+ */
+
+const originalExecuteStrategyTrade =
+  executeStrategyTrade;
+
+
+/*
+ * Keep the original function logic,
+ * but the account is selected globally.
+ */
+
+async function executeSelectedAccountTrade(
   symbol,
   strategy
 ){
@@ -3072,7 +3963,7 @@ async function executeStrategyTrade(
                 "buy",
 
               account_type:
-                "demo",
+                accountMode,
 
               symbol:
                 symbol,
@@ -3196,12 +4087,6 @@ async function executeStrategyTrade(
       "Trade active";
 
 
-    /*
-     * Clear the trigger sequence so
-     * the same setup cannot immediately
-     * trigger another trade.
-     */
-
     state.movingSequence =
       [];
 
@@ -3211,6 +4096,8 @@ async function executeStrategyTrade(
         symbol
       ).slice();
 
+
+    updateBalance();
 
     startContractMonitoring();
 
@@ -3255,746 +4142,84 @@ async function executeStrategyTrade(
 
 
 /* =====================================================
-   CONTRACT MONITORING
+   USE SELECTED ACCOUNT FOR BOT
 ===================================================== */
 
-const CONTRACT_CHECK_DELAY =
-  150;
-
-
-async function checkContractStatus(){
-
-  if(
-    !currentTrade ||
-    contractPolling
-  ){
-
-    return false;
-
-  }
-
-
-  contractPolling =
-    true;
-
-
-  try{
-
-    const response =
-      await fetch(
-        "/trading",
-        {
-
-          method:
-            "POST",
-
-          headers:{
-            "Content-Type":
-              "application/json"
-          },
-
-          credentials:
-            "same-origin",
-
-          cache:
-            "no-store",
-
-          body:
-            JSON.stringify({
-
-              action:
-                "contract_status",
-
-              account_type:
-                "demo",
-
-              contract_id:
-                currentTrade.contract_id
-
-            })
-
-        }
-      );
-
-
-    const data =
-      await response.json();
-
-
-    if(
-      !response.ok ||
-      !data.ok
-    ){
-
-      return false;
-
-    }
-
-
-    const contract =
-      data.contract || {};
-
-
-    const status =
-      String(
-        contract.status ||
-        ""
-      ).toUpperCase();
-
-
-    const finished =
-      status === "WON" ||
-      status === "LOST" ||
-      contract.is_sold === true;
-
-
-    if(!finished)
-      return false;
-
-
-    addCompletedTrade(
-      contract
-    );
-
-
-    tradeActive =
-      false;
-
-
-    currentTrade =
-      null;
-
-
-    currentStrategy =
-      null;
-
-
-    $("tradeState").textContent =
-      botRunning
-        ? "Waiting for next setup"
-        : "No active trade";
-
-
-    $("botState").textContent =
-      botRunning
-        ? "Scanning all markets"
-        : "Stopped";
-
-
-    $("selectedMarket").textContent =
-      botRunning
-        ? "Searching…"
-        : "None";
-
-
-    /*
-     * Reset the market that just finished.
-     */
-
-    if(
-      contract.underlying_symbol
-    ){
-
-      const symbol =
-        contract.underlying_symbol;
-
-
-      if(
-        marketStates[symbol]
-      ){
-
-        marketStates[
-          symbol
-        ].movingSequence = [];
-
-      }
-
-    }
-
-
-    renderScanner();
-
-
-    if(botRunning){
-
-      /*
-       * Immediately resume scanning.
-       */
-
-      evaluateAllMarkets();
-
-    }
-
-
-    return true;
-
-
-  }catch(error){
-
-    console.error(
-      "Contract status error:",
-      error
-    );
-
-
-    return false;
-
-  }finally{
-
-    contractPolling =
-      false;
-
-  }
-
-}
-
-
-function startContractMonitoring(){
-
-  const monitor =
-    async function(){
-
-      if(!currentTrade)
-        return;
-
-
-      const finished =
-        await checkContractStatus();
-
-
-      if(
-        finished ||
-        !currentTrade
-      ){
-
-        return;
-
-      }
-
-
-      setTimeout(
-        monitor,
-        CONTRACT_CHECK_DELAY
-      );
-
-    };
-
-
-  monitor();
-
-}
+window.executeStrategyTrade =
+  executeSelectedAccountTrade;
 
 
 /* =====================================================
-   TRADE HISTORY
+   UPDATE BALANCE AFTER BOT RESULT
 ===================================================== */
 
-const HISTORY_KEY =
-  "dollarticks_bot_history_all";
+const oldAddCompletedTrade =
+  addCompletedTrade;
 
 
-let tradeHistory = [];
-
-
-function loadHistory(){
-
-  try{
-
-    const saved =
-      localStorage.getItem(
-        HISTORY_KEY
-      );
-
-
-    if(!saved)
-      return [];
-
-
-    const parsed =
-      JSON.parse(
-        saved
-      );
-
-
-    return Array.isArray(parsed)
-      ? parsed
-      : [];
-
-
-  }catch(error){
-
-    return [];
-
-  }
-
-}
-
-
-function saveHistory(){
-
-  try{
-
-    localStorage.setItem(
-      HISTORY_KEY,
-      JSON.stringify(
-        tradeHistory
-      )
-    );
-
-  }catch(error){
-
-    console.error(
-      "History save error:",
-      error
-    );
-
-  }
-
-}
-
-
-/* =====================================================
-   ADD COMPLETED TRADE
-===================================================== */
-
-function addCompletedTrade(
+function addCompletedTradeAndBalance(
   contract
 ){
 
-  if(!contract)
-    return;
+  oldAddCompletedTrade(
+    contract
+  );
 
 
-  const contractId =
-    Number(
-      contract.contract_id ??
-      currentTrade?.contract_id
-    );
-
-
-  if(
-    !Number.isFinite(
-      contractId
-    )
-  ){
-
-    return;
-
-  }
-
-
-  if(
-    tradeHistory.some(
-      item =>
-        Number(
-          item.contract_id
-        ) === contractId
-    )
-  ){
-
-    return;
-
-  }
-
-
-  const profit =
-    Number(
-      contract.profit || 0
-    );
-
-
-  const result =
-    String(
-      contract.status ||
-      ""
-    ).toUpperCase() === "WON" ||
-    profit > 0
-      ? "win"
-      : "loss";
-
-
-  tradeHistory.unshift({
-
-    contract_id:
-      contractId,
-
-    strategy:
-      currentTrade?.strategy_name ||
-      strategyName(
-        currentStrategy
-      ) ||
-      "Unknown",
-
-    contract_type:
-      contract.contract_type ||
-      currentTrade?.contract_type ||
-      "Trade",
-
-    symbol:
-      contract.underlying_symbol ||
-      currentTrade?.symbol ||
-      "—",
-
-    stake:
-      contract.buy_price ??
-      currentTrade?.stake ??
-      "—",
-
-    duration:
-      currentTrade?.duration ??
-      "—",
-
-    entry_spot:
-      contract.entry_spot ??
-      contract.entry_tick ??
-      currentTrade?.entry_spot ??
-      "—",
-
-    exit_spot:
-      contract.exit_spot ??
-      contract.exit_tick ??
-      contract.current_spot ??
-      "—",
-
-    result:
-      result,
-
-    profit:
-      Number.isFinite(profit)
-        ? profit
-        : 0,
-
-    time:
-      new Date().toLocaleString()
-
-  });
-
-
-  if(
-    tradeHistory.length >
-    100
-  ){
-
-    tradeHistory =
-      tradeHistory.slice(
-        0,
-        100
-      );
-
-  }
-
-
-  saveHistory();
-
-  renderHistory();
+  updateBalance();
 
 }
 
 
 /* =====================================================
-   RENDER HISTORY
+   REFRESH BALANCE
 ===================================================== */
 
-function renderHistory(){
-
-  const container =
-    $("tradeHistory");
-
-
-  if(!tradeHistory.length){
-
-    container.innerHTML =
-      `<div class="empty">
-        No completed trades yet.
-      </div>`;
-
-
-    $("totalTrades").textContent =
-      "0";
-
-
-    $("totalWins").textContent =
-      "0";
-
-
-    $("totalProfit").textContent =
-      "0.00";
-
-
-    return;
-
-  }
-
-
-  let wins = 0;
-
-  let profit = 0;
-
-
-  container.innerHTML =
-    tradeHistory.map(
-      item => {
-
-        const pnl =
-          Number(
-            item.profit || 0
-          );
-
-
-        profit += pnl;
-
-
-        if(
-          item.result === "win"
-        ){
-
-          wins++;
-
-        }
-
-
-        const resultClass =
-          item.result === "win"
-            ? "win"
-            : "loss";
-
-
-        const resultText =
-          item.result === "win"
-            ? "WIN"
-            : "LOSS";
-
-
-        return `
-
-          <div class="historyItem">
-
-            <div class="historyTop">
-
-              <b class="${resultClass}">
-                ${resultText}
-              </b>
-
-              <b class="${resultClass}">
-                ${pnl >= 0 ? "+" : ""}
-                ${pnl.toFixed(2)}
-              </b>
-
-            </div>
-
-            <div>
-              Strategy:
-              ${escapeHtml(
-                item.strategy
-              )}
-            </div>
-
-            <div class="historyMeta">
-              <span>Market</span>
-              <b>
-                ${escapeHtml(
-                  item.symbol
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Contract</span>
-              <b>
-                ${escapeHtml(
-                  item.contract_type
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Stake</span>
-              <b>
-                ${escapeHtml(
-                  String(
-                    item.stake
-                  )
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Duration</span>
-              <b>
-                ${escapeHtml(
-                  String(
-                    item.duration
-                  )
-                )} ticks
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Entry</span>
-              <b>
-                ${escapeHtml(
-                  String(
-                    item.entry_spot
-                  )
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Exit</span>
-              <b>
-                ${escapeHtml(
-                  String(
-                    item.exit_spot
-                  )
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Contract ID</span>
-              <b>
-                ${escapeHtml(
-                  String(
-                    item.contract_id
-                  )
-                )}
-              </b>
-            </div>
-
-            <div class="historyMeta">
-              <span>Time</span>
-              <b>
-                ${escapeHtml(
-                  item.time
-                )}
-              </b>
-            </div>
-
-          </div>
-
-        `;
-
-      }
-    ).join("");
-
-
-  $("totalTrades").textContent =
-    tradeHistory.length;
-
-
-  $("totalWins").textContent =
-    wins;
-
-
-  $("totalProfit").textContent =
-    profit.toFixed(2);
-
-}
-
-
-/* =====================================================
-   CLEAR HISTORY
-===================================================== */
-
-$("clearHistory").addEventListener(
-  "click",
+setInterval(
   function(){
 
-    if(
-      !confirm(
-        "Clear all DollarTicks trade history?"
-      )
-    ){
+    updateBalance();
 
-      return;
+    syncBotAccountMode();
 
-    }
-
-
-    tradeHistory =
-      [];
-
-
-    saveHistory();
-
-    renderHistory();
-
-  }
+  },
+  5000
 );
 
 
 /* =====================================================
-   START / STOP
+   HOME
 ===================================================== */
 
-$("startButton").addEventListener(
-  "click",
-  startBot
+showPage(
+  "home"
 );
 
 
-$("stopButton").addEventListener(
-  "click",
-  stopBot
+setAccountMode(
+  "demo"
 );
+
+
+syncBotAccountMode();
+
+updateBalance();
 
 
 /* =====================================================
-   INITIALIZE SCANNER
+   BOT INITIALIZATION
 ===================================================== */
 
-function initializeScanner(){
+if(
+  typeof initialize ===
+  "function"
+){
 
-  $("scanGrid").innerHTML =
-    MARKETS.map(
-      market => `
-
-        <div class="scanItem">
-
-          <span>
-            ${escapeHtml(
-              market.name
-            )}
-          </span>
-
-          <b>
-            WAITING
-          </b>
-
-        </div>
-
-      `
-    ).join("");
+  initialize();
 
 }
-
-
-/* =====================================================
-   INITIALIZE
-===================================================== */
-
-function initialize(){
-
-  tradeHistory =
-    loadHistory();
-
-
-  renderHistory();
-
-
-  initializeScanner();
-
-
-  renderCurrentMarket();
-
-}
-
-
-initialize();
 
 </script>
 
 </body>
 </html>
-  
