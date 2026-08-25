@@ -6,13 +6,16 @@ const DERIV_API = "https://api.derivws.com";
 ===================================================== */
 
 function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json",
-      "Cache-Control": "no-store"
+  return new Response(
+    JSON.stringify(data),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store"
+      }
     }
-  });
+  );
 }
 
 /* =====================================================
@@ -20,19 +23,24 @@ function json(data, status = 200) {
 ===================================================== */
 
 function getCookie(request, name) {
-  const cookies = request.headers.get("Cookie") || "";
+  const cookies =
+    request.headers.get("Cookie") || "";
 
   for (const part of cookies.split(";")) {
-    const i = part.indexOf("=");
+    const i =
+      part.indexOf("=");
 
     if (i === -1) continue;
 
-    const key = part.slice(0, i).trim();
+    const key =
+      part.slice(0, i).trim();
 
     if (key !== name) continue;
 
     try {
-      return decodeURIComponent(part.slice(i + 1).trim());
+      return decodeURIComponent(
+        part.slice(i + 1).trim()
+      );
     } catch {
       return part.slice(i + 1).trim();
     }
@@ -46,25 +54,36 @@ function getCookie(request, name) {
 ===================================================== */
 
 async function getAccounts(token) {
-  const response = await fetch(
-    `${DERIV_API}/trading/v1/options/accounts`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Deriv-App-ID": CLIENT_ID,
-        Accept: "application/json"
-      },
-      cache: "no-store"
-    }
-  );
+  const response =
+    await fetch(
+      `${DERIV_API}/trading/v1/options/accounts`,
+      {
+        method: "GET",
 
-  const raw = await response.text();
+        headers: {
+          Authorization:
+            `Bearer ${token}`,
+
+          "Deriv-App-ID":
+            CLIENT_ID,
+
+          Accept:
+            "application/json"
+        },
+
+        cache:
+          "no-store"
+      }
+    );
+
+  const raw =
+    await response.text();
 
   let data;
 
   try {
-    data = JSON.parse(raw);
+    data =
+      JSON.parse(raw);
   } catch {
     throw new Error(
       "Trading service returned an invalid account response."
@@ -109,29 +128,36 @@ function getAccountId(account) {
 
 function getAccountType(account) {
   return String(
-    account?.account_type || "demo"
+    account?.account_type ||
+    "demo"
   ).toLowerCase();
 }
 
 function getAccountBalance(account) {
-  const value = Number(
-    account?.balance ?? 0
-  );
+  const value =
+    Number(
+      account?.balance ?? 0
+    );
 
   return Number.isFinite(value)
     ? value
     : 0;
 }
 
-function findAccount(accounts, requestedType) {
-  const wanted = String(
-    requestedType || "demo"
-  ).toLowerCase();
+function findAccount(
+  accounts,
+  requestedType
+) {
+  const wanted =
+    String(
+      requestedType || "demo"
+    ).toLowerCase();
 
   return (
     accounts.find(
       account =>
-        getAccountType(account) === wanted
+        getAccountType(account) ===
+        wanted
     ) || null
   );
 }
@@ -140,7 +166,8 @@ async function getSelectedAccount(
   token,
   requestedType
 ) {
-  const accounts = await getAccounts(token);
+  const accounts =
+    await getAccounts(token);
 
   if (!accounts.length) {
     throw new Error(
@@ -148,10 +175,11 @@ async function getSelectedAccount(
     );
   }
 
-  const account = findAccount(
-    accounts,
-    requestedType
-  );
+  const account =
+    findAccount(
+      accounts,
+      requestedType
+    );
 
   if (!account) {
     throw new Error(
@@ -161,7 +189,8 @@ async function getSelectedAccount(
     );
   }
 
-  const accountId = getAccountId(account);
+  const accountId =
+    getAccountId(account);
 
   if (!accountId) {
     throw new Error(
@@ -172,9 +201,16 @@ async function getSelectedAccount(
   return {
     account,
     accountId,
-    accountType: getAccountType(account),
-    balance: getAccountBalance(account),
-    currency: account.currency || "USD"
+
+    accountType:
+      getAccountType(account),
+
+    balance:
+      getAccountBalance(account),
+
+    currency:
+      account.currency ||
+      "USD"
   };
 }
 
@@ -182,28 +218,42 @@ async function getSelectedAccount(
    OTP
 ===================================================== */
 
-async function getOTP(token, accountId) {
-  const response = await fetch(
-    `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(
-      accountId
-    )}/otp`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Deriv-App-ID": CLIENT_ID,
-        Accept: "application/json"
-      },
-      cache: "no-store"
-    }
-  );
+async function getOTP(
+  token,
+  accountId
+) {
+  const response =
+    await fetch(
+      `${DERIV_API}/trading/v1/options/accounts/${encodeURIComponent(
+        accountId
+      )}/otp`,
+      {
+        method: "POST",
 
-  const raw = await response.text();
+        headers: {
+          Authorization:
+            `Bearer ${token}`,
+
+          "Deriv-App-ID":
+            CLIENT_ID,
+
+          Accept:
+            "application/json"
+        },
+
+        cache:
+          "no-store"
+      }
+    );
+
+  const raw =
+    await response.text();
 
   let data;
 
   try {
-    data = JSON.parse(raw);
+    data =
+      JSON.parse(raw);
   } catch {
     throw new Error(
       `Trading session returned HTTP ${response.status}.`
@@ -230,7 +280,11 @@ async function getOTP(token, accountId) {
     );
   }
 
-  if (!String(wsUrl).startsWith("wss://")) {
+  if (
+    !String(wsUrl).startsWith(
+      "wss://"
+    )
+  ) {
     throw new Error(
       "Invalid trading WebSocket URL."
     );
@@ -244,54 +298,74 @@ async function getOTP(token, accountId) {
 ===================================================== */
 
 function openWebSocket(wsUrl) {
-  return new Promise((resolve, reject) => {
-    let ws;
+  return new Promise(
+    (resolve, reject) => {
+      let ws;
 
-    const timeout = setTimeout(() => {
+      const timeout =
+        setTimeout(
+          () => {
+            try {
+              ws?.close();
+            } catch {}
+
+            reject(
+              new Error(
+                "Trading connection timed out."
+              )
+            );
+          },
+          8000
+        );
+
       try {
-        ws?.close();
-      } catch {}
+        ws =
+          new WebSocket(
+            wsUrl
+          );
+      } catch {
+        clearTimeout(timeout);
 
-      reject(
-        new Error(
-          "Trading connection timed out."
-        )
+        reject(
+          new Error(
+            "Could not open trading connection."
+          )
+        );
+
+        return;
+      }
+
+      ws.addEventListener(
+        "open",
+        () => {
+          clearTimeout(
+            timeout
+          );
+
+          resolve(ws);
+        }
       );
-    }, 8000);
 
-    try {
-      ws = new WebSocket(wsUrl);
-    } catch {
-      clearTimeout(timeout);
+      ws.addEventListener(
+        "error",
+        () => {
+          clearTimeout(
+            timeout
+          );
 
-      reject(
-        new Error(
-          "Could not open trading connection."
-        )
+          try {
+            ws?.close();
+          } catch {}
+
+          reject(
+            new Error(
+              "Trading connection failed."
+            )
+          );
+        }
       );
-
-      return;
     }
-
-    ws.addEventListener("open", () => {
-      clearTimeout(timeout);
-      resolve(ws);
-    });
-
-    ws.addEventListener("error", () => {
-      clearTimeout(timeout);
-
-      try {
-        ws?.close();
-      } catch {}
-
-      reject(
-        new Error(
-          "Trading connection failed."
-        )
-      );
-    });
-  });
+  );
 }
 
 function closeWebSocket(ws) {
@@ -299,8 +373,10 @@ function closeWebSocket(ws) {
     if (
       ws &&
       (
-        ws.readyState === WebSocket.OPEN ||
-        ws.readyState === WebSocket.CONNECTING
+        ws.readyState ===
+          WebSocket.OPEN ||
+        ws.readyState ===
+          WebSocket.CONNECTING
       )
     ) {
       ws.close();
@@ -318,124 +394,136 @@ function sendRequest(
   wantedMsgType,
   timeoutMs = 8000
 ) {
-  return new Promise((resolve, reject) => {
-    let finished = false;
+  return new Promise(
+    (resolve, reject) => {
+      let finished = false;
 
-    const timeout = setTimeout(() => {
-      if (finished) return;
+      const timeout =
+        setTimeout(
+          () => {
+            if (finished) return;
 
-      finished = true;
-      cleanup();
+            finished = true;
+            cleanup();
 
-      reject(
-        new Error(
-          `Trading service timed out waiting for ${wantedMsgType}.`
-        )
-      );
-    }, timeoutMs);
-
-    function cleanup() {
-      clearTimeout(timeout);
-
-      ws.removeEventListener(
-        "message",
-        onMessage
-      );
-
-      ws.removeEventListener(
-        "error",
-        onError
-      );
-
-      ws.removeEventListener(
-        "close",
-        onClose
-      );
-    }
-
-    function fail(message) {
-      if (finished) return;
-
-      finished = true;
-      cleanup();
-
-      reject(
-        new Error(message)
-      );
-    }
-
-    function onMessage(event) {
-      let data;
-
-      try {
-        data = JSON.parse(event.data);
-      } catch {
-        return;
-      }
-
-      if (data.error) {
-        fail(
-          data.error.message ||
-          data.error?.detail?.message ||
-          "Deriv rejected the request."
+            reject(
+              new Error(
+                `Trading service timed out waiting for ${wantedMsgType}.`
+              )
+            );
+          },
+          timeoutMs
         );
 
-        return;
+      function cleanup() {
+        clearTimeout(timeout);
+
+        ws.removeEventListener(
+          "message",
+          onMessage
+        );
+
+        ws.removeEventListener(
+          "error",
+          onError
+        );
+
+        ws.removeEventListener(
+          "close",
+          onClose
+        );
       }
 
-      if (
-        data.msg_type === wantedMsgType
-      ) {
+      function fail(message) {
         if (finished) return;
 
         finished = true;
         cleanup();
 
-        resolve(data);
+        reject(
+          new Error(message)
+        );
+      }
+
+      function onMessage(event) {
+        let data;
+
+        try {
+          data =
+            JSON.parse(
+              event.data
+            );
+        } catch {
+          return;
+        }
+
+        if (data.error) {
+          fail(
+            data.error.message ||
+            data.error?.detail?.message ||
+            "Deriv rejected the request."
+          );
+
+          return;
+        }
+
+        if (
+          data.msg_type ===
+          wantedMsgType
+        ) {
+          if (finished) return;
+
+          finished = true;
+          cleanup();
+
+          resolve(data);
+        }
+      }
+
+      function onError() {
+        fail(
+          "Trading connection failed."
+        );
+      }
+
+      function onClose() {
+        fail(
+          "Trading connection closed."
+        );
+      }
+
+      ws.addEventListener(
+        "message",
+        onMessage
+      );
+
+      ws.addEventListener(
+        "error",
+        onError
+      );
+
+      ws.addEventListener(
+        "close",
+        onClose
+      );
+
+      try {
+        ws.send(
+          JSON.stringify(
+            payload
+          )
+        );
+      } catch {
+        fail(
+          "Could not send trading request."
+        );
       }
     }
-
-    function onError() {
-      fail(
-        "Trading connection failed."
-      );
-    }
-
-    function onClose() {
-      fail(
-        "Trading connection closed."
-      );
-    }
-
-    ws.addEventListener(
-      "message",
-      onMessage
-    );
-
-    ws.addEventListener(
-      "error",
-      onError
-    );
-
-    ws.addEventListener(
-      "close",
-      onClose
-    );
-
-    try {
-      ws.send(
-        JSON.stringify(payload)
-      );
-    } catch {
-      fail(
-        "Could not send trading request."
-      );
-    }
-  });
+  );
 }
 
 /* =====================================================
-   CONTRACT TYPES
+   CONTRACTS
 ===================================================== */
 
 const SUPPORTED_CONTRACTS =
@@ -455,61 +543,93 @@ const DIGIT_BARRIER_CONTRACTS =
   ]);
 
 /* =====================================================
-   DIGIT STRATEGIES
+   STRATEGIES
 ===================================================== */
 
 const STRATEGIES = {
   UNDER7: {
-    name: "Under 7",
-    contract_type: "DIGITUNDER",
-    barrier: 7
+    name:
+      "Under 7",
+
+    contract_type:
+      "DIGITUNDER",
+
+    barrier:
+      7
   },
 
   OVER5: {
-    name: "Over 5",
-    contract_type: "DIGITOVER",
-    barrier: 5
+    name:
+      "Over 5",
+
+    contract_type:
+      "DIGITOVER",
+
+    barrier:
+      5
   },
 
   OVER7: {
-    name: "Over 7",
-    contract_type: "DIGITOVER",
-    barrier: 7
+    name:
+      "Over 7",
+
+    contract_type:
+      "DIGITOVER",
+
+    barrier:
+      7
   },
 
   OVER6: {
-    name: "Over 6",
-    contract_type: "DIGITOVER",
-    barrier: 6
+    name:
+      "Over 6",
+
+    contract_type:
+      "DIGITOVER",
+
+    barrier:
+      6
   },
 
   UNDER4: {
-    name: "Under 4",
-    contract_type: "DIGITUNDER",
-    barrier: 4
+    name:
+      "Under 4",
+
+    contract_type:
+      "DIGITUNDER",
+
+    barrier:
+      4
   }
 };
 
 /* =====================================================
-   STRATEGY VALIDATION
+   NUMBER HELPERS
 ===================================================== */
 
 function numberValue(value) {
-  const n = Number(value);
+  const n =
+    Number(value);
 
   return Number.isFinite(n)
     ? n
     : null;
 }
 
-function normalisePercentages(percentages) {
+function normalisePercentages(
+  percentages
+) {
   const result = {};
 
-  for (let i = 0; i <= 9; i++) {
+  for (
+    let i = 0;
+    i <= 9;
+    i++
+  ) {
     result[i] =
       numberValue(
         percentages?.[i] ??
-        percentages?.String?.(i) ??
+        percentages?.[String(i)] ??
         0
       ) ?? 0;
   }
@@ -517,21 +637,17 @@ function normalisePercentages(percentages) {
   return result;
 }
 
-function validateUnder7(data) {
-  const p =
-    normalisePercentages(
-      data.percentages
-    );
+/* =====================================================
+   STRATEGY VALIDATION
+===================================================== */
 
+function validateUnder7(data) {
   const green =
     Number(data.green_digit);
 
   const red =
     Number(data.red_digit);
 
-  /*
-   * Both bars must be below 7.
-   */
   if (
     green < 0 ||
     green >= 7 ||
@@ -541,9 +657,6 @@ function validateUnder7(data) {
     return false;
   }
 
-  /*
-   * Green must appear before red.
-   */
   if (
     Number(data.green_position) >=
     Number(data.red_position)
@@ -551,20 +664,13 @@ function validateUnder7(data) {
     return false;
   }
 
-  /*
-   * Moving tick must currently touch 8 or 9.
-   */
   const tick =
     Number(data.moving_digit);
 
-  if (
-    tick !== 8 &&
-    tick !== 9
-  ) {
-    return false;
-  }
-
-  return true;
+  return (
+    tick === 8 ||
+    tick === 9
+  );
 }
 
 function validateOver5(data) {
@@ -577,9 +683,6 @@ function validateOver5(data) {
   const tick =
     Number(data.moving_digit);
 
-  /*
-   * Red must be 0 or 1.
-   */
   if (
     red !== 0 &&
     red !== 1
@@ -587,9 +690,6 @@ function validateOver5(data) {
     return false;
   }
 
-  /*
-   * Green must be 8 or 9.
-   */
   if (
     green !== 8 &&
     green !== 9
@@ -597,17 +697,10 @@ function validateOver5(data) {
     return false;
   }
 
-  /*
-   * Entry when moving tick touches 0 or 1.
-   */
-  if (
-    tick !== 0 &&
-    tick !== 1
-  ) {
-    return false;
-  }
-
-  return true;
+  return (
+    tick === 0 ||
+    tick === 1
+  );
 }
 
 function validateOver7(data) {
@@ -622,23 +715,14 @@ function validateOver7(data) {
   const red =
     Number(data.red_digit);
 
-  /*
-   * Green must be 9.
-   */
   if (green !== 9) {
     return false;
   }
 
-  /*
-   * Red must be 0.
-   */
   if (red !== 0) {
     return false;
   }
 
-  /*
-   * 8 and 9 must be above 12.5%.
-   */
   if (
     p[8] <= 12.5 ||
     p[9] <= 12.5
@@ -646,42 +730,33 @@ function validateOver7(data) {
     return false;
   }
 
-  /*
-   * Every number below 7 must be below 10%.
-   */
-  for (let d = 0; d < 7; d++) {
+  for (
+    let d = 0;
+    d < 7;
+    d++
+  ) {
     if (p[d] >= 10) {
       return false;
     }
   }
 
-  /*
-   * Moving tick must have touched
-   * at least 4 digits.
-   */
   const touched =
-    Array.isArray(data.touched_digits)
+    Array.isArray(
+      data.touched_digits
+    )
       ? data.touched_digits
       : [];
 
-  if (touched.length < 4) {
-    return false;
-  }
-
-  /*
-   * Enter while touching the 4th
-   * number.
-   */
-  const current =
-    Number(data.moving_digit);
-
   if (
-    Number(touched[3]) !== current
+    touched.length < 4
   ) {
     return false;
   }
 
-  return true;
+  return (
+    Number(touched[3]) ===
+    Number(data.moving_digit)
+  );
 }
 
 function validateOver6(data) {
@@ -696,10 +771,6 @@ function validateOver6(data) {
   const red =
     Number(data.red_digit);
 
-  /*
-   * Green = 9
-   * Red = 0
-   */
   if (
     green !== 9 ||
     red !== 0
@@ -707,23 +778,18 @@ function validateOver6(data) {
     return false;
   }
 
-  /*
-   * 9 > 12.5%
-   */
-  if (p[9] <= 12.5) {
+  if (
+    p[9] <= 12.5
+  ) {
     return false;
   }
 
-  /*
-   * 0 = 8.5% or below.
-   */
-  if (p[0] > 8.5) {
+  if (
+    p[0] > 8.5
+  ) {
     return false;
   }
 
-  /*
-   * 6,7,8 > 10.5%
-   */
   if (
     p[6] <= 10.5 ||
     p[7] <= 10.5 ||
@@ -732,17 +798,18 @@ function validateOver6(data) {
     return false;
   }
 
-  /*
-   * Reject if 6,7,8,9 is decreasing
-   * by even 0.1%.
-   */
   const previous =
     normalisePercentages(
       data.previous_percentages
     );
 
   for (
-    const digit of [6, 7, 8, 9]
+    const digit of [
+      6,
+      7,
+      8,
+      9
+    ]
   ) {
     if (
       p[digit] <
@@ -752,32 +819,31 @@ function validateOver6(data) {
     }
   }
 
-  /*
-   * At least 3 numbers below 6
-   * must have been touched.
-   */
   const touched =
-    Array.isArray(data.touched_digits)
+    Array.isArray(
+      data.touched_digits
+    )
       ? data.touched_digits
       : [];
 
   const below6 =
     touched.filter(
-      d => Number(d) < 6
+      d =>
+        Number(d) < 6
     );
 
-  if (below6.length < 3) {
+  if (
+    below6.length < 3
+  ) {
     return false;
   }
 
-  /*
-   * 1 must always be the LAST
-   * digit touched.
-   */
   const last =
     touched.length
       ? Number(
-          touched[touched.length - 1]
+          touched[
+            touched.length - 1
+          ]
         )
       : null;
 
@@ -785,17 +851,10 @@ function validateOver6(data) {
     return false;
   }
 
-  /*
-   * Enter while moving tick
-   * is touching 1.
-   */
-  if (
-    Number(data.moving_digit) !== 1
-  ) {
-    return false;
-  }
-
-  return true;
+  return (
+    Number(data.moving_digit) ===
+    1
+  );
 }
 
 function validateUnder4(data) {
@@ -810,15 +869,6 @@ function validateUnder4(data) {
   const red =
     Number(data.red_digit);
 
-  /*
-   * Valid bar arrangements:
-   *
-   * green = 0, red = 9
-   *
-   * OR
-   *
-   * green = 0, red = 1
-   */
   const validBars =
     (
       green === 0 &&
@@ -833,43 +883,46 @@ function validateUnder4(data) {
     return false;
   }
 
-  /*
-   * Every number above 4 < 10%.
-   */
-  for (let d = 5; d <= 9; d++) {
-    if (p[d] >= 10) {
+  for (
+    let d = 5;
+    d <= 9;
+    d++
+  ) {
+    if (
+      p[d] >= 10
+    ) {
       return false;
     }
   }
 
-  /*
-   * 0,1,2,3,4 > 10.5%.
-   */
-  for (let d = 0; d <= 4; d++) {
-    if (p[d] <= 10.5) {
+  for (
+    let d = 0;
+    d <= 4;
+    d++
+  ) {
+    if (
+      p[d] <= 10.5
+    ) {
       return false;
     }
   }
 
-  /*
-   * At least 4 numbers above 4
-   * must have been touched.
-   */
   const touched =
-    Array.isArray(data.touched_digits)
+    Array.isArray(
+      data.touched_digits
+    )
       ? data.touched_digits
       : [];
 
   const above4 =
     touched.filter(
-      d => Number(d) > 4
+      d =>
+        Number(d) > 4
     );
 
-  if (above4.length < 4) {
-    return false;
-  }
-
-  return true;
+  return (
+    above4.length >= 4
+  );
 }
 
 function strategyAllowsTrade(
@@ -914,11 +967,14 @@ function buildProposalPayload({
   barrier
 }) {
   const payload = {
-    proposal: 1,
+    proposal:
+      1,
 
-    amount: stake,
+    amount:
+      stake,
 
-    basis: "stake",
+    basis:
+      "stake",
 
     contract_type:
       contractType,
@@ -933,7 +989,8 @@ function buildProposalPayload({
     underlying_symbol:
       market,
 
-    req_id: 4001
+    req_id:
+      4001
   };
 
   if (
@@ -987,7 +1044,8 @@ function normalizeContract(
       source?.profit ?? 0
     );
 
-  let status = rawStatus;
+  let status =
+    rawStatus;
 
   if (
     isSold &&
@@ -1128,32 +1186,36 @@ async function getContractResult(
         let finished = false;
 
         const timeout =
-          setTimeout(() => {
-            finish({
-              contract: {
-                contract_id:
-                  Number(contractId),
+          setTimeout(
+            () => {
+              finish({
+                contract:
+                  normalizeContract(
+                    {
+                      contract_id:
+                        contractId,
 
-                status:
-                  "OPEN",
+                      status:
+                        "OPEN",
 
-                is_sold:
-                  false,
+                      is_sold:
+                        false,
 
-                profit:
-                  0,
+                      profit:
+                        0
+                    },
 
-                entry_spot:
-                  null,
-
-                exit_spot:
-                  null
-              }
-            });
-          }, 5000);
+                    contractId
+                  )
+              });
+            },
+            5000
+          );
 
         function cleanup() {
-          clearTimeout(timeout);
+          clearTimeout(
+            timeout
+          );
 
           ws.removeEventListener(
             "message",
@@ -1195,7 +1257,9 @@ async function getContractResult(
           reject(
             error instanceof Error
               ? error
-              : new Error(String(error))
+              : new Error(
+                  String(error)
+                )
           );
         }
 
@@ -1235,13 +1299,13 @@ async function getContractResult(
 
           if (!raw) return;
 
-          const returnedContractId =
+          const returnedId =
             Number(
               raw.contract_id
             );
 
           if (
-            returnedContractId !==
+            returnedId !==
             Number(contractId)
           ) {
             return;
@@ -1258,7 +1322,9 @@ async function getContractResult(
             contract.status === "WON" ||
             contract.status === "LOST";
 
-          if (finishedContract) {
+          if (
+            finishedContract
+          ) {
             finish({
               contract
             });
@@ -1305,7 +1371,9 @@ async function getContractResult(
                 1,
 
               contract_id:
-                Number(contractId),
+                Number(
+                  contractId
+                ),
 
               subscribe:
                 1,
@@ -1314,11 +1382,12 @@ async function getContractResult(
                 9001
             })
           );
-        } catch (error) {
+        } catch(error) {
           fail(error);
         }
       }
     );
+
   } finally {
     closeWebSocket(ws);
   }
@@ -1340,7 +1409,8 @@ export async function onRequest(
   ) {
     return json(
       {
-        ok: false,
+        ok:false,
+
         error:
           "Method not allowed."
       },
@@ -1357,8 +1427,10 @@ export async function onRequest(
   if (!token) {
     return json(
       {
-        ok: false,
-        connected: false,
+        ok:false,
+
+        connected:false,
+
         error:
           "Trading session unavailable. Please log in again."
       },
@@ -1377,7 +1449,8 @@ export async function onRequest(
     } catch {
       return json(
         {
-          ok: false,
+          ok:false,
+
           error:
             "Invalid trading request."
         },
@@ -1436,8 +1509,10 @@ export async function onRequest(
   } catch(error) {
     return json(
       {
-        ok: false,
-        connected: false,
+        ok:false,
+
+        connected:false,
+
         error:
           error.message ||
           "Trading account unavailable."
@@ -1462,11 +1537,11 @@ export async function onRequest(
     request.method === "GET"
   ) {
     return json({
-      ok: true,
+      ok:true,
 
-      connected: true,
+      connected:true,
 
-      account: {
+      account:{
         account_id:
           accountId,
 
@@ -1495,11 +1570,11 @@ export async function onRequest(
     "select_account"
   ) {
     return json({
-      ok: true,
+      ok:true,
 
-      connected: true,
+      connected:true,
 
-      account: {
+      account:{
         account_id:
           accountId,
 
@@ -1541,9 +1616,9 @@ export async function onRequest(
 
       if (freshAccount) {
         return json({
-          ok: true,
+          ok:true,
 
-          account: {
+          account:{
             account_id:
               getAccountId(
                 freshAccount
@@ -1565,6 +1640,7 @@ export async function onRequest(
             currency
         });
       }
+
     } catch(error) {
       console.error(
         "Fast balance error:",
@@ -1573,9 +1649,9 @@ export async function onRequest(
     }
 
     return json({
-      ok: true,
+      ok:true,
 
-      account: {
+      account:{
         account_id:
           accountId,
 
@@ -1611,7 +1687,7 @@ export async function onRequest(
     ) {
       return json(
         {
-          ok: false,
+          ok:false,
 
           error:
             "Unknown strategy."
@@ -1627,12 +1703,13 @@ export async function onRequest(
       );
 
     return json({
-      ok: true,
+      ok:true,
 
       strategy,
 
       strategy_name:
-        STRATEGIES[strategy].name,
+        STRATEGIES[strategy]
+          .name,
 
       allowed,
 
@@ -1667,7 +1744,8 @@ export async function onRequest(
     ) {
       return json(
         {
-          ok: false,
+          ok:false,
+
           error:
             "Invalid contract ID."
         },
@@ -1684,12 +1762,12 @@ export async function onRequest(
         );
 
       return json({
-        ok: true,
+        ok:true,
 
         contract:
           result.contract,
 
-        account: {
+        account:{
           account_id:
             accountId,
 
@@ -1697,13 +1775,13 @@ export async function onRequest(
             accountType
         }
       });
+
     } catch(error) {
       return json(
         {
-          ok: false,
+          ok:false,
 
-          connected:
-            true,
+          connected:true,
 
           error:
             error.message ||
@@ -1719,8 +1797,10 @@ export async function onRequest(
   ===================================================== */
 
   if (
-    body.action === "session" ||
-    body.action === "trading_session"
+    body.action ===
+      "session" ||
+    body.action ===
+      "trading_session"
   ) {
     let ws;
 
@@ -1741,8 +1821,11 @@ export async function onRequest(
           ws,
 
           {
-            balance: 1,
-            req_id: 3001
+            balance:
+              1,
+
+            req_id:
+              3001
           },
 
           "balance",
@@ -1751,9 +1834,9 @@ export async function onRequest(
         );
 
       return json({
-        ok: true,
+        ok:true,
 
-        connected: true,
+        connected:true,
 
         trading_ready:
           true,
@@ -1766,7 +1849,7 @@ export async function onRequest(
           result?.balance?.currency ??
           currency,
 
-        account: {
+        account:{
           account_id:
             accountId,
 
@@ -1774,13 +1857,13 @@ export async function onRequest(
             accountType
         }
       });
+
     } catch(error) {
       return json(
         {
-          ok: false,
+          ok:false,
 
-          connected:
-            true,
+          connected:true,
 
           trading_ready:
             false,
@@ -1791,6 +1874,7 @@ export async function onRequest(
         },
         502
       );
+
     } finally {
       closeWebSocket(ws);
     }
@@ -1821,10 +1905,6 @@ export async function onRequest(
         );
       }
 
-      /*
-       * Strategy can determine the
-       * contract automatically.
-       */
       const strategy =
         String(
           body.strategy || ""
@@ -1844,10 +1924,6 @@ export async function onRequest(
         body.barrier ??
         null;
 
-      /*
-       * If a strategy is supplied,
-       * use its exact contract.
-       */
       if (
         strategy &&
         STRATEGIES[strategy]
@@ -1912,7 +1988,7 @@ export async function onRequest(
         ).trim();
 
       /* -----------------------------------------------
-         AUTHENTICATED CONNECTION
+         CONNECTION
       ----------------------------------------------- */
 
       const wsUrl =
@@ -1933,19 +2009,28 @@ export async function onRequest(
       const proposalPayload =
         buildProposalPayload({
           market,
+
           contractType,
+
           stake,
+
           duration,
+
           durationUnit,
+
           currency,
+
           barrier
         });
 
       const proposalResponse =
         await sendRequest(
           ws,
+
           proposalPayload,
+
           "proposal",
+
           8000
         );
 
@@ -1966,7 +2051,9 @@ export async function onRequest(
         );
 
       if (
-        !Number.isFinite(askPrice) ||
+        !Number.isFinite(
+          askPrice
+        ) ||
         askPrice <= 0
       ) {
         throw new Error(
@@ -2023,12 +2110,12 @@ export async function onRequest(
         null;
 
       return json({
-        ok: true,
+        ok:true,
 
         strategy:
           strategy || null,
 
-        contract: {
+        contract:{
           contract_id:
             Number(
               buy.contract_id
@@ -2065,8 +2152,7 @@ export async function onRequest(
           account_id:
             accountId,
 
-          market:
-            market,
+          market,
 
           underlying_symbol:
             market,
@@ -2088,7 +2174,7 @@ export async function onRequest(
             null
         },
 
-        account: {
+        account:{
           account_id:
             accountId,
 
@@ -2102,10 +2188,10 @@ export async function onRequest(
               ? balanceAfter
               : balance,
 
-          currency:
-            currency
+          currency
         }
       });
+
     } catch(error) {
       console.error(
         "DollarTicks BUY ERROR:",
@@ -2114,10 +2200,9 @@ export async function onRequest(
 
       return json(
         {
-          ok: false,
+          ok:false,
 
-          connected:
-            true,
+          connected:true,
 
           error:
             error.message ||
@@ -2125,6 +2210,7 @@ export async function onRequest(
         },
         400
       );
+
     } finally {
       closeWebSocket(ws);
     }
@@ -2136,7 +2222,7 @@ export async function onRequest(
 
   return json(
     {
-      ok: false,
+      ok:false,
 
       error:
         `Unknown action: ${
@@ -2145,4 +2231,4 @@ export async function onRequest(
     },
     400
   );
-}
+         }
