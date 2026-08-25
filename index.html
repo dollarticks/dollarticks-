@@ -53,10 +53,6 @@ body{
   font-size:12px
 }
 
-.status.live{
-  color:#62e6a7
-}
-
 .status.running{
   color:#62e6a7;
   background:#10271d
@@ -74,7 +70,6 @@ label{
   margin-bottom:6px
 }
 
-select,
 input,
 button{
   width:100%;
@@ -114,23 +109,11 @@ button:disabled{
   cursor:not-allowed
 }
 
-.marketName{
-  font-size:18px;
-  font-weight:800;
-  margin-top:10px
-}
-
-.quote{
-  color:#9da8b8;
-  font-size:13px;
-  margin-top:4px
-}
-
 .botState{
   background:#0d1219;
   border-radius:12px;
   padding:12px;
-  line-height:1.7;
+  line-height:1.8;
   font-size:13px
 }
 
@@ -138,27 +121,53 @@ button:disabled{
   color:#fff
 }
 
-.strategy{
+.marketScan{
   background:#0d1219;
-  border:1px solid #202733;
   border-radius:12px;
   padding:12px;
+  margin-top:10px
+}
+
+.scanTitle{
+  color:#8f9aab;
+  font-size:11px;
   margin-bottom:8px
 }
 
-.strategy.active{
+.scanGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px
+}
+
+.scanItem{
+  border:1px solid #202733;
+  border-radius:9px;
+  padding:8px;
+  font-size:11px;
+  display:flex;
+  justify-content:space-between;
+  gap:5px
+}
+
+.scanItem b{
+  color:#aeb8c7
+}
+
+.scanItem.active{
   border-color:#18c6d8
 }
 
-.strategyName{
-  font-weight:900;
-  margin-bottom:5px
+.scanItem.ready{
+  border-color:#62e6a7
 }
 
-.strategyStatus{
-  color:#8995a6;
-  font-size:11px;
-  line-height:1.5
+.scanItem.error{
+  border-color:#ff4d5a
+}
+
+.latest{
+  color:#62e6a7 !important
 }
 
 .grid{
@@ -335,10 +344,6 @@ button:disabled{
   line-height:1.6
 }
 
-.hidden{
-  display:none
-}
-
 @media(max-width:430px){
 
   .wrap{
@@ -360,6 +365,10 @@ button:disabled{
   .controls{
     gap:7px
   }
+
+  .scanGrid{
+    grid-template-columns:1fr 1fr
+  }
 }
 </style>
 </head>
@@ -367,10 +376,6 @@ button:disabled{
 <body>
 
 <div class="wrap">
-
-<!-- =====================================================
-     HEADER
-===================================================== -->
 
 <div class="top">
 
@@ -385,81 +390,15 @@ button:disabled{
 </div>
 
 
-<!-- =====================================================
-     BOT CONTROLS
-===================================================== -->
+<!-- BOT CONTROLS -->
 
 <div class="card">
 
-  <div class="latestBadge">
+  <div style="font-size:12px;color:#8f9aab">
     BOT CONTROLS
   </div>
 
   <div style="height:8px"></div>
-
-  <label>Volatility Market</label>
-
-  <select id="market">
-
-    <optgroup label="Volatility 1 Second">
-
-      <option value="1HZ100V">
-        Volatility 100 (1s)
-      </option>
-
-      <option value="1HZ75V">
-        Volatility 75 (1s)
-      </option>
-
-      <option value="1HZ50V">
-        Volatility 50 (1s)
-      </option>
-
-      <option value="1HZ25V">
-        Volatility 25 (1s)
-      </option>
-
-      <option value="1HZ10V">
-        Volatility 10 (1s)
-      </option>
-
-    </optgroup>
-
-    <optgroup label="Volatility">
-
-      <option value="R_100">
-        Volatility 100
-      </option>
-
-      <option value="R_75">
-        Volatility 75
-      </option>
-
-      <option value="R_50">
-        Volatility 50
-      </option>
-
-      <option value="R_25">
-        Volatility 25
-      </option>
-
-      <option value="R_10">
-        Volatility 10
-      </option>
-
-    </optgroup>
-
-  </select>
-
-  <div class="marketName" id="marketName">
-    Volatility 100 (1s)
-  </div>
-
-  <div class="quote" id="quote">
-    Waiting for tick…
-  </div>
-
-  <div style="height:12px"></div>
 
   <div class="controls">
 
@@ -518,13 +457,11 @@ button:disabled{
 </div>
 
 
-<!-- =====================================================
-     BOT STATE
-===================================================== -->
+<!-- BOT STATUS -->
 
 <div class="card">
 
-  <div class="latestBadge">
+  <div style="font-size:12px;color:#8f9aab">
     BOT STATUS
   </div>
 
@@ -539,16 +476,9 @@ button:disabled{
 
     <br>
 
-    Strategy:
-    <b id="activeStrategy">
+    Market:
+    <b id="selectedMarket">
       Waiting
-    </b>
-
-    <br>
-
-    Moving tick:
-    <b id="movingDigit">
-      —
     </b>
 
     <br>
@@ -560,16 +490,51 @@ button:disabled{
 
   </div>
 
+  <div class="marketScan">
+
+    <div class="scanTitle">
+      AUTOMATIC MARKET SCANNER
+    </div>
+
+    <div id="scanGrid" class="scanGrid"></div>
+
+  </div>
+
 </div>
 
 
-<!-- =====================================================
-     DIGIT ANALYSIS
-===================================================== -->
+<!-- LIVE ANALYSIS -->
 
 <div class="card">
 
-  <div class="latestBadge">
+  <div style="font-size:12px;color:#8f9aab">
+    LIVE MARKET ANALYSIS
+  </div>
+
+  <div style="height:8px"></div>
+
+  <div
+    style="font-size:18px;font-weight:900"
+    id="marketName"
+  >
+    Waiting for market
+  </div>
+
+  <div
+    id="quote"
+    style="color:#9da8b8;font-size:13px;margin-top:4px"
+  >
+    Start the bot to scan markets.
+  </div>
+
+</div>
+
+
+<!-- DIGIT ANALYSIS -->
+
+<div class="card">
+
+  <div style="font-size:12px;color:#8f9aab">
     LAST DIGIT FREQUENCY —
     LAST <b id="countLabel">100</b> TICKS
   </div>
@@ -581,9 +546,7 @@ button:disabled{
 </div>
 
 
-<!-- =====================================================
-     METRICS
-===================================================== -->
+<!-- METRICS -->
 
 <div class="card">
 
@@ -648,108 +611,11 @@ button:disabled{
 </div>
 
 
-<!-- =====================================================
-     STRATEGIES
-===================================================== -->
+<!-- TRADE HISTORY -->
 
 <div class="card">
 
-  <div class="latestBadge">
-    STRATEGY ENGINE
-  </div>
-
-  <div style="height:8px"></div>
-
-
-  <div id="strategy-under7" class="strategy">
-
-    <div class="strategyName">
-      Under 7
-    </div>
-
-    <div
-      id="under7Status"
-      class="strategyStatus"
-    >
-      Waiting for analysis…
-    </div>
-
-  </div>
-
-
-  <div id="strategy-over5" class="strategy">
-
-    <div class="strategyName">
-      Over 5
-    </div>
-
-    <div
-      id="over5Status"
-      class="strategyStatus"
-    >
-      Waiting for analysis…
-    </div>
-
-  </div>
-
-
-  <div id="strategy-over7" class="strategy">
-
-    <div class="strategyName">
-      Over 7
-    </div>
-
-    <div
-      id="over7Status"
-      class="strategyStatus"
-    >
-      Waiting for analysis…
-    </div>
-
-  </div>
-
-
-  <div id="strategy-over6" class="strategy">
-
-    <div class="strategyName">
-      Over 6
-    </div>
-
-    <div
-      id="over6Status"
-      class="strategyStatus"
-    >
-      Waiting for analysis…
-    </div>
-
-  </div>
-
-
-  <div id="strategy-under4" class="strategy">
-
-    <div class="strategyName">
-      Under 4
-    </div>
-
-    <div
-      id="under4Status"
-      class="strategyStatus"
-    >
-      Waiting for analysis…
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     TRADE HISTORY
-===================================================== -->
-
-<div class="card">
-
-  <div class="latestBadge">
+  <div style="font-size:12px;color:#8f9aab">
     TRADE HISTORY
   </div>
 
@@ -803,25 +669,26 @@ button:disabled{
 
   </div>
 
-  <button
-    id="clearHistory"
-  >
+  <button id="clearHistory">
     Clear Trade History
   </button>
 
 </div>
 
 
-<!-- =====================================================
-     NOTE
-===================================================== -->
+<!-- NOTE -->
 
 <div class="card">
 
   <div class="note">
 
-    DollarTicks receives live tick data from Deriv
-    and evaluates the five configured strategies.
+    DollarTicks automatically scans all configured
+    Volatility markets and looks for valid strategy
+    conditions.
+
+    <br><br>
+
+    You only control the stake and duration.
 
     <br><br>
 
@@ -837,12 +704,17 @@ button:disabled{
 
     <br><br>
 
-    The bot never opens more than one trade at a time.
+    Only one trade can be active at a time.
 
     <br><br>
 
-    Trading involves risk. Strategy conditions are
-    rules for automation and do not guarantee profit.
+    Strategy details are recorded in Trade History
+    after a completed trade.
+
+    <br><br>
+
+    Trading involves risk. Automated strategy
+    conditions do not guarantee profit.
 
   </div>
 
@@ -854,7 +726,7 @@ button:disabled{
 <script>
 
 /* =====================================================
-   BASIC HELPERS
+   HELPERS
 ===================================================== */
 
 const $ = id =>
@@ -862,7 +734,7 @@ const $ = id =>
 
 
 /* =====================================================
-   MARKET DATA
+   DERIV CONNECTION
 ===================================================== */
 
 const WS_URL =
@@ -870,51 +742,114 @@ const WS_URL =
 
 const MAX_TICKS = 100;
 
-const marketNames = {
 
-  "1HZ100V":
-    "Volatility 100 (1s)",
+/* =====================================================
+   ALL MARKETS
+===================================================== */
 
-  "1HZ75V":
-    "Volatility 75 (1s)",
+const MARKETS = [
 
-  "1HZ50V":
-    "Volatility 50 (1s)",
+  {
+    symbol:"1HZ100V",
+    name:"Volatility 100 (1s)"
+  },
 
-  "1HZ25V":
-    "Volatility 25 (1s)",
+  {
+    symbol:"1HZ75V",
+    name:"Volatility 75 (1s)"
+  },
 
-  "1HZ10V":
-    "Volatility 10 (1s)",
+  {
+    symbol:"1HZ50V",
+    name:"Volatility 50 (1s)"
+  },
 
-  "R_100":
-    "Volatility 100",
+  {
+    symbol:"1HZ25V",
+    name:"Volatility 25 (1s)"
+  },
 
-  "R_75":
-    "Volatility 75",
+  {
+    symbol:"1HZ10V",
+    name:"Volatility 10 (1s)"
+  },
 
-  "R_50":
-    "Volatility 50",
+  {
+    symbol:"R_100",
+    name:"Volatility 100"
+  },
 
-  "R_25":
-    "Volatility 25",
+  {
+    symbol:"R_75",
+    name:"Volatility 75"
+  },
 
-  "R_10":
-    "Volatility 10"
-};
+  {
+    symbol:"R_50",
+    name:"Volatility 50"
+  },
+
+  {
+    symbol:"R_25",
+    name:"Volatility 25"
+  },
+
+  {
+    symbol:"R_10",
+    name:"Volatility 10"
+  }
+
+];
 
 
-let ws = null;
+const marketNames = {};
 
-let history = [];
+MARKETS.forEach(
+  market =>
+    marketNames[
+      market.symbol
+    ] = market.name
+);
 
-let latestDigit = null;
 
-let currentPipSize = null;
+/* =====================================================
+   MARKET STATES
+===================================================== */
 
-let manuallyStopped = true;
+const marketStates = {};
 
-let reconnectTimer = null;
+
+MARKETS.forEach(
+  market => {
+
+    marketStates[
+      market.symbol
+    ] = {
+
+      ws:null,
+
+      history:[],
+
+      latestDigit:null,
+
+      pipSize:null,
+
+      connected:false,
+
+      loading:false,
+
+      error:false,
+
+      previousPercentages:null,
+
+      movingSequence:[],
+
+      reconnectTimer:null
+
+    };
+
+  }
+);
 
 
 /* =====================================================
@@ -929,17 +864,13 @@ let currentTrade = null;
 
 let contractPolling = false;
 
-let strategyCandidate = null;
+let currentMarketSymbol = null;
 
-let movingSequence = [];
-
-let strategyState = {};
-
-let previousPercentages = null;
+let currentStrategy = null;
 
 
 /* =====================================================
-   CONFIG
+   STRATEGIES
 ===================================================== */
 
 const STRATEGIES = {
@@ -958,6 +889,137 @@ const STRATEGIES = {
 
 
 /* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(value){
+
+  return String(value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+function setStatus(
+  text,
+  running=false
+){
+
+  $("status").textContent =
+    text;
+
+  $("status").className =
+    "status " +
+    (
+      running
+        ? "running"
+        : "stopped"
+    );
+
+}
+
+
+/* =====================================================
+   SCANNER DISPLAY
+===================================================== */
+
+function renderScanner(){
+
+  $("scanGrid").innerHTML =
+    MARKETS.map(
+      market => {
+
+        const state =
+          marketStates[
+            market.symbol
+          ];
+
+        let status =
+          "WAITING";
+
+        let cls = "";
+
+        if(state.error){
+
+          status =
+            "ERROR";
+
+          cls =
+            "error";
+
+        }else if(
+          currentMarketSymbol ===
+          market.symbol &&
+          tradeActive
+        ){
+
+          status =
+            "TRADE";
+
+          cls =
+            "ready";
+
+        }else if(
+          currentMarketSymbol ===
+          market.symbol
+        ){
+
+          status =
+            "ANALYSING";
+
+          cls =
+            "active";
+
+        }else if(
+          state.connected
+        ){
+
+          status =
+            "LIVE";
+
+        }else if(
+          state.loading
+        ){
+
+          status =
+            "CONNECTING";
+
+        }
+
+
+        return `
+
+          <div class="scanItem ${cls}">
+
+            <span>
+              ${escapeHtml(
+                market.name
+              )}
+            </span>
+
+            <b>
+              ${status}
+            </b>
+
+          </div>
+
+        `;
+
+      }
+    ).join("");
+
+}
+
+
+/* =====================================================
    DIGIT EXTRACTION
 ===================================================== */
 
@@ -972,8 +1034,10 @@ function getLastDigit(
   if(!Number.isFinite(n))
     return null;
 
+
   const size =
     Number(pipSize);
+
 
   if(
     Number.isFinite(size) &&
@@ -985,15 +1049,21 @@ function getLastDigit(
       10 ** size;
 
     return Math.abs(
-      Math.round(n * factor)
+      Math.round(
+        n * factor
+      )
     ) % 10;
+
   }
+
 
   const text =
     String(quote);
 
+
   const decimal =
     text.split(".")[1];
+
 
   if(decimal){
 
@@ -1003,15 +1073,761 @@ function getLastDigit(
         ""
       );
 
-    if(digits.length)
+
+    if(digits.length){
+
       return Number(
         digits.charAt(
           digits.length - 1
         )
       );
+
+    }
+
   }
 
+
   return null;
+
+}
+
+
+/* =====================================================
+   COUNTS
+===================================================== */
+
+function getCounts(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const counts =
+    Array(10).fill(0);
+
+
+  if(!state)
+    return counts;
+
+
+  for(
+    const digit of state.history
+  ){
+
+    if(
+      Number.isInteger(digit) &&
+      digit >= 0 &&
+      digit <= 9
+    ){
+
+      counts[digit]++;
+
+    }
+
+  }
+
+
+  return counts;
+
+}
+
+
+/* =====================================================
+   PERCENTAGES
+===================================================== */
+
+function getPercentages(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const counts =
+    getCounts(symbol);
+
+
+  const total =
+    state?.history?.length || 0;
+
+
+  if(!total)
+    return Array(10).fill(0);
+
+
+  return counts.map(
+    value =>
+      value / total * 100
+  );
+
+}
+
+
+/* =====================================================
+   MOST DIGIT
+===================================================== */
+
+function findMostDigit(
+  symbol
+){
+
+  const counts =
+    getCounts(symbol);
+
+
+  let digit = 0;
+
+
+  for(let i=1;i<10;i++){
+
+    if(
+      counts[i] >
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
+
+  }
+
+
+  return digit;
+
+}
+
+
+/* =====================================================
+   LEAST DIGIT
+===================================================== */
+
+function findLeastDigit(
+  symbol
+){
+
+  const counts =
+    getCounts(symbol);
+
+
+  let digit = 0;
+
+
+  for(let i=1;i<10;i++){
+
+    if(
+      counts[i] <
+      counts[digit]
+    ){
+
+      digit = i;
+
+    }
+
+  }
+
+
+  return digit;
+
+}
+
+
+/* =====================================================
+   LAST POSITION
+===================================================== */
+
+function findLastPosition(
+  array,
+  value
+){
+
+  for(
+    let i=array.length-1;
+    i>=0;
+    i--
+  ){
+
+    if(
+      array[i] === value
+    ){
+
+      return i;
+
+    }
+
+  }
+
+
+  return -1;
+
+}
+
+
+/* =====================================================
+   UNDER 7
+===================================================== */
+
+function checkUnder7(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const green =
+    findMostDigit(symbol);
+
+
+  const red =
+    findLeastDigit(symbol);
+
+
+  if(
+    green >= 7 ||
+    red >= 7
+  ){
+
+    return false;
+
+  }
+
+
+  const greenPosition =
+    findLastPosition(
+      state.movingSequence,
+      green
+    );
+
+
+  const redPosition =
+    findLastPosition(
+      state.movingSequence,
+      red
+    );
+
+
+  if(
+    greenPosition === -1 ||
+    redPosition === -1 ||
+    greenPosition >= redPosition
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    state.latestDigit === 8 ||
+    state.latestDigit === 9
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================================
+   OVER 5
+===================================================== */
+
+function checkOver5(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const green =
+    findMostDigit(symbol);
+
+
+  const red =
+    findLeastDigit(symbol);
+
+
+  if(
+    !(red === 0 || red === 1)
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    !(green === 8 || green === 9)
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    state.latestDigit === 0 ||
+    state.latestDigit === 1
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================================
+   OVER 7
+===================================================== */
+
+function checkOver7(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const percentages =
+    getPercentages(symbol);
+
+
+  const green =
+    findMostDigit(symbol);
+
+
+  const red =
+    findLeastDigit(symbol);
+
+
+  if(green !== 9)
+    return false;
+
+
+  if(red !== 0)
+    return false;
+
+
+  if(
+    percentages[8] <= 12.5 ||
+    percentages[9] <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  for(let i=0;i<7;i++){
+
+    if(
+      percentages[i] >= 10
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  const unique =
+    new Set(
+      state.movingSequence
+    );
+
+
+  if(unique.size < 4)
+    return false;
+
+
+  const current =
+    state.latestDigit;
+
+
+  const previousUnique =
+    new Set(
+      state.movingSequence.slice(
+        0,
+        -1
+      )
+    );
+
+
+  if(
+    previousUnique.size === 3 &&
+    !previousUnique.has(current)
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================================
+   OVER 6
+===================================================== */
+
+function checkOver6(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const percentages =
+    getPercentages(symbol);
+
+
+  const green =
+    findMostDigit(symbol);
+
+
+  const red =
+    findLeastDigit(symbol);
+
+
+  if(green !== 9)
+    return false;
+
+
+  if(red !== 0)
+    return false;
+
+
+  if(
+    percentages[9] <= 12.5
+  ){
+
+    return false;
+
+  }
+
+
+  if(
+    percentages[0] > 8.5
+  ){
+
+    return false;
+
+  }
+
+
+  for(
+    const digit of [6,7,8]
+  ){
+
+    if(
+      percentages[digit] <= 10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  if(state.previousPercentages){
+
+    for(
+      const digit of [6,7,8,9]
+    ){
+
+      if(
+        percentages[digit] <
+        state.previousPercentages[digit]
+      ){
+
+        return false;
+
+      }
+
+    }
+
+  }
+
+
+  const belowSix =
+    state.movingSequence.filter(
+      digit => digit < 6
+    );
+
+
+  const unique =
+    [...new Set(
+      belowSix
+    )];
+
+
+  if(unique.length < 3)
+    return false;
+
+
+  if(
+    state.latestDigit !== 1
+  ){
+
+    return false;
+
+  }
+
+
+  const beforeCurrent =
+    state.movingSequence.slice(
+      0,
+      -1
+    );
+
+
+  const beforeUnique =
+    [...new Set(
+      beforeCurrent.filter(
+        digit => digit < 6
+      )
+    )];
+
+
+  if(beforeUnique.length < 2)
+    return false;
+
+
+  return true;
+
+}
+
+
+/* =====================================================
+   UNDER 4
+===================================================== */
+
+function checkUnder4(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  const percentages =
+    getPercentages(symbol);
+
+
+  const green =
+    findMostDigit(symbol);
+
+
+  const red =
+    findLeastDigit(symbol);
+
+
+  const setupA =
+    green === 0 &&
+    red === 9;
+
+
+  const setupB =
+    green === 0 &&
+    red === 1;
+
+
+  if(
+    !setupA &&
+    !setupB
+  ){
+
+    return false;
+
+  }
+
+
+  for(let i=5;i<=9;i++){
+
+    if(
+      percentages[i] >= 10
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  for(let i=0;i<=4;i++){
+
+    if(
+      percentages[i] <= 10.5
+    ){
+
+      return false;
+
+    }
+
+  }
+
+
+  const aboveFour =
+    state.movingSequence.filter(
+      digit => digit > 4
+    );
+
+
+  const unique =
+    [...new Set(
+      aboveFour
+    )];
+
+
+  if(unique.length < 4)
+    return false;
+
+
+  const current =
+    state.latestDigit;
+
+
+  if(current <= 4)
+    return false;
+
+
+  const before =
+    state.movingSequence.slice(
+      0,
+      -1
+    );
+
+
+  const beforeUnique =
+    new Set(
+      before.filter(
+        digit => digit > 4
+      )
+    );
+
+
+  if(
+    beforeUnique.size === 3 &&
+    !beforeUnique.has(current)
+  ){
+
+    return true;
+
+  }
+
+
+  return false;
+
+}
+
+
+/* =====================================================
+   FIND STRATEGY
+===================================================== */
+
+function findStrategy(
+  symbol
+){
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  if(
+    !state ||
+    state.history.length <
+    MAX_TICKS
+  ){
+
+    return null;
+
+  }
+
+
+  const checks = [
+
+    [
+      STRATEGIES.UNDER7,
+      checkUnder7
+    ],
+
+    [
+      STRATEGIES.OVER5,
+      checkOver5
+    ],
+
+    [
+      STRATEGIES.OVER7,
+      checkOver7
+    ],
+
+    [
+      STRATEGIES.OVER6,
+      checkOver6
+    ],
+
+    [
+      STRATEGIES.UNDER4,
+      checkUnder4
+    ]
+
+  ];
+
+
+  for(
+    const [
+      strategy,
+      checker
+    ] of checks
+  ){
+
+    if(
+      checker(symbol)
+    ){
+
+      return strategy;
+
+    }
+
+  }
+
+
+  return null;
+
 }
 
 
@@ -1020,6 +1836,7 @@ function getLastDigit(
 ===================================================== */
 
 function addTick(
+  symbol,
   digit,
   quote,
   epoch
@@ -1030,19 +1847,40 @@ function addTick(
     digit < 0 ||
     digit > 9
   ){
+
     return;
+
   }
 
-  latestDigit =
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  if(!state)
+    return;
+
+
+  state.latestDigit =
     digit;
 
-  history.push(digit);
 
-  if(history.length > MAX_TICKS){
+  state.history.push(
+    digit
+  );
 
-    history.shift();
+
+  if(
+    state.history.length >
+    MAX_TICKS
+  ){
+
+    state.history.shift();
 
   }
+
 
   if(
     Number.isFinite(
@@ -1050,91 +1888,115 @@ function addTick(
     )
   ){
 
-    $("quote").textContent =
+    state.lastQuote =
       `${quote} • ${new Date(
         epoch * 1000
       ).toLocaleTimeString()}`;
 
   }else{
 
-    $("quote").textContent =
+    state.lastQuote =
       String(quote);
 
   }
 
-  if(botRunning && !tradeActive){
 
-    movingSequence.push(digit);
+  /*
+   * Only the market currently being
+   * analysed gets its moving sequence
+   * updated for strategy detection.
+   */
 
-    processStrategies();
+  if(
+    botRunning &&
+    !tradeActive &&
+    state.history.length >=
+    MAX_TICKS
+  ){
 
-  }
+    state.movingSequence.push(
+      digit
+    );
 
-  render();
-}
-
-
-/* =====================================================
-   COUNTS
-===================================================== */
-
-function getCounts(){
-
-  const counts =
-    Array(10).fill(0);
-
-  for(const d of history){
 
     if(
-      Number.isInteger(d) &&
-      d >= 0 &&
-      d <= 9
+      state.movingSequence.length >
+      100
     ){
 
-      counts[d]++;
+      state.movingSequence.shift();
 
     }
 
+
+    evaluateAllMarkets();
+
   }
 
-  return counts;
-}
 
+  if(
+    currentMarketSymbol ===
+    symbol
+  ){
 
-function getPercentages(){
+    renderCurrentMarket();
 
-  const counts =
-    getCounts();
+  }
 
-  const total =
-    history.length;
-
-  if(!total)
-    return Array(10).fill(0);
-
-  return counts.map(
-    value =>
-      value / total * 100
-  );
 }
 
 
 /* =====================================================
-   RENDER DIGITS
+   RENDER CURRENT MARKET
 ===================================================== */
 
-function render(){
+function renderCurrentMarket(){
+
+  const symbol =
+    currentMarketSymbol;
+
+
+  if(!symbol){
+
+    $("marketName").textContent =
+      "Waiting for market";
+
+    $("quote").textContent =
+      "Start the bot to scan markets.";
+
+    return;
+
+  }
+
+
+  const state =
+    marketStates[
+      symbol
+    ];
+
+
+  $("marketName").textContent =
+    marketNames[symbol];
+
+
+  $("quote").textContent =
+    state.lastQuote ||
+    "Waiting for tick…";
+
 
   const counts =
-    getCounts();
+    getCounts(symbol);
+
 
   const percentages =
-    getPercentages();
+    getPercentages(symbol);
+
 
   $("countLabel").textContent =
-    history.length;
+    state.history.length;
 
-  if(!history.length){
+
+  if(!state.history.length){
 
     $("digits").innerHTML =
       counts.map(
@@ -1156,37 +2018,16 @@ function render(){
       ).join("");
 
     return;
-  }
-
-
-  let most =
-    0;
-
-  let least =
-    0;
-
-
-  for(let i=1;i<10;i++){
-
-    if(
-      counts[i] >
-      counts[most]
-    ){
-
-      most = i;
-
-    }
-
-    if(
-      counts[i] <
-      counts[least]
-    ){
-
-      least = i;
-
-    }
 
   }
+
+
+  const most =
+    findMostDigit(symbol);
+
+
+  const least =
+    findLeastDigit(symbol);
 
 
   $("digits").innerHTML =
@@ -1197,11 +2038,14 @@ function render(){
           digit === most &&
           count > 0;
 
+
         const isLeast =
           digit === least;
 
+
         const isLatest =
-          digit === latestDigit;
+          digit ===
+          state.latestDigit;
 
 
         return `
@@ -1262,606 +2106,534 @@ function render(){
 
   $("over5").textContent =
     `${(
-      over5 / history.length * 100
+      over5 /
+      state.history.length *
+      100
     ).toFixed(1)}%`;
 
 
   $("under7").textContent =
     `${(
-      under7 / history.length * 100
+      under7 /
+      state.history.length *
+      100
     ).toFixed(1)}%`;
 
 }
 
 
 /* =====================================================
-   RESET MOVING SEQUENCE
+   CONNECT ONE MARKET
 ===================================================== */
 
-function resetMovingSequence(){
-
-  movingSequence = [];
-
-  strategyCandidate = null;
-
-}
-
-
-/* =====================================================
-   UNDER 7
-===================================================== */
-
-function checkUnder7(
-  percentages
+function connectOneMarket(
+  symbol
 ){
 
-  /*
-   * Green and red must both be below 7.
-   */
-
-  const green =
-    findMostDigit();
-
-  const red =
-    findLeastDigit();
+  const state =
+    marketStates[
+      symbol
+    ];
 
 
-  if(
-    green >= 7 ||
-    red >= 7
-  ){
-
-    return false;
-
-  }
+  if(!state)
+    return;
 
 
-  /*
-   * Green must appear before red
-   * in the recent tick sequence.
-   */
+  if(state.reconnectTimer){
 
-  const greenPosition =
-    findLastPosition(
-      movingSequence,
-      green
+    clearTimeout(
+      state.reconnectTimer
     );
 
-  const redPosition =
-    findLastPosition(
-      movingSequence,
-      red
+    state.reconnectTimer =
+      null;
+
+  }
+
+
+  if(state.ws){
+
+    try{
+
+      state.ws.onclose =
+        null;
+
+      state.ws.close();
+
+    }catch(e){}
+
+    state.ws =
+      null;
+
+  }
+
+
+  state.connected =
+    false;
+
+  state.loading =
+    true;
+
+  state.error =
+    false;
+
+
+  renderScanner();
+
+
+  const socket =
+    new WebSocket(
+      WS_URL
     );
 
 
-  if(
-    greenPosition === -1 ||
-    redPosition === -1 ||
-    greenPosition >= redPosition
-  ){
+  state.ws =
+    socket;
 
-    return false;
 
-  }
-
-
-  /*
-   * Once valid, wait for 8 or 9.
-   */
-
-  if(
-    latestDigit === 8 ||
-    latestDigit === 9
-  ){
-
-    return true;
-
-  }
-
-  return false;
-}
-
-
-/* =====================================================
-   OVER 5
-===================================================== */
-
-function checkOver5(){
-
-  const green =
-    findMostDigit();
-
-  const red =
-    findLeastDigit();
-
-
-  if(
-    !(red === 0 || red === 1)
-  ){
-
-    return false;
-
-  }
-
-
-  if(
-    !(green === 8 || green === 9)
-  ){
-
-    return false;
-
-  }
-
-
-  /*
-   * Entry occurs after moving tick
-   * touches 0 or 1.
-   */
-
-  if(
-    latestDigit === 0 ||
-    latestDigit === 1
-  ){
-
-    return true;
-
-  }
-
-  return false;
-}
-
-
-/* =====================================================
-   OVER 7
-===================================================== */
-
-function checkOver7(
-  percentages
-){
-
-  const green =
-    findMostDigit();
-
-  const red =
-    findLeastDigit();
-
-
-  if(green !== 9)
-    return false;
-
-  if(red !== 0)
-    return false;
-
-
-  if(
-    percentages[8] <= 12.5 ||
-    percentages[9] <= 12.5
-  ){
-
-    return false;
-
-  }
-
-
-  /*
-   * Every digit below 7
-   * must be below 10%.
-   */
-
-  for(let i=0;i<7;i++){
-
-    if(percentages[i] >= 10){
-
-      return false;
-
-    }
-
-  }
-
-
-  /*
-   * Minimum four distinct digits
-   * touched.
-   */
-
-  const unique =
-    new Set(movingSequence);
-
-
-  if(unique.size < 4)
-    return false;
-
-
-  /*
-   * Enter exactly when the
-   * fourth distinct digit is touched.
-   */
-
-  if(
-    unique.size >= 4 &&
-    movingSequence.length
-  ){
-
-    const current =
-      latestDigit;
-
-    const previousUnique =
-      new Set(
-        movingSequence.slice(
-          0,
-          -1
-        )
-      );
-
-    if(
-      previousUnique.size === 3 &&
-      !previousUnique.has(current)
-    ){
-
-      return true;
-
-    }
-
-  }
-
-  return false;
-}
-
-
-/* =====================================================
-   OVER 6
-===================================================== */
-
-function checkOver6(
-  percentages
-){
-
-  const green =
-    findMostDigit();
-
-  const red =
-    findLeastDigit();
-
-
-  if(green !== 9)
-    return false;
-
-  if(red !== 0)
-    return false;
-
-
-  if(
-    percentages[9] <= 12.5
-  ){
-
-    return false;
-
-  }
-
-
-  if(
-    percentages[0] > 8.5
-  ){
-
-    return false;
-
-  }
-
-
-  for(
-    const digit of [6,7,8]
-  ){
-
-    if(
-      percentages[digit] <= 10.5
-    ){
-
-      return false;
-
-    }
-
-  }
-
-
-  /*
-   * Do not enter if any of
-   * 6,7,8,9 is decreasing.
-   */
-
-  if(previousPercentages){
-
-    for(
-      const digit of [6,7,8,9]
-    ){
+  socket.onopen =
+    function(){
 
       if(
-        percentages[digit] <
-        previousPercentages[digit]
+        socket !== state.ws
       ){
 
-        return false;
+        return;
 
       }
 
-    }
 
-  }
+      state.connected =
+        true;
 
+      state.loading =
+        false;
 
-  /*
-   * Need at least three distinct
-   * digits below 6.
-   */
-
-  const belowSix =
-    movingSequence.filter(
-      digit => digit < 6
-    );
+      state.error =
+        false;
 
 
-  const unique =
-    [...new Set(belowSix)];
+      renderScanner();
 
 
-  if(unique.length < 3)
-    return false;
+      socket.send(
+        JSON.stringify({
+
+          ticks_history:
+            symbol,
+
+          count:
+            MAX_TICKS,
+
+          end:
+            "latest",
+
+          style:
+            "ticks",
+
+          subscribe:
+            1,
+
+          req_id:
+            Date.now()
+
+        })
+      );
+
+    };
 
 
-  /*
-   * 1 must always be the last
-   * digit touched before entry.
-   */
+  socket.onmessage =
+    function(event){
 
-  if(latestDigit !== 1)
-    return false;
+      if(
+        socket !== state.ws
+      ){
 
+        return;
 
-  /*
-   * Make sure the current 1
-   * completes the three-number
-   * requirement.
-   */
-
-  const beforeCurrent =
-    movingSequence.slice(
-      0,
-      -1
-    );
+      }
 
 
-  const beforeUnique =
-    [...new Set(
-      beforeCurrent.filter(
-        digit => digit < 6
+      try{
+
+        const data =
+          JSON.parse(
+            event.data
+          );
+
+
+        if(data.error){
+
+          console.error(
+            symbol,
+            data.error
+          );
+
+          state.error =
+            true;
+
+          renderScanner();
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "history"
+        ){
+
+          const prices =
+            data.history?.prices ||
+            [];
+
+
+          const times =
+            data.history?.times ||
+            [];
+
+
+          if(
+            Number.isFinite(
+              Number(
+                data.pip_size
+              )
+            )
+          ){
+
+            state.pipSize =
+              Number(
+                data.pip_size
+              );
+
+          }
+
+
+          state.history =
+            [];
+
+
+          for(
+            let i=0;
+            i<prices.length;
+            i++
+          ){
+
+            const digit =
+              getLastDigit(
+                prices[i],
+                state.pipSize
+              );
+
+
+            if(
+              digit !== null
+            ){
+
+              state.history.push(
+                digit
+              );
+
+            }
+
+          }
+
+
+          if(
+            state.history.length >
+            MAX_TICKS
+          ){
+
+            state.history =
+              state.history.slice(
+                -MAX_TICKS
+              );
+
+          }
+
+
+          if(state.history.length){
+
+            state.latestDigit =
+              state.history[
+                state.history.length - 1
+              ];
+
+          }
+
+
+          if(prices.length){
+
+            const price =
+              prices[
+                prices.length - 1
+              ];
+
+
+            const time =
+              times[
+                times.length - 1
+              ];
+
+
+            state.lastQuote =
+              Number.isFinite(
+                Number(time)
+              )
+                ? `${price} • ${new Date(
+                    time * 1000
+                  ).toLocaleTimeString()}`
+                : String(price);
+
+          }
+
+
+          state.movingSequence =
+            [];
+
+
+          state.previousPercentages =
+            null;
+
+
+          if(
+            currentMarketSymbol ===
+            symbol
+          ){
+
+            renderCurrentMarket();
+
+          }
+
+
+          renderScanner();
+
+
+          /*
+           * If the bot is already running,
+           * check this market immediately.
+           */
+
+          if(
+            botRunning &&
+            !tradeActive
+          ){
+
+            evaluateAllMarkets();
+
+          }
+
+
+          return;
+
+        }
+
+
+        if(
+          data.msg_type ===
+          "tick"
+        ){
+
+          const tick =
+            data.tick;
+
+
+          if(!tick)
+            return;
+
+
+          if(
+            Number.isFinite(
+              Number(
+                tick.pip_size
+              )
+            )
+          ){
+
+            state.pipSize =
+              Number(
+                tick.pip_size
+              );
+
+          }
+
+
+          const digit =
+            getLastDigit(
+              tick.quote,
+              state.pipSize
+            );
+
+
+          addTick(
+            symbol,
+            digit,
+            tick.quote,
+            tick.epoch
+          );
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "Market tick error:",
+          symbol,
+          error
+        );
+
+      }
+
+    };
+
+
+  socket.onerror =
+    function(){
+
+      state.error =
+        true;
+
+      state.loading =
+        false;
+
+      renderScanner();
+
+    };
+
+
+  socket.onclose =
+    function(){
+
+      if(
+        socket !== state.ws
+      ){
+
+        return;
+
+      }
+
+
+      state.ws =
+        null;
+
+      state.connected =
+        false;
+
+
+      renderScanner();
+
+
+      if(
+        botRunning &&
+        !tradeActive
+      ){
+
+        state.reconnectTimer =
+          setTimeout(
+            () =>
+              connectOneMarket(
+                symbol
+              ),
+            1500
+          );
+
+      }
+
+    };
+
+}
+
+
+/* =====================================================
+   CONNECT ALL MARKETS
+===================================================== */
+
+function connectAllMarkets(){
+
+  MARKETS.forEach(
+    market =>
+      connectOneMarket(
+        market.symbol
       )
-    )];
+  );
 
 
-  if(beforeUnique.length < 2)
-    return false;
+  renderScanner();
 
-
-  return true;
 }
 
 
 /* =====================================================
-   UNDER 4
+   STOP ALL MARKET CONNECTIONS
 ===================================================== */
 
-function checkUnder4(
-  percentages
-){
+function stopAllMarkets(){
 
-  const green =
-    findMostDigit();
+  MARKETS.forEach(
+    market => {
 
-  const red =
-    findLeastDigit();
-
-
-  const setupA =
-    green === 0 &&
-    red === 9;
+      const state =
+        marketStates[
+          market.symbol
+        ];
 
 
-  const setupB =
-    green === 0 &&
-    red === 1;
+      if(state.reconnectTimer){
+
+        clearTimeout(
+          state.reconnectTimer
+        );
+
+        state.reconnectTimer =
+          null;
+
+      }
 
 
-  if(
-    !setupA &&
-    !setupB
-  ){
+      if(state.ws){
 
-    return false;
+        try{
 
-  }
+          state.ws.onclose =
+            null;
 
+          state.ws.close();
 
-  /*
-   * Digits above 4 must be below 10%.
-   */
+        }catch(e){}
 
-  for(let i=5;i<=9;i++){
-
-    if(
-      percentages[i] >= 10
-    ){
-
-      return false;
-
-    }
-
-  }
+      }
 
 
-  /*
-   * 0 through 4 must all be
-   * above 10.5%.
-   */
+      state.ws =
+        null;
 
-  for(let i=0;i<=4;i++){
+      state.connected =
+        false;
 
-    if(
-      percentages[i] <= 10.5
-    ){
-
-      return false;
+      state.loading =
+        false;
 
     }
-
-  }
-
-
-  /*
-   * Wait for four distinct digits
-   * above 4.
-   */
-
-  const aboveFour =
-    movingSequence.filter(
-      digit => digit > 4
-    );
+  );
 
 
-  const unique =
-    [...new Set(aboveFour)];
+  renderScanner();
 
-
-  if(unique.length < 4)
-    return false;
-
-
-  /*
-   * Enter when the fourth distinct
-   * digit above 4 is touched.
-   */
-
-  const current =
-    latestDigit;
-
-  if(current <= 4)
-    return false;
-
-
-  const before =
-    movingSequence.slice(
-      0,
-      -1
-    );
-
-
-  const beforeUnique =
-    new Set(
-      before.filter(
-        digit => digit > 4
-      )
-    );
-
-
-  if(
-    beforeUnique.size === 3 &&
-    !beforeUnique.has(current)
-  ){
-
-    return true;
-
-  }
-
-
-  return false;
 }
 
 
 /* =====================================================
-   DIGIT HELPERS
+   EVALUATE ALL MARKETS
 ===================================================== */
 
-function findMostDigit(){
-
-  const counts =
-    getCounts();
-
-  let digit = 0;
-
-  for(let i=1;i<10;i++){
-
-    if(
-      counts[i] >
-      counts[digit]
-    ){
-
-      digit = i;
-
-    }
-
-  }
-
-  return digit;
-}
-
-
-function findLeastDigit(){
-
-  const counts =
-    getCounts();
-
-  let digit = 0;
-
-  for(let i=1;i<10;i++){
-
-    if(
-      counts[i] <
-      counts[digit]
-    ){
-
-      digit = i;
-
-    }
-
-  }
-
-  return digit;
-}
-
-
-function findLastPosition(
-  array,
-  value
-){
-
-  for(
-    let i=array.length-1;
-    i>=0;
-    i--
-  ){
-
-    if(
-      array[i] === value
-    ){
-
-      return i;
-
-    }
-
-  }
-
-  return -1;
-}
-
-
-/* =====================================================
-   STRATEGY ENGINE
-===================================================== */
-
-function processStrategies(){
+function evaluateAllMarkets(){
 
   if(
     !botRunning ||
-    tradeActive ||
-    history.length < MAX_TICKS
+    tradeActive
   ){
 
     return;
@@ -1869,185 +2641,86 @@ function processStrategies(){
   }
 
 
-  const percentages =
-    getPercentages();
-
-
   /*
-   * Save previous percentages
-   * for the Over 6 rule.
+   * Search through every market.
+   * The first valid setup is selected.
    */
-
-  const oldPercentages =
-    previousPercentages;
-
-  previousPercentages =
-    percentages.slice();
-
-
-  const results = {
-
-    UNDER7:
-      checkUnder7(percentages),
-
-    OVER5:
-      checkOver5(),
-
-    OVER7:
-      checkOver7(percentages),
-
-    OVER6:
-      checkOver6(percentages),
-
-    UNDER4:
-      checkUnder4(percentages)
-
-  };
-
-
-  updateStrategyDisplay(
-    percentages,
-    results
-  );
-
-
-  /*
-   * Priority order.
-   */
-
-  const order = [
-
-    STRATEGIES.UNDER7,
-
-    STRATEGIES.OVER5,
-
-    STRATEGIES.OVER7,
-
-    STRATEGIES.OVER6,
-
-    STRATEGIES.UNDER4
-
-  ];
-
 
   for(
-    const strategy of order
+    const market of MARKETS
   ){
 
-    if(results[strategy]){
+    const symbol =
+      market.symbol;
 
-      strategyCandidate =
+
+    const state =
+      marketStates[
+        symbol
+      ];
+
+
+    if(
+      !state ||
+      !state.connected ||
+      state.history.length <
+      MAX_TICKS
+    ){
+
+      continue;
+
+    }
+
+
+    const strategy =
+      findStrategy(
+        symbol
+      );
+
+
+    if(strategy){
+
+      currentMarketSymbol =
+        symbol;
+
+      currentStrategy =
         strategy;
 
+
+      state.previousPercentages =
+        getPercentages(
+          symbol
+        ).slice();
+
+
+      renderCurrentMarket();
+
+      renderScanner();
+
+
       executeStrategyTrade(
+        symbol,
         strategy
       );
+
 
       return;
 
     }
 
+
+    /*
+     * Keep percentage history updated
+     * for the Over 6 strategy.
+     */
+
+    state.previousPercentages =
+      getPercentages(
+        symbol
+      ).slice();
+
   }
 
-}
-
-
-/* =====================================================
-   STRATEGY DISPLAY
-===================================================== */
-
-function updateStrategyDisplay(
-  percentages,
-  results
-){
-
-  const green =
-    findMostDigit();
-
-  const red =
-    findLeastDigit();
-
-
-  $("under7Status").textContent =
-    `Green ${green}, Red ${red}. ` +
-    (
-      results.UNDER7
-        ? "ENTRY TRIGGERED"
-        : "Waiting for conditions."
-    );
-
-
-  $("over5Status").textContent =
-    `Green ${green}, Red ${red}. ` +
-    (
-      results.OVER5
-        ? "ENTRY TRIGGERED"
-        : "Waiting for conditions."
-    );
-
-
-  $("over7Status").textContent =
-    `9 ${percentages[9].toFixed(1)}% • ` +
-    `8 ${percentages[8].toFixed(1)}%. ` +
-    (
-      results.OVER7
-        ? "ENTRY TRIGGERED"
-        : "Waiting for conditions."
-    );
-
-
-  $("over6Status").textContent =
-    `9 ${percentages[9].toFixed(1)}% • ` +
-    `0 ${percentages[0].toFixed(1)}% • ` +
-    `6 ${percentages[6].toFixed(1)}% • ` +
-    `7 ${percentages[7].toFixed(1)}% • ` +
-    `8 ${percentages[8].toFixed(1)}%. ` +
-    (
-      results.OVER6
-        ? "ENTRY TRIGGERED"
-        : "Waiting for conditions."
-    );
-
-
-  $("under4Status").textContent =
-    `0 ${percentages[0].toFixed(1)}% • ` +
-    `4 ${percentages[4].toFixed(1)}%. ` +
-    (
-      results.UNDER4
-        ? "ENTRY TRIGGERED"
-        : "Waiting for conditions."
-    );
-
-
-  document
-    .querySelectorAll(".strategy")
-    .forEach(
-      element =>
-        element.classList.remove(
-          "active"
-        )
-    );
-
-
-  if(results.UNDER7)
-    $("strategy-under7")
-      .classList.add("active");
-
-  if(results.OVER5)
-    $("strategy-over5")
-      .classList.add("active");
-
-  if(results.OVER7)
-    $("strategy-over7")
-      .classList.add("active");
-
-  if(results.OVER6)
-    $("strategy-over6")
-      .classList.add("active");
-
-  if(results.UNDER4)
-    $("strategy-under4")
-      .classList.add("active");
 }
 
 
@@ -2101,32 +2774,36 @@ async function startBot(){
   }
 
 
-  botRunning = true;
+  botRunning =
+    true;
 
-  manuallyStopped = false;
 
-  tradeActive = false;
+  tradeActive =
+    false;
 
-  strategyCandidate = null;
 
-  resetMovingSequence();
+  currentMarketSymbol =
+    null;
 
-  previousPercentages = null;
+
+  currentStrategy =
+    null;
 
 
   $("startButton").disabled =
     true;
+
 
   $("stopButton").disabled =
     false;
 
 
   $("botState").textContent =
-    "Running";
+    "Scanning all markets";
 
 
-  $("activeStrategy").textContent =
-    "Analysing";
+  $("selectedMarket").textContent =
+    "Searching…";
 
 
   $("tradeState").textContent =
@@ -2139,12 +2816,7 @@ async function startBot(){
   );
 
 
-  /*
-   * Start live market connection
-   * immediately.
-   */
-
-  connectMarket();
+  connectAllMarkets();
 
 }
 
@@ -2155,19 +2827,17 @@ async function startBot(){
 
 function stopBot(){
 
-  botRunning = false;
+  botRunning =
+    false;
 
-  manuallyStopped = true;
 
-  strategyCandidate = null;
-
-  resetMovingSequence();
-
-  previousPercentages = null;
+  currentStrategy =
+    null;
 
 
   $("startButton").disabled =
     false;
+
 
   $("stopButton").disabled =
     true;
@@ -2178,8 +2848,10 @@ function stopBot(){
     $("botState").textContent =
       "Stopped";
 
-    $("activeStrategy").textContent =
-      "Stopped";
+
+    $("selectedMarket").textContent =
+      "None";
+
 
     $("tradeState").textContent =
       "No active trade";
@@ -2187,7 +2859,7 @@ function stopBot(){
   }else{
 
     $("botState").textContent =
-      "Stopped — monitoring active trade";
+      "Stopped — active trade continues";
 
   }
 
@@ -2197,386 +2869,41 @@ function stopBot(){
   );
 
 
-  /*
-   * Stop receiving new ticks.
-   * Existing contract continues to
-   * be monitored.
-   */
-
-  if(ws){
-
-    try{
-
-      ws.onclose = null;
-
-      ws.close();
-
-    }catch(e){}
-
-    ws = null;
-
-  }
+  stopAllMarkets();
 
 }
-
-
-/* =====================================================
-   MARKET CONNECTION
+  /* =====================================================
+   STRATEGY NAME
 ===================================================== */
 
-function connectMarket(){
+function strategyName(
+  strategy
+){
 
-  if(reconnectTimer){
+  const names = {
 
-    clearTimeout(
-      reconnectTimer
-    );
+    UNDER7:
+      "Under 7",
 
-    reconnectTimer = null;
+    OVER5:
+      "Over 5",
 
-  }
+    OVER7:
+      "Over 7",
 
+    OVER6:
+      "Over 6",
 
-  if(ws){
+    UNDER4:
+      "Under 4"
 
-    try{
+  };
 
-      ws.onclose = null;
 
-      ws.close();
-
-    }catch(e){}
-
-    ws = null;
-
-  }
-
-
-  history = [];
-
-  latestDigit = null;
-
-  currentPipSize = null;
-
-  resetMovingSequence();
-
-  previousPercentages = null;
-
-  render();
-
-
-  const symbol =
-    $("market").value;
-
-
-  $("marketName").textContent =
-    marketNames[symbol];
-
-
-  $("quote").textContent =
-    "Connecting to Deriv…";
-
-
-  const socket =
-    new WebSocket(
-      WS_URL
-    );
-
-
-  ws = socket;
-
-
-  socket.onopen =
-    function(){
-
-      if(socket !== ws)
-        return;
-
-
-      setStatus(
-        botRunning
-          ? "RUNNING"
-          : "LIVE",
-        true
-      );
-
-
-      socket.send(
-        JSON.stringify({
-
-          ticks_history:
-            symbol,
-
-          count:
-            MAX_TICKS,
-
-          end:
-            "latest",
-
-          style:
-            "ticks",
-
-          subscribe:
-            1,
-
-          req_id:
-            1
-
-        })
-      );
-
-    };
-
-
-  socket.onmessage =
-    function(event){
-
-      if(socket !== ws)
-        return;
-
-
-      try{
-
-        const data =
-          JSON.parse(
-            event.data
-          );
-
-
-        if(data.error){
-
-          console.error(
-            data.error
-          );
-
-          return;
-
-        }
-
-
-        if(
-          data.msg_type ===
-          "history"
-        ){
-
-          const prices =
-            data.history?.prices ||
-            [];
-
-          const times =
-            data.history?.times ||
-            [];
-
-
-          if(
-            Number.isFinite(
-              Number(
-                data.pip_size
-              )
-            )
-          ){
-
-            currentPipSize =
-              Number(
-                data.pip_size
-              );
-
-          }
-
-
-          history = [];
-
-
-          for(
-            let i=0;
-            i<prices.length;
-            i++
-          ){
-
-            const digit =
-              getLastDigit(
-                prices[i],
-                currentPipSize
-              );
-
-
-            if(
-              digit !== null
-            ){
-
-              history.push(
-                digit
-              );
-
-            }
-
-          }
-
-
-          if(
-            history.length >
-            MAX_TICKS
-          ){
-
-            history =
-              history.slice(
-                -MAX_TICKS
-              );
-
-          }
-
-
-          if(history.length){
-
-            latestDigit =
-              history[
-                history.length - 1
-              ];
-
-          }
-
-
-          if(prices.length){
-
-            const price =
-              prices[
-                prices.length - 1
-              ];
-
-            const time =
-              times[
-                times.length - 1
-              ];
-
-
-            $("quote").textContent =
-              Number.isFinite(
-                Number(time)
-              )
-                ? `${price} • ${new Date(
-                    time * 1000
-                  ).toLocaleTimeString()}`
-                : String(price);
-
-          }
-
-
-          render();
-
-
-          /*
-           * Analyse immediately
-           * after loading the 100 ticks.
-           */
-
-          if(
-            botRunning &&
-            !tradeActive
-          ){
-
-            processStrategies();
-
-          }
-
-
-          return;
-
-        }
-
-
-        if(
-          data.msg_type ===
-          "tick"
-        ){
-
-          const tick =
-            data.tick;
-
-
-          if(!tick)
-            return;
-
-
-          if(
-            Number.isFinite(
-              Number(
-                tick.pip_size
-              )
-            )
-          ){
-
-            currentPipSize =
-              Number(
-                tick.pip_size
-              );
-
-          }
-
-
-          const digit =
-            getLastDigit(
-              tick.quote,
-              currentPipSize
-            );
-
-
-          addTick(
-            digit,
-            tick.quote,
-            tick.epoch
-          );
-
-        }
-
-      }catch(error){
-
-        console.error(
-          "Tick error:",
-          error
-        );
-
-      }
-
-    };
-
-
-  socket.onerror =
-    function(){
-
-      $("quote").textContent =
-        "Deriv connection error.";
-
-    };
-
-
-  socket.onclose =
-    function(){
-
-      if(socket !== ws)
-        return;
-
-
-      ws = null;
-
-
-      if(
-        botRunning &&
-        !manuallyStopped
-      ){
-
-        $("quote").textContent =
-          "Reconnecting…";
-
-
-        reconnectTimer =
-          setTimeout(
-            connectMarket,
-            1500
-          );
-
-      }
-
-    };
+  return (
+    names[strategy] ||
+    strategy
+  );
 
 }
 
@@ -2586,6 +2913,7 @@ function connectMarket(){
 ===================================================== */
 
 async function executeStrategyTrade(
+  symbol,
   strategy
 ){
 
@@ -2599,15 +2927,31 @@ async function executeStrategyTrade(
   }
 
 
-  tradeActive = true;
+  tradeActive =
+    true;
 
 
-  $("activeStrategy").textContent =
-    strategyName(strategy);
+  currentMarketSymbol =
+    symbol;
+
+
+  currentStrategy =
+    strategy;
+
+
+  $("botState").textContent =
+    "Trading";
+
+
+  $("selectedMarket").textContent =
+    marketNames[symbol];
 
 
   $("tradeState").textContent =
-    "Opening trade…";
+    "Trade active";
+
+
+  renderScanner();
 
 
   const stake =
@@ -2622,12 +2966,9 @@ async function executeStrategyTrade(
     );
 
 
-  const symbol =
-    $("market").value;
-
-
   let contractType =
     null;
+
 
   let barrier =
     null;
@@ -2805,6 +3146,12 @@ async function executeStrategyTrade(
     }
 
 
+    const state =
+      marketStates[
+        symbol
+      ];
+
+
     currentTrade = {
 
       contract_id:
@@ -2839,6 +3186,7 @@ async function executeStrategyTrade(
         contract.entry_spot ??
         contract.entry_tick ??
         contract.current_spot ??
+        state?.lastQuote ??
         "—"
 
     };
@@ -2848,18 +3196,21 @@ async function executeStrategyTrade(
       "Trade active";
 
 
-    $("activeStrategy").textContent =
-      strategyName(
-        strategy
-      );
-
-
     /*
-     * The strategy trigger has
-     * already been consumed.
+     * Clear the trigger sequence so
+     * the same setup cannot immediately
+     * trigger another trade.
      */
 
-    resetMovingSequence();
+    state.movingSequence =
+      [];
+
+
+    state.previousPercentages =
+      getPercentages(
+        symbol
+      ).slice();
+
 
     startContractMonitoring();
 
@@ -2872,54 +3223,33 @@ async function executeStrategyTrade(
     );
 
 
-    tradeActive = false;
+    tradeActive =
+      false;
 
-    currentTrade = null;
+
+    currentTrade =
+      null;
+
+
+    currentStrategy =
+      null;
 
 
     $("tradeState").textContent =
-      "Trade failed — continuing analysis";
+      "Setup cancelled";
 
 
-    resetMovingSequence();
+    $("selectedMarket").textContent =
+      "Searching…";
+
+
+    $("botState").textContent =
+      "Scanning all markets";
+
+
+    renderScanner();
 
   }
-
-}
-
-
-/* =====================================================
-   STRATEGY NAME
-===================================================== */
-
-function strategyName(
-  strategy
-){
-
-  const names = {
-
-    UNDER7:
-      "Under 7",
-
-    OVER5:
-      "Over 5",
-
-    OVER7:
-      "Over 7",
-
-    OVER6:
-      "Over 6",
-
-    UNDER4:
-      "Under 4"
-
-  };
-
-
-  return (
-    names[strategy] ||
-    strategy
-  );
 
 }
 
@@ -2928,7 +3258,8 @@ function strategyName(
    CONTRACT MONITORING
 ===================================================== */
 
-const CONTRACT_CHECK_DELAY = 150;
+const CONTRACT_CHECK_DELAY =
+  150;
 
 
 async function checkContractStatus(){
@@ -2943,7 +3274,8 @@ async function checkContractStatus(){
   }
 
 
-  contractPolling = true;
+  contractPolling =
+    true;
 
 
   try{
@@ -3025,37 +3357,71 @@ async function checkContractStatus(){
     );
 
 
-    tradeActive = false;
+    tradeActive =
+      false;
 
-    currentTrade = null;
+
+    currentTrade =
+      null;
+
+
+    currentStrategy =
+      null;
 
 
     $("tradeState").textContent =
-      "Trade finished — analysing";
+      botRunning
+        ? "Waiting for next setup"
+        : "No active trade";
 
 
-    $("activeStrategy").textContent =
-      "Analysing";
+    $("botState").textContent =
+      botRunning
+        ? "Scanning all markets"
+        : "Stopped";
 
 
-    resetMovingSequence();
-
-    previousPercentages = null;
+    $("selectedMarket").textContent =
+      botRunning
+        ? "Searching…"
+        : "None";
 
 
     /*
-     * If the bot is still running,
-     * immediately continue.
+     * Reset the market that just finished.
      */
+
+    if(
+      contract.underlying_symbol
+    ){
+
+      const symbol =
+        contract.underlying_symbol;
+
+
+      if(
+        marketStates[symbol]
+      ){
+
+        marketStates[
+          symbol
+        ].movingSequence = [];
+
+      }
+
+    }
+
+
+    renderScanner();
+
 
     if(botRunning){
 
-      processStrategies();
+      /*
+       * Immediately resume scanning.
+       */
 
-    }else{
-
-      $("tradeState").textContent =
-        "No active trade";
+      evaluateAllMarkets();
 
     }
 
@@ -3070,11 +3436,13 @@ async function checkContractStatus(){
       error
     );
 
+
     return false;
 
   }finally{
 
-    contractPolling = false;
+    contractPolling =
+      false;
 
   }
 
@@ -3121,14 +3489,8 @@ function startContractMonitoring(){
    TRADE HISTORY
 ===================================================== */
 
-function historyKey(){
-
-  return (
-    "dollarticks_bot_history_" +
-    $("market").value
-  );
-
-}
+const HISTORY_KEY =
+  "dollarticks_bot_history_all";
 
 
 let tradeHistory = [];
@@ -3140,7 +3502,7 @@ function loadHistory(){
 
     const saved =
       localStorage.getItem(
-        historyKey()
+        HISTORY_KEY
       );
 
 
@@ -3173,7 +3535,7 @@ function saveHistory(){
   try{
 
     localStorage.setItem(
-      historyKey(),
+      HISTORY_KEY,
       JSON.stringify(
         tradeHistory
       )
@@ -3190,6 +3552,10 @@ function saveHistory(){
 
 }
 
+
+/* =====================================================
+   ADD COMPLETED TRADE
+===================================================== */
 
 function addCompletedTrade(
   contract
@@ -3254,6 +3620,9 @@ function addCompletedTrade(
 
     strategy:
       currentTrade?.strategy_name ||
+      strategyName(
+        currentStrategy
+      ) ||
       "Unknown",
 
     contract_type:
@@ -3264,7 +3633,7 @@ function addCompletedTrade(
     symbol:
       contract.underlying_symbol ||
       currentTrade?.symbol ||
-      $("market").value,
+      "—",
 
     stake:
       contract.buy_price ??
@@ -3414,6 +3783,7 @@ function renderHistory(){
             </div>
 
             <div>
+              Strategy:
               ${escapeHtml(
                 item.strategy
               )}
@@ -3542,7 +3912,9 @@ $("clearHistory").addEventListener(
     }
 
 
-    tradeHistory = [];
+    tradeHistory =
+      [];
+
 
     saveHistory();
 
@@ -3553,43 +3925,7 @@ $("clearHistory").addEventListener(
 
 
 /* =====================================================
-   MARKET CHANGE
-===================================================== */
-
-$("market").addEventListener(
-  "change",
-  function(){
-
-    $("marketName").textContent =
-      marketNames[
-        $("market").value
-      ];
-
-
-    tradeHistory =
-      loadHistory();
-
-
-    renderHistory();
-
-
-    if(botRunning){
-
-      /*
-       * Restart analysis on the
-       * newly selected market.
-       */
-
-      connectMarket();
-
-    }
-
-  }
-);
-
-
-/* =====================================================
-   START / STOP EVENTS
+   START / STOP
 ===================================================== */
 
 $("startButton").addEventListener(
@@ -3605,34 +3941,31 @@ $("stopButton").addEventListener(
 
 
 /* =====================================================
-   ESCAPE HTML
+   INITIALIZE SCANNER
 ===================================================== */
 
-function escapeHtml(
-  value
-){
+function initializeScanner(){
 
-  return String(value)
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-    .replace(
-      /</g,
-      "&lt;"
-    )
-    .replace(
-      />/g,
-      "&gt;"
-    )
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+  $("scanGrid").innerHTML =
+    MARKETS.map(
+      market => `
+
+        <div class="scanItem">
+
+          <span>
+            ${escapeHtml(
+              market.name
+            )}
+          </span>
+
+          <b>
+            WAITING
+          </b>
+
+        </div>
+
+      `
+    ).join("");
 
 }
 
@@ -3643,17 +3976,17 @@ function escapeHtml(
 
 function initialize(){
 
-  render();
-
   tradeHistory =
     loadHistory();
 
+
   renderHistory();
 
-  $("marketName").textContent =
-    marketNames[
-      $("market").value
-    ];
+
+  initializeScanner();
+
+
+  renderCurrentMarket();
 
 }
 
@@ -3663,4 +3996,5 @@ initialize();
 </script>
 
 </body>
-    </html>
+</html>
+  
