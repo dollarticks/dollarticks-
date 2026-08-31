@@ -1,8 +1,11 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DollarTicks — Over / Under</title><style>
+<title>DollarTicks — Over / Under</title>
+
+<style>
 *{
   box-sizing:border-box;
   margin:0;
@@ -153,6 +156,8 @@ button{
   padding:22px;
 }
 
+/* ================= STATS ================= */
+
 .stats{
   display:grid;
   grid-template-columns:repeat(4,1fr);
@@ -206,7 +211,7 @@ button{
 }
 
 .price{
-  min-width:190px;
+  min-width:170px;
   text-align:center;
   background:#101f32;
   border:1px solid #253a53;
@@ -283,6 +288,11 @@ button{
   font-weight:800;
   color:#19d58b;
   text-shadow:0 0 25px rgba(25,213,139,.2);
+  transition:.15s;
+}
+
+.big-digit.flash{
+  transform:scale(1.12);
 }
 
 .digit-label{
@@ -293,121 +303,157 @@ button{
   margin-bottom:15px;
 }
 
-/* ================= DIGIT TRACK ================= */
+/* ================= DIGIT ANALYZER ================= */
 
-.digit-track{
+.digit-analyzer{
+  position:relative;
+  padding:12px 2px 25px;
+  margin-top:4px;
+}
+
+.digit-grid{
   position:relative;
   display:grid;
   grid-template-columns:repeat(10,1fr);
-  gap:5px;
-  height:86px;
-  padding-top:20px;
-  margin-bottom:18px;
+  gap:7px;
 }
 
-.digit-column{
-  position:relative;
-  height:62px;
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-}
-
-.digit-number{
-  position:absolute;
-  bottom:0;
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  background:#12243a;
-  border:1px solid #27405a;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  font-weight:800;
-  z-index:3;
-}
-
-.digit-column.most .digit-number{
-  border-color:#19d58b;
-  color:#19d58b;
-}
-
-.digit-column.least .digit-number{
-  border-color:#ff626c;
-  color:#ff626c;
-}
-
-/* GREEN HALF BAR */
-
-.half-bar{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  bottom:29px;
-  width:29px;
-  height:20px;
-  border-radius:20px 20px 0 0;
-  z-index:2;
-  display:none;
-}
-
-.digit-column.most .green-half{
-  display:block;
-  background:#19d58b;
-  box-shadow:0 0 10px rgba(25,213,139,.25);
-}
-
-/* RED HALF BAR */
-
-.digit-column.least .red-half{
-  display:block;
-  background:#ff626c;
-  box-shadow:0 0 10px rgba(255,98,108,.2);
-}
-
-/* ================= MOVING POINTER ================= */
+/*
+   Moving pointer.
+   It slides horizontally to the
+   current digit.
+*/
 
 .moving-pointer{
   position:absolute;
-  top:0;
-  left:5%;
-  width:0;
-  height:22px;
-  z-index:10;
-  transition:left .22s linear;
+  top:-13px;
+  left:0;
+  width:calc((100% - 63px) / 10);
+  height:18px;
   pointer-events:none;
+  transition:left .18s cubic-bezier(.2,.8,.2,1);
+  z-index:5;
+}
+
+.pointer-arrow{
+  width:0;
+  height:0;
+  margin:auto;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:9px solid #fff;
+  filter:drop-shadow(0 0 5px rgba(255,255,255,.5));
 }
 
 .pointer-line{
   position:absolute;
-  left:-1px;
-  top:0;
+  top:9px;
+  left:50%;
+  transform:translateX(-50%);
   width:2px;
-  height:20px;
-  background:#fff;
-  box-shadow:0 0 8px rgba(255,255,255,.7);
+  height:88px;
+  background:rgba(255,255,255,.22);
 }
 
-.pointer-arrow{
-  position:absolute;
-  top:17px;
-  left:-5px;
-  width:0;
-  height:0;
-  border-left:5px solid transparent;
-  border-right:5px solid transparent;
-  border-top:7px solid #fff;
+.digit-column{
+  position:relative;
+  min-width:0;
+  height:93px;
+  border-radius:9px;
+  background:#101f32;
+  border:1px solid #1c334b;
+  overflow:hidden;
+  transition:.15s;
 }
 
-.pointer-digit{
+.digit-column.current{
+  border-color:#6f8094;
+  box-shadow:0 0 0 1px rgba(255,255,255,.05);
+}
+
+.digit-number{
   position:absolute;
-  top:-17px;
-  left:-10px;
+  top:12px;
+  left:0;
+  right:0;
+  text-align:center;
+  font-size:17px;
+  font-weight:800;
+  z-index:3;
+}
+
+.digit-percent{
+  position:absolute;
+  top:39px;
+  left:0;
+  right:0;
+  text-align:center;
+  color:#71849a;
   font-size:9px;
+  z-index:3;
+}
+
+/*
+   These are deliberately HALF bars.
+
+   They are hidden by default.
+   Only the most frequent digit gets
+   green and only the least frequent
+   digit gets red.
+*/
+
+.half-bar{
+  position:absolute;
+  bottom:0;
+  left:0;
+  height:25px;
+  width:50%;
+  opacity:0;
+  transition:.25s;
+  z-index:1;
+}
+
+.half-bar.green{
+  left:0;
+  border-radius:0 8px 0 8px;
+  background:rgba(25,213,139,.72);
+  box-shadow:0 -3px 12px rgba(25,213,139,.12);
+}
+
+.half-bar.red{
+  left:50%;
+  border-radius:8px 0 8px 0;
+  background:rgba(255,98,108,.72);
+  box-shadow:0 -3px 12px rgba(255,98,108,.12);
+}
+
+.digit-column.most .green{
+  opacity:1;
+}
+
+.digit-column.least .red{
+  opacity:1;
+}
+
+.bar-label{
+  position:absolute;
+  bottom:5px;
+  font-size:7px;
+  font-weight:800;
+  z-index:4;
+  opacity:0;
+}
+
+.digit-column.most .bar-label.most-label{
+  left:5px;
+  opacity:1;
+  color:#03150e;
+}
+
+.digit-column.least .bar-label.least-label{
+  right:5px;
+  opacity:1;
   color:#fff;
-  font-weight:700;
 }
 
 /* ================= HISTORY ================= */
@@ -475,16 +521,8 @@ button{
   border-color:#19d58b;
 }
 
-.freq-box.most b{
-  color:#19d58b;
-}
-
 .freq-box.least{
   border-color:#ff626c;
-}
-
-.freq-box.least b{
-  color:#ff626c;
 }
 
 /* ================= OVER UNDER ================= */
@@ -755,267 +793,631 @@ th{
     font-size:54px;
   }
 
-  .digit-track{
-    gap:2px;
+  .digit-grid{
+    gap:3px;
+  }
+
+  .digit-column{
+    height:82px;
   }
 
   .digit-number{
-    width:28px;
-    height:28px;
-    font-size:11px;
+    top:9px;
+    font-size:14px;
+  }
+
+  .digit-percent{
+    top:34px;
+    font-size:8px;
   }
 
   .half-bar{
-    width:25px;
+    height:21px;
+  }
+
+  .moving-pointer{
+    width:calc((100% - 27px) / 10);
   }
 }
-</style></head><body><div class="app"><!-- ================= SIDEBAR ================= --><aside class="sidebar">  <div class="logo">
-    Dollar<span>Ticks</span>
-  </div>  <div class="section-title">Trading</div><button class="nav-btn active">▦ Dashboard</button>
-<button class="nav-btn">↗ Over / Under</button>
-<button class="nav-btn">◉ Live Digits</button>
-<button class="nav-btn">◷ Trade History</button>
+</style>
+</head>
 
-  <div class="section-title">Account</div><button class="nav-btn">◎ Account</button>
-<button class="nav-btn">⚙ Settings</button>
+<body>
+
+<div class="app">
+
+<!-- ================= SIDEBAR ================= -->
+
+<aside class="sidebar">
+
+  <div class="logo">
+    Dollar<span>Ticks</span>
+  </div>
+
+  <div class="section-title">Trading</div>
+
+  <button class="nav-btn active">
+    ▦ Dashboard
+  </button>
+
+  <button class="nav-btn">
+    ↗ Over / Under
+  </button>
+
+  <button class="nav-btn">
+    ◉ Live Digits
+  </button>
+
+  <button class="nav-btn">
+    ◷ Trade History
+  </button>
+
+  <div class="section-title">Account</div>
+
+  <button class="nav-btn">
+    ◎ Account
+  </button>
+
+  <button class="nav-btn">
+    ⚙ Settings
+  </button>
 
   <div class="sidebar-account">
     <small>ACCOUNT</small>
     <strong id="sideAccount">Demo Account</strong>
-  </div></aside><!-- ================= MAIN ================= --><main class="main"><header class="topbar">  <div style="display:flex;align-items:center;gap:10px"><button class="mobile">☰</button>
+  </div>
 
-<div class="title">
-  Over / Under
-</div>
+</aside>
 
-  </div>  <div class="top-right"><div class="connection">
-  <span class="green-dot"></span>
-  Connected
-</div>
 
-<select class="account-select" id="account">
+<!-- ================= MAIN ================= -->
 
-  <option value="demo">
-    Demo $10,000
-  </option>
+<main class="main">
 
-  <option value="real">
-    Real Account
-  </option>
+<header class="topbar">
 
-</select>
+  <div style="display:flex;align-items:center;gap:10px">
 
-  </div></header><section class="content"><!-- ================= STATS ================= --><div class="stats">  <div class="stat">
-    <div class="stat-label">BALANCE</div>
+    <button class="mobile">
+      ☰
+    </button>
+
+    <div class="title">
+      Over / Under
+    </div>
+
+  </div>
+
+  <div class="top-right">
+
+    <div class="connection">
+      <span class="green-dot"></span>
+      Connected
+    </div>
+
+    <select class="account-select" id="account">
+
+      <option value="demo">
+        Demo $10,000
+      </option>
+
+      <option value="real">
+        Real Account
+      </option>
+
+    </select>
+
+  </div>
+
+</header>
+
+
+<section class="content">
+
+<!-- ================= STATS ================= -->
+
+<div class="stats">
+
+  <div class="stat">
+
+    <div class="stat-label">
+      BALANCE
+    </div>
+
     <div class="stat-value" id="balance">
       $10,000.00
     </div>
-  </div>  <div class="stat">
-    <div class="stat-label">TODAY'S P/L</div>
-    <div class="stat-value profit">
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      TODAY'S P/L
+    </div>
+
+    <div class="stat-value profit" id="todayPL">
       $0.00
     </div>
-  </div>  <div class="stat">
-    <div class="stat-label">LAST TRADE</div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      LAST TRADE
+    </div>
+
     <div class="stat-value" id="lastTrade">
       —
     </div>
-  </div>  <div class="stat">
-    <div class="stat-label">STATUS</div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      STATUS
+    </div>
+
     <div class="stat-value profit" style="font-size:16px">
       READY
     </div>
-  </div></div><!-- ================= MARKET ================= --><div class="market-bar">  <select class="market-select" id="market"><option value="1HZ100V">
-  Volatility 100 (1s) Index
-</option>
 
-<option value="1HZ75V">
-  Volatility 75 (1s) Index
-</option>
+  </div>
 
-<option value="1HZ50V">
-  Volatility 50 (1s) Index
-</option>
-
-<option value="1HZ25V">
-  Volatility 25 (1s) Index
-</option>
-
-<option value="1HZ10V">
-  Volatility 10 (1s) Index
-</option>
-
-  </select>  <div class="price" id="price">
-    Waiting for tick...
-  </div></div><!-- ================= GRID ================= --><div class="grid"><div><!-- ================= LIVE MARKET ================= --><div class="panel"><div class="panel-head"><strong>Live Market</strong>
-
-  <span id="tickState">
-    WAITING
-  </span></div><div class="panel-body"><div class="live-status">  <span>
-    LAST DIGIT
-  </span>  <b id="liveConnection">
-    LIVE
-  </b></div><div class="last-digit">  <div class="big-digit" id="bigDigit">
-    —
-  </div></div><div class="digit-label">
-  CURRENT LAST DIGIT
-</div><!-- ================= DIGIT TRACK ================= --><div class="digit-track" id="digitTrack">  <div class="moving-pointer" id="movingPointer"><div class="pointer-digit" id="pointerDigit">
-  —
 </div>
 
-<div class="pointer-line"></div>
 
-<div class="pointer-arrow"></div>
+<!-- ================= MARKET ================= -->
 
-  </div>  <div class="digit-column" data-digit="0">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">0</div>
-  </div>  <div class="digit-column" data-digit="1">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">1</div>
-  </div>  <div class="digit-column" data-digit="2">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">2</div>
-  </div>  <div class="digit-column" data-digit="3">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">3</div>
-  </div>  <div class="digit-column" data-digit="4">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">4</div>
-  </div>  <div class="digit-column" data-digit="5">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">5</div>
-  </div>  <div class="digit-column" data-digit="6">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">6</div>
-  </div>  <div class="digit-column" data-digit="7">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">7</div>
-  </div>  <div class="digit-column" data-digit="8">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">8</div>
-  </div>  <div class="digit-column" data-digit="9">
-    <div class="half-bar green-half"></div>
-    <div class="half-bar red-half"></div>
-    <div class="digit-number">9</div>
-  </div></div><!-- ================= HISTORY ================= --><div class="history-digits" id="historyDigits"></div><!-- ================= FREQUENCY ================= --><div class="freq-title">
-  LAST 100 TICKS — DIGIT FREQUENCY
-</div><div class="frequency" id="frequency"></div><!-- ================= OVER UNDER ================= --><div class="ou-analysis">  <div class="ou-box"><small>
-  OVER 5 — 6,7,8,9
-</small>
+<div class="market-bar">
 
-<strong class="over-text" id="overPercent">
-  0%
-</strong>
+  <select class="market-select" id="market">
 
-  </div>  <div class="ou-box"><small>
-  UNDER 5 — 0,1,2,3,4
-</small>
+    <option value="1HZ100V">
+      Volatility 100 (1s) Index
+    </option>
 
-<strong class="under-text" id="underPercent">
-  0%
-</strong>
+    <option value="1HZ75V">
+      Volatility 75 (1s) Index
+    </option>
 
-  </div></div></div>
-</div><!-- ================= TRADE HISTORY ================= --><div class="panel history-panel"><div class="panel-head">  <strong>
-    Recent Manual Trades
-  </strong>  <span>
-    MANUAL ONLY
-  </span></div><div class="table-wrap"><table><thead><tr>
-  <th>TIME</th>
-  <th>MARKET</th>
-  <th>TYPE</th>
-  <th>ENTRY</th>
-  <th>EXIT</th>
-  <th>STAKE</th>
-  <th>RESULT</th>
-</tr></thead><tbody id="tradeHistory"><tr><td colspan="7" class="empty">
-  No trades yet
-</td></tr></tbody></table></div></div></div><!-- ================= TRADE PANEL ================= --><div class="panel trade-panel"><div class="panel-head">  <strong>
-    Manual Trade
-  </strong>  <span>
-    OVER / UNDER
-  </span></div><div class="panel-body"><!-- CONTRACT --><div class="control"><label>
-  CONTRACT
-</label><div class="contract-tabs"><button
-class="contract-tab active"
-id="overTab"
-onclick="setType('OVER')">
-OVER
-</button>
+    <option value="1HZ50V">
+      Volatility 50 (1s) Index
+    </option>
 
-<button
-class="contract-tab"
-id="underTab"
-onclick="setType('UNDER')">
-UNDER
-</button>
+    <option value="1HZ25V">
+      Volatility 25 (1s) Index
+    </option>
 
-</div></div><!-- PREDICTION --><div class="control"><label>
-  PREDICTION
-</label><div class="prediction"><button onclick="setPrediction(4)">4</button>
-<button onclick="setPrediction(5)">5</button>
-<button class="active" onclick="setPrediction(6)">6</button>
-<button onclick="setPrediction(7)">7</button>
-<button onclick="setPrediction(8)">8</button>
+    <option value="1HZ10V">
+      Volatility 10 (1s) Index
+    </option>
 
-</div></div><!-- STAKE --><div class="control"><label>
-  STAKE
-</label><input
-type="number"
-id="stake"
-value="1"
-min="0.35"
-step="0.01">
+  </select>
 
-</div><!-- DURATION --><div class="control"><label>
-  DURATION
-</label><select id="duration"><option value="1">
-  1 Tick
-</option><option value="2">
-  2 Ticks
-</option><option value="3">
-  3 Ticks
-</option><option value="5">
-  5 Ticks
-</option><option value="10">
-  10 Ticks
-</option></select></div><!-- PAYOUT --><div class="payout"><span>
-  EXPECTED PAYOUT
-</span><strong id="payout">
-  —
-</strong></div><!-- BUY --><div class="buy-buttons"><button
-class="buy buy-over"
-onclick="buy('OVER')">
-BUY OVER
-</button>
 
-<button
-class="buy buy-under"
-onclick="buy('UNDER')">
-BUY UNDER
-</button>
+  <div class="price" id="price">
+    Waiting for tick...
+  </div>
 
-</div><div style="
-font-size:10px;
-color:#61758d;
-line-height:1.5;
-margin-top:13px;
-">Manual trading only.
-DollarTicks does not automatically open trades.
+</div>
 
-</div></div>
-</div></div></section></main>
-</div><script>
+
+<!-- ================= GRID ================= -->
+
+<div class="grid">
+
+
+<!-- ================= LEFT ================= -->
+
+<div>
+
+
+<!-- LIVE MARKET -->
+
+<div class="panel">
+
+  <div class="panel-head">
+
+    <strong>
+      Live Market
+    </strong>
+
+    <span id="tickState">
+      WAITING
+    </span>
+
+  </div>
+
+
+  <div class="panel-body">
+
+    <div class="live-status">
+
+      <span>
+        LAST DIGIT
+      </span>
+
+      <b id="liveConnection">
+        LIVE
+      </b>
+
+    </div>
+
+
+    <div class="last-digit">
+
+      <div class="big-digit" id="bigDigit">
+        —
+      </div>
+
+    </div>
+
+
+    <div class="digit-label">
+      CURRENT LAST DIGIT
+    </div>
+
+
+    <!-- DIGIT ANALYZER -->
+
+    <div class="digit-analyzer">
+
+      <div
+        class="digit-grid"
+        id="digitGrid"
+      >
+
+        <div
+          class="moving-pointer"
+          id="movingPointer"
+        >
+          <div class="pointer-arrow"></div>
+          <div class="pointer-line"></div>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- HISTORY -->
+
+    <div
+      class="history-digits"
+      id="historyDigits"
+    ></div>
+
+
+    <!-- FREQUENCY -->
+
+    <div class="freq-title">
+      LAST 100 TICKS — DIGIT FREQUENCY
+    </div>
+
+    <div
+      class="frequency"
+      id="frequency"
+    ></div>
+
+
+    <!-- OVER UNDER -->
+
+    <div class="ou-analysis">
+
+      <div class="ou-box">
+
+        <small>
+          OVER 5 — 6,7,8,9
+        </small>
+
+        <strong
+          class="over-text"
+          id="overPercent"
+        >
+          0%
+        </strong>
+
+      </div>
+
+
+      <div class="ou-box">
+
+        <small>
+          UNDER 5 — 0,1,2,3,4
+        </small>
+
+        <strong
+          class="under-text"
+          id="underPercent"
+        >
+          0%
+        </strong>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- TRADE HISTORY -->
+
+<div class="panel history-panel">
+
+  <div class="panel-head">
+
+    <strong>
+      Recent Manual Trades
+    </strong>
+
+    <span>
+      MANUAL ONLY
+    </span>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>TIME</th>
+          <th>MARKET</th>
+          <th>TYPE</th>
+          <th>ENTRY</th>
+          <th>EXIT</th>
+          <th>STAKE</th>
+          <th>RESULT</th>
+        </tr>
+
+      </thead>
+
+
+      <tbody id="tradeHistory">
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="empty"
+          >
+            No trades yet
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- ================= RIGHT TRADE PANEL ================= -->
+
+<div class="panel trade-panel">
+
+  <div class="panel-head">
+
+    <strong>
+      Manual Trade
+    </strong>
+
+    <span>
+      OVER / UNDER
+    </span>
+
+  </div>
+
+
+  <div class="panel-body">
+
+
+    <!-- CONTRACT -->
+
+    <div class="control">
+
+      <label>
+        CONTRACT
+      </label>
+
+
+      <div class="contract-tabs">
+
+        <button
+          class="contract-tab active"
+          id="overTab"
+          onclick="setType('OVER')"
+        >
+          OVER
+        </button>
+
+
+        <button
+          class="contract-tab"
+          id="underTab"
+          onclick="setType('UNDER')"
+        >
+          UNDER
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- PREDICTION -->
+
+    <div class="control">
+
+      <label>
+        PREDICTION
+      </label>
+
+
+      <div class="prediction">
+
+        <button onclick="setPrediction(4)">
+          4
+        </button>
+
+        <button onclick="setPrediction(5)">
+          5
+        </button>
+
+        <button
+          class="active"
+          onclick="setPrediction(6)"
+        >
+          6
+        </button>
+
+        <button onclick="setPrediction(7)">
+          7
+        </button>
+
+        <button onclick="setPrediction(8)">
+          8
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- STAKE -->
+
+    <div class="control">
+
+      <label>
+        STAKE
+      </label>
+
+      <input
+        type="number"
+        id="stake"
+        value="1"
+        min="0.35"
+        step="0.01"
+      >
+
+    </div>
+
+
+    <!-- DURATION -->
+
+    <div class="control">
+
+      <label>
+        DURATION
+      </label>
+
+      <select id="duration">
+
+        <option value="1">
+          1 Tick
+        </option>
+
+        <option value="2">
+          2 Ticks
+        </option>
+
+        <option value="3">
+          3 Ticks
+        </option>
+
+        <option value="5">
+          5 Ticks
+        </option>
+
+        <option value="10">
+          10 Ticks
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- PAYOUT -->
+
+    <div class="payout">
+
+      <span>
+        EXPECTED PAYOUT
+      </span>
+
+      <strong id="payout">
+        —
+      </strong>
+
+    </div>
+
+
+    <!-- BUY -->
+
+    <div class="buy-buttons">
+
+      <button
+        class="buy buy-over"
+        onclick="buy('OVER')"
+      >
+        BUY OVER
+      </button>
+
+
+      <button
+        class="buy buy-under"
+        onclick="buy('UNDER')"
+      >
+        BUY UNDER
+      </button>
+
+    </div>
+
+
+    <div style="
+      font-size:10px;
+      color:#61758d;
+      line-height:1.5;
+      margin-top:13px;
+    ">
+
+      Manual trading only.
+      DollarTicks does not automatically
+      open trades.
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
 
 /* =====================================================
    STATE
@@ -1027,112 +1429,355 @@ let selectedType = "OVER";
 
 let selectedPrediction = 6;
 
+let currentDigit = null;
 
-/* =====================================================
-   RANDOM DEMO TICKS
-   This keeps the interface moving until the
-   Deriv tick WebSocket is connected.
-===================================================== */
+let currentMarket = "1HZ100V";
 
-function generateTick(){
-
-  const digit =
-    Math.floor(Math.random() * 10);
-
-  const price =
-    (
-      700 +
-      Math.random() * 100
-    ).toFixed(2);
-
-  tickHistory.push(digit);
-
-  if(tickHistory.length > 100){
-    tickHistory.shift();
-  }
-
-  updateLiveDisplay(
-    digit,
-    price
-  );
-}
+let previousCounts = new Array(10).fill(0);
 
 
 /* =====================================================
-   LIVE DISPLAY
+   DIGIT GRID
 ===================================================== */
 
-function updateLiveDisplay(
-  digit,
-  price
-){
+function createDigitGrid(){
 
-  document.getElementById(
-    "bigDigit"
-  ).textContent = digit;
-
-  document.getElementById(
-    "price"
-  ).textContent = price;
-
-  document.getElementById(
-    "tickState"
-  ).textContent = "LIVE";
-
-  document.getElementById(
-    "liveConnection"
-  ).textContent = "LIVE";
-
-  updatePointer(digit);
-
-  renderHistory();
-
-  renderFrequency();
-
-}
-
-
-/* =====================================================
-   MOVING POINTER
-===================================================== */
-
-function updatePointer(
-  digit
-){
+  const grid =
+    document.getElementById(
+      "digitGrid"
+    );
 
   const pointer =
     document.getElementById(
       "movingPointer"
     );
 
-  const pointerDigit =
-    document.getElementById(
-      "pointerDigit"
+  grid.querySelectorAll(
+    ".digit-column"
+  ).forEach(
+    el => el.remove()
+  );
+
+
+  for(
+    let digit=0;
+    digit<=9;
+    digit++
+  ){
+
+    const column =
+      document.createElement(
+        "div"
+      );
+
+    column.className =
+      "digit-column";
+
+    column.dataset.digit =
+      digit;
+
+
+    column.innerHTML = `
+
+      <div class="half-bar green"></div>
+
+      <div class="half-bar red"></div>
+
+      <div class="digit-number">
+        ${digit}
+      </div>
+
+      <div
+        class="digit-percent"
+        id="digitPercent${digit}"
+      >
+        0.0%
+      </div>
+
+      <div class="bar-label most-label">
+        MOST
+      </div>
+
+      <div class="bar-label least-label">
+        LEAST
+      </div>
+
+    `;
+
+
+    grid.appendChild(
+      column
     );
 
-  if(!pointer){
-    return;
   }
 
-  /*
-    0 = 5%
-    9 = 95%
-  */
 
-  const left =
-    5 + (Number(digit) * 10);
-
-  pointer.style.left =
-    left + "%";
-
-  pointerDigit.textContent =
-    digit;
+  grid.appendChild(
+    pointer
+  );
 
 }
 
 
 /* =====================================================
-   HISTORY DIGITS
+   MOVE POINTER
+===================================================== */
+
+function movePointer(
+  digit
+){
+
+  if(
+    digit === null ||
+    digit < 0 ||
+    digit > 9
+  ){
+
+    return;
+
+  }
+
+
+  currentDigit =
+    Number(digit);
+
+
+  const pointer =
+    document.getElementById(
+      "movingPointer"
+    );
+
+
+  /*
+    Percentage position.
+
+    Each digit occupies one
+    equal column of the grid.
+  */
+
+  pointer.style.left =
+    `calc(${currentDigit * 10}% + ${
+      currentDigit * 0
+    }px)`;
+
+
+  document
+    .querySelectorAll(
+      ".digit-column"
+    )
+    .forEach(
+      column => {
+
+        column.classList.toggle(
+          "current",
+          Number(
+            column.dataset.digit
+          ) === currentDigit
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   GENERATE A TEMPORARY INITIAL SAMPLE
+===================================================== */
+
+function createInitialSample(){
+
+  tickHistory = [];
+
+  for(
+    let i=0;
+    i<30;
+    i++
+  ){
+
+    tickHistory.push(
+      Math.floor(
+        Math.random()*10
+      )
+    );
+
+  }
+
+  renderAll();
+
+}
+
+
+/* =====================================================
+   LIVE TICK
+===================================================== */
+
+function processTick(
+  quote
+){
+
+  const text =
+    String(quote);
+
+  const cleaned =
+    text.replace(
+      /[^0-9]/g,
+      ""
+    );
+
+  if(!cleaned){
+
+    return;
+
+  }
+
+  const digit =
+    Number(
+      cleaned[
+        cleaned.length-1
+      ]
+    );
+
+
+  tickHistory.push(
+    digit
+  );
+
+
+  if(
+    tickHistory.length >
+    100
+  ){
+
+    tickHistory.shift();
+
+  }
+
+
+  currentDigit =
+    digit;
+
+
+  document.getElementById(
+    "bigDigit"
+  ).textContent =
+    digit;
+
+
+  document.getElementById(
+    "price"
+  ).textContent =
+    text;
+
+
+  document.getElementById(
+    "tickState"
+  ).textContent =
+    "LIVE";
+
+
+  const big =
+    document.getElementById(
+      "bigDigit"
+    );
+
+
+  big.classList.remove(
+    "flash"
+  );
+
+
+  void big.offsetWidth;
+
+
+  big.classList.add(
+    "flash"
+  );
+
+
+  movePointer(
+    digit
+  );
+
+
+  renderAll();
+
+}
+
+
+/* =====================================================
+   RANDOM FALLBACK PREVIEW
+=====================================================
+
+   This is only used until the
+   real Deriv WebSocket connection
+   is attached.
+
+   It is intentionally isolated
+   so it can be removed without
+   changing the analyzer.
+===================================================== */
+
+let previewTimer = null;
+
+function startPreview(){
+
+  stopPreview();
+
+
+  previewTimer =
+    setInterval(
+      () => {
+
+        const digit =
+          Math.floor(
+            Math.random()*10
+          );
+
+        processTick(
+          digit
+        );
+
+      },
+      1000
+    );
+
+}
+
+
+function stopPreview(){
+
+  if(previewTimer){
+
+    clearInterval(
+      previewTimer
+    );
+
+    previewTimer =
+      null;
+
+  }
+
+}
+
+
+/* =====================================================
+   RENDER ALL
+===================================================== */
+
+function renderAll(){
+
+  renderHistory();
+
+  renderFrequency();
+
+  renderDigitBars();
+
+}
+
+
+/* =====================================================
+   HISTORY
 ===================================================== */
 
 function renderHistory(){
@@ -1144,11 +1789,15 @@ function renderHistory(){
 
   box.innerHTML = "";
 
+
   const recent =
-    tickHistory.slice(-20);
+    tickHistory.slice(
+      -20
+    );
+
 
   recent.forEach(
-    (digit,index)=>{
+    (digit,index) => {
 
       const el =
         document.createElement(
@@ -1158,9 +1807,10 @@ function renderHistory(){
       el.className =
         "history-digit";
 
+
       if(
         index ===
-        recent.length - 1
+        recent.length-1
       ){
 
         el.classList.add(
@@ -1169,10 +1819,14 @@ function renderHistory(){
 
       }
 
+
       el.textContent =
         digit;
 
-      box.appendChild(el);
+
+      box.appendChild(
+        el
+      );
 
     }
   );
@@ -1181,190 +1835,202 @@ function renderHistory(){
 
 
 /* =====================================================
-   FREQUENCY + MOST/LEAST BARS
+   COUNTS
+===================================================== */
+
+function getCounts(){
+
+  const counts =
+    new Array(10).fill(0);
+
+
+  tickHistory.forEach(
+    digit => {
+
+      if(
+        digit >= 0 &&
+        digit <= 9
+      ){
+
+        counts[digit]++;
+
+      }
+
+    }
+  );
+
+
+  return counts;
+
+}
+
+
+/* =====================================================
+   FREQUENCY
 ===================================================== */
 
 function renderFrequency(){
 
   const counts =
-    new Array(10).fill(0);
+    getCounts();
 
-  tickHistory.forEach(
-    digit=>{
-      counts[digit]++;
-    }
-  );
+
+  const total =
+    tickHistory.length;
+
+
+  const frequency =
+    document.getElementById(
+      "frequency"
+    );
+
+  frequency.innerHTML =
+    "";
 
 
   /*
-   * Determine the most and least
-   * occurring digits.
-   */
+    Find the most and least
+    occurring digits.
+
+    Least ignores zero-count digits
+    when we have enough live data,
+    so a digit that has never appeared
+    does not permanently become LEAST.
+  */
 
   let mostDigit = 0;
 
   let leastDigit = 0;
 
 
-  for(
-    let i = 1;
-    i < 10;
-    i++
-  ){
+  if(total > 0){
+
+    mostDigit =
+      counts.indexOf(
+        Math.max(...counts)
+      );
+
+
+    const seenDigits =
+      counts
+        .map(
+          (count,digit) =>
+            count > 0
+              ? digit
+              : null
+        )
+        .filter(
+          digit =>
+            digit !== null
+        );
+
 
     if(
-      counts[i] >
-      counts[mostDigit]
+      seenDigits.length
     ){
 
-      mostDigit = i;
-
-    }
-
-    if(
-      counts[i] <
-      counts[leastDigit]
-    ){
-
-      leastDigit = i;
+      leastDigit =
+        seenDigits.reduce(
+          (best,digit) =>
+            counts[digit] <
+            counts[best]
+              ? digit
+              : best,
+          seenDigits[0]
+        );
 
     }
 
   }
 
 
-  /* ==============================
-     DIGIT TRACK BARS
-  ============================== */
-
-  document
-    .querySelectorAll(
-      ".digit-column"
-    )
-    .forEach(
-      column=>{
-
-        const digit =
-          Number(
-            column.dataset.digit
-          );
-
-        column.classList.remove(
-          "most",
-          "least"
-        );
-
-        if(
-          digit === mostDigit
-        ){
-
-          column.classList.add(
-            "most"
-          );
-
-        }
-
-        /*
-         * Only show red if the
-         * least digit is different
-         * from the most digit.
-         */
-
-        if(
-          digit === leastDigit &&
-          digit !== mostDigit
-        ){
-
-          column.classList.add(
-            "least"
-          );
-
-        }
-
-      }
-    );
-
-
-  /* ==============================
-     FREQUENCY BOXES
-  ============================== */
-
-  const box =
-    document.getElementById(
-      "frequency"
-    );
-
-  box.innerHTML = "";
-
-
   for(
-    let i = 0;
-    i < 10;
-    i++
+    let digit=0;
+    digit<=9;
+    digit++
   ){
 
-    const percentage =
-      tickHistory.length
-      ? (
-          counts[i] /
-          tickHistory.length *
-          100
-        ).toFixed(1)
-      : "0.0";
+    const percent =
+      total
+        ? (
+            counts[digit] /
+            total *
+            100
+          ).toFixed(1)
+        : "0.0";
 
 
-    const el =
+    const box =
       document.createElement(
         "div"
       );
 
-    el.className =
+    box.className =
       "freq-box";
 
 
-    if(i === mostDigit){
-      el.classList.add("most");
-    }
-
     if(
-      i === leastDigit &&
-      i !== mostDigit
+      digit === mostDigit &&
+      total > 0
     ){
 
-      el.classList.add("least");
+      box.classList.add(
+        "most"
+      );
 
     }
 
 
-    el.innerHTML = `
-      <b>${i}</b>
-      <span>${percentage}%</span>
+    if(
+      digit === leastDigit &&
+      total > 0
+    ){
+
+      box.classList.add(
+        "least"
+      );
+
+    }
+
+
+    box.innerHTML = `
+
+      <b>${digit}</b>
+
+      <span>
+        ${percent}%
+      </span>
+
     `;
 
 
-    box.appendChild(el);
+    frequency.appendChild(
+      box
+    );
 
   }
 
 
-  /* ==============================
-     OVER / UNDER
-  ============================== */
-
   const over =
     tickHistory.filter(
-      d => d >= 6
+      digit =>
+        digit >= 6
     ).length;
 
+
+  /*
+    Over 5 means 6,7,8,9.
+    Under 5 means 0,1,2,3,4,5.
+    We keep the contract display
+    consistent with the selected
+    prediction interface.
+  */
 
   const under =
     tickHistory.filter(
-      d => d <= 5
+      digit =>
+        digit <= 5
     ).length;
-
-
-  const total =
-    tickHistory.length;
 
 
   document.getElementById(
@@ -1375,7 +2041,7 @@ function renderFrequency(){
           over /
           total *
           100
-        ).toFixed(1) + "%"
+        ).toFixed(1)+"%"
       : "0%";
 
 
@@ -1387,8 +2053,164 @@ function renderFrequency(){
           under /
           total *
           100
-        ).toFixed(1) + "%"
+        ).toFixed(1)+"%"
       : "0%";
+
+
+  previousCounts =
+    counts.slice();
+
+}
+
+
+/* =====================================================
+   GREEN / RED HALF BARS
+===================================================== */
+
+function renderDigitBars(){
+
+  const counts =
+    getCounts();
+
+
+  const total =
+    tickHistory.length;
+
+
+  let mostDigit = null;
+
+  let leastDigit = null;
+
+
+  if(total){
+
+    const maximum =
+      Math.max(...counts);
+
+
+    mostDigit =
+      counts.indexOf(
+        maximum
+      );
+
+
+    const seen =
+      counts
+        .map(
+          (count,digit) => ({
+            count,
+            digit
+          })
+        )
+        .filter(
+          item =>
+            item.count > 0
+        );
+
+
+    if(seen.length){
+
+      seen.sort(
+        (a,b) => {
+
+          if(
+            a.count !==
+            b.count
+          ){
+
+            return (
+              a.count -
+              b.count
+            );
+
+          }
+
+          return (
+            a.digit -
+            b.digit
+          );
+
+        }
+      );
+
+
+      leastDigit =
+        seen[0].digit;
+
+    }
+
+  }
+
+
+  document
+    .querySelectorAll(
+      ".digit-column"
+    )
+    .forEach(
+      column => {
+
+        const digit =
+          Number(
+            column.dataset.digit
+          );
+
+
+        column.classList.remove(
+          "most",
+          "least"
+        );
+
+
+        if(
+          digit === mostDigit &&
+          mostDigit !== null
+        ){
+
+          column.classList.add(
+            "most"
+          );
+
+        }
+
+
+        if(
+          digit === leastDigit &&
+          leastDigit !== null &&
+          leastDigit !== mostDigit
+        ){
+
+          column.classList.add(
+            "least"
+          );
+
+        }
+
+
+        const percent =
+          total
+            ? (
+                counts[digit] /
+                total *
+                100
+              ).toFixed(1)
+            : "0.0";
+
+
+        const percentElement =
+          document.getElementById(
+            "digitPercent"+digit
+          );
+
+
+        if(percentElement){
+
+          percentElement.textContent =
+            percent+"%";
+
+        }
+
+      }
+    );
 
 }
 
@@ -1397,30 +2219,30 @@ function renderFrequency(){
    CONTRACT TYPE
 ===================================================== */
 
-function setType(type){
+function setType(
+  type
+){
 
   selectedType =
     type;
 
 
-  document
-    .getElementById(
-      "overTab"
-    )
-    .classList.toggle(
-      "active",
-      type === "OVER"
-    );
+  document.getElementById(
+    "overTab"
+  )
+  .classList.toggle(
+    "active",
+    type === "OVER"
+  );
 
 
-  document
-    .getElementById(
-      "underTab"
-    )
-    .classList.toggle(
-      "active",
-      type === "UNDER"
-    );
+  document.getElementById(
+    "underTab"
+  )
+  .classList.toggle(
+    "active",
+    type === "UNDER"
+  );
 
 }
 
@@ -1442,17 +2264,20 @@ function setPrediction(
       ".prediction button"
     )
     .forEach(
-      btn=>{
+      button => {
 
-        btn.classList.toggle(
+        button.classList.toggle(
           "active",
           Number(
-            btn.textContent
+            button.textContent
           ) === number
         );
 
       }
     );
+
+
+  updatePayout();
 
 }
 
@@ -1461,14 +2286,13 @@ function setPrediction(
    PAYOUT
 ===================================================== */
 
-document
-  .getElementById(
-    "stake"
-  )
-  .addEventListener(
-    "input",
-    updatePayout
-  );
+document.getElementById(
+  "stake"
+)
+.addEventListener(
+  "input",
+  updatePayout
+);
 
 
 function updatePayout(){
@@ -1481,7 +2305,9 @@ function updatePayout(){
     ) || 0;
 
 
-  if(stake <= 0){
+  if(
+    stake <= 0
+  ){
 
     document.getElementById(
       "payout"
@@ -1493,6 +2319,13 @@ function updatePayout(){
   }
 
 
+  /*
+    Front-end estimate only.
+
+    Real Deriv payout must come
+    from the proposal response.
+  */
+
   const estimated =
     stake * 1.90;
 
@@ -1500,8 +2333,7 @@ function updatePayout(){
   document.getElementById(
     "payout"
   ).textContent =
-    "$" +
-    estimated.toFixed(2);
+    "$"+estimated.toFixed(2);
 
 }
 
@@ -1510,10 +2342,12 @@ updatePayout();
 
 
 /* =====================================================
-   MANUAL BUY INTERFACE
+   MANUAL BUY
 ===================================================== */
 
-function buy(type){
+function buy(
+  type
+){
 
   const stake =
     parseFloat(
@@ -1540,17 +2374,29 @@ function buy(type){
   const market =
     document.getElementById(
       "market"
-    ).options[
-      document.getElementById(
-        "market"
-      ).selectedIndex
-    ].text;
+    );
+
+
+  const marketText =
+    market.options[
+      market.selectedIndex
+    ].text
+      .replace(
+        " Index",
+        ""
+      );
+
+
+  const duration =
+    document.getElementById(
+      "duration"
+    ).value;
 
 
   const entry =
     tickHistory.length
       ? tickHistory[
-          tickHistory.length - 1
+          tickHistory.length-1
         ]
       : "—";
 
@@ -1569,7 +2415,8 @@ function buy(type){
       )
   ){
 
-    table.innerHTML = "";
+    table.innerHTML =
+      "";
 
   }
 
@@ -1583,11 +2430,12 @@ function buy(type){
   row.innerHTML = `
 
     <td>
-      ${new Date().toLocaleTimeString()}
+      ${new Date()
+        .toLocaleTimeString()}
     </td>
 
     <td>
-      ${market.replace(" Index","")}
+      ${marketText}
     </td>
 
     <td>
@@ -1613,15 +2461,24 @@ function buy(type){
   `;
 
 
-  table.prepend(row);
+  table.prepend(
+    row
+  );
 
 
   document.getElementById(
     "lastTrade"
   ).textContent =
-    type +
-    " " +
-    selectedPrediction;
+    type+" "+selectedPrediction;
+
+
+  /*
+    This is still manual UI.
+
+    The actual Deriv proposal/buy
+    connection remains in the
+    Cloudflare trading function.
+  */
 
 }
 
@@ -1630,68 +2487,105 @@ function buy(type){
    ACCOUNT
 ===================================================== */
 
-document
-  .getElementById(
-    "account"
-  )
-  .addEventListener(
-    "change",
-    function(){
+document.getElementById(
+  "account"
+)
+.addEventListener(
+  "change",
+  function(){
 
-      if(
-        this.value === "real"
-      ){
+    if(
+      this.value === "real"
+    ){
 
-        document.getElementById(
-          "sideAccount"
-        ).textContent =
-          "Real Account";
+      document.getElementById(
+        "sideAccount"
+      ).textContent =
+        "Real Account";
 
-      }else{
+    }else{
 
-        document.getElementById(
-          "sideAccount"
-        ).textContent =
-          "Demo Account";
-
-      }
+      document.getElementById(
+        "sideAccount"
+      ).textContent =
+        "Demo Account";
 
     }
-  );
 
-
-/* =====================================================
-   INITIAL DATA
-===================================================== */
-
-for(
-  let i = 0;
-  i < 30;
-  i++
-){
-
-  tickHistory.push(
-    Math.floor(
-      Math.random() * 10
-    )
-  );
-
-}
-
-
-renderHistory();
-
-renderFrequency();
-
-
-/* =====================================================
-   START MOVING TICKS
-===================================================== */
-
-setInterval(
-  generateTick,
-  1000
+  }
 );
 
-</script></body>
-</html>
+
+/* =====================================================
+   MARKET CHANGE
+===================================================== */
+
+document.getElementById(
+  "market"
+)
+.addEventListener(
+  "change",
+  function(){
+
+    currentMarket =
+      this.value;
+
+
+    tickHistory = [];
+
+    document.getElementById(
+      "bigDigit"
+    ).textContent =
+      "—";
+
+
+    document.getElementById(
+      "price"
+    ).textContent =
+      "Waiting for tick...";
+
+
+    document.getElementById(
+      "tickState"
+    ).textContent =
+      "WAITING";
+
+
+    createInitialSample();
+
+  }
+);
+
+
+/* =====================================================
+   INITIALISE
+===================================================== */
+
+createDigitGrid();
+
+createInitialSample();
+
+movePointer(
+  tickHistory[
+    tickHistory.length-1
+  ]
+);
+
+
+/*
+  PREVIEW ONLY.
+
+  Replace this preview with the
+  authenticated Deriv tick WebSocket
+  in the next integration step.
+
+  The analyzer itself is already
+  separated from the tick source.
+*/
+
+startPreview();
+
+</script>
+
+</body>
+  </html>
