@@ -1,922 +1,1870 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DollarTicks — Over / Under</title><style>
-*{box-sizing:border-box;margin:0;padding:0}
+<title>DollarTicks — Over / Under</title>
 
-body{
-font-family:Inter,Arial,sans-serif;
-background:#07111f;
-color:#fff;
-min-height:100vh;
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
 }
 
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
+body{
+  font-family:Inter,Arial,sans-serif;
+  background:#07111f;
+  color:#fff;
+  min-height:100vh;
+}
 
-.app{display:flex;min-height:100vh}
+button,input,select{
+  font:inherit;
+}
 
-/* SIDEBAR */
+button{
+  cursor:pointer;
+  border:0;
+}
+
+.app{
+  display:flex;
+  min-height:100vh;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
 .sidebar{
-width:240px;
-position:fixed;
-top:0;
-bottom:0;
-left:0;
-background:#091625;
-border-right:1px solid #17283c;
-padding:20px 14px;
+  width:240px;
+  position:fixed;
+  top:0;
+  bottom:0;
+  left:0;
+  background:#091625;
+  border-right:1px solid #17283c;
+  padding:20px 14px;
+  z-index:20;
 }
 
 .logo{
-font-size:25px;
-font-weight:800;
-padding:7px 13px 28px;
+  font-size:25px;
+  font-weight:800;
+  padding:7px 13px 28px;
 }
 
-.logo span{color:#19d58b}
+.logo span{
+  color:#19d58b;
+}
 
 .section-title{
-font-size:10px;
-color:#61738a;
-text-transform:uppercase;
-padding:10px 13px;
+  font-size:10px;
+  color:#61738a;
+  text-transform:uppercase;
+  padding:10px 13px;
 }
 
 .nav-btn{
-width:100%;
-background:transparent;
-color:#92a2b6;
-padding:13px;
-margin:2px 0;
-border-radius:9px;
-text-align:left;
-font-size:13px;
+  width:100%;
+  background:transparent;
+  color:#92a2b6;
+  padding:13px;
+  margin:2px 0;
+  border-radius:9px;
+  text-align:left;
+  font-size:13px;
 }
 
-.nav-btn:hover,.nav-btn.active{
-background:#12243a;
-color:#fff;
+.nav-btn:hover,
+.nav-btn.active{
+  background:#12243a;
+  color:#fff;
 }
 
 .sidebar-account{
-position:absolute;
-bottom:18px;
-left:14px;
-right:14px;
-padding:13px;
-border:1px solid #1b3047;
-background:#0e1d30;
-border-radius:11px;
+  position:absolute;
+  bottom:18px;
+  left:14px;
+  right:14px;
+  padding:13px;
+  border:1px solid #1b3047;
+  background:#0e1d30;
+  border-radius:11px;
 }
 
 .sidebar-account small{
-display:block;
-color:#667b92;
-font-size:10px;
-margin-bottom:5px;
+  display:block;
+  color:#667b92;
+  font-size:10px;
+  margin-bottom:5px;
 }
 
-/* MAIN */
+/* =========================
+   MAIN
+========================= */
+
 .main{
-margin-left:240px;
-width:calc(100% - 240px);
+  margin-left:240px;
+  width:calc(100% - 240px);
 }
 
 .topbar{
-height:70px;
-border-bottom:1px solid #17283c;
-background:#091625;
-display:flex;
-align-items:center;
-justify-content:space-between;
-padding:0 24px;
+  height:70px;
+  border-bottom:1px solid #17283c;
+  background:#091625;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
 
 .title{
-font-size:18px;
-font-weight:700;
+  font-size:18px;
+  font-weight:700;
 }
 
 .top-right{
-display:flex;
-align-items:center;
-gap:12px;
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
 .connection{
-font-size:11px;
-color:#8b9caf;
+  font-size:11px;
+  color:#8b9caf;
 }
 
 .green-dot{
-display:inline-block;
-width:7px;
-height:7px;
-border-radius:50%;
-background:#19d58b;
-box-shadow:0 0 8px #19d58b;
-margin-right:5px;
+  display:inline-block;
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#19d58b;
+  box-shadow:0 0 8px #19d58b;
+  margin-right:5px;
 }
 
 .account-select{
-background:#12243a;
-border:1px solid #263c55;
-color:#fff;
-padding:9px 12px;
-border-radius:8px;
-outline:none;
+  background:#12243a;
+  border:1px solid #263c55;
+  color:#fff;
+  padding:9px 12px;
+  border-radius:8px;
+  outline:none;
 }
 
-.content{padding:22px}
+/* =========================
+   CONTENT
+========================= */
 
-/* STATS */
+.content{
+  padding:22px;
+}
+
+/* =========================
+   STATS
+========================= */
+
 .stats{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:13px;
-margin-bottom:18px;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:13px;
+  margin-bottom:18px;
 }
 
 .stat{
-background:#0b192b;
-border:1px solid #172d44;
-border-radius:12px;
-padding:16px;
+  background:#0b192b;
+  border:1px solid #172d44;
+  border-radius:12px;
+  padding:16px;
 }
 
 .stat-label{
-font-size:11px;
-color:#71839a;
+  font-size:11px;
+  color:#71839a;
 }
 
 .stat-value{
-font-size:21px;
-font-weight:750;
-margin-top:8px;
+  font-size:21px;
+  font-weight:750;
+  margin-top:8px;
 }
 
-.profit{color:#19d58b}
+.profit{
+  color:#19d58b;
+}
 
-/* MARKET */
+/* =========================
+   MARKET
+========================= */
+
 .market-bar{
-background:#0b192b;
-border:1px solid #172d44;
-border-radius:12px;
-padding:14px;
-display:flex;
-gap:12px;
-align-items:center;
-margin-bottom:18px;
+  background:#0b192b;
+  border:1px solid #172d44;
+  border-radius:12px;
+  padding:14px;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  margin-bottom:18px;
 }
 
 .market-select{
-flex:1;
-background:#101f32;
-color:#fff;
-border:1px solid #253a53;
-padding:12px;
-border-radius:8px;
-outline:none;
+  flex:1;
+  background:#101f32;
+  color:#fff;
+  border:1px solid #253a53;
+  padding:12px;
+  border-radius:8px;
+  outline:none;
 }
 
 .price{
-min-width:170px;
-text-align:center;
-background:#101f32;
-border:1px solid #253a53;
-padding:12px;
-border-radius:8px;
-font-weight:700;
+  min-width:190px;
+  text-align:center;
+  background:#101f32;
+  border:1px solid #253a53;
+  padding:12px;
+  border-radius:8px;
+  font-weight:700;
 }
 
-/* GRID */
+/* =========================
+   GRID
+========================= */
+
 .grid{
-display:grid;
-grid-template-columns:minmax(0,1fr) 350px;
-gap:18px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 350px;
+  gap:18px;
 }
 
 .panel{
-background:#0b192b;
-border:1px solid #172d44;
-border-radius:13px;
-overflow:hidden;
+  background:#0b192b;
+  border:1px solid #172d44;
+  border-radius:13px;
+  overflow:hidden;
 }
 
 .panel-head{
-padding:15px 17px;
-border-bottom:1px solid #172d44;
-display:flex;
-justify-content:space-between;
-align-items:center;
+  padding:15px 17px;
+  border-bottom:1px solid #172d44;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.panel-head strong{font-size:14px}
+.panel-head strong{
+  font-size:14px;
+}
 
 .panel-head span{
-font-size:10px;
-color:#6e8198;
+  font-size:10px;
+  color:#6e8198;
 }
 
-.panel-body{padding:17px}
+.panel-body{
+  padding:17px;
+}
 
-/* LIVE DIGIT */
+/* =========================
+   LIVE DIGIT
+========================= */
+
 .live-status{
-display:flex;
-justify-content:space-between;
-font-size:11px;
-color:#70839a;
-margin-bottom:12px;
+  display:flex;
+  justify-content:space-between;
+  font-size:11px;
+  color:#70839a;
+  margin-bottom:12px;
 }
 
-.live-status b{color:#19d58b}
+.live-status b{
+  color:#19d58b;
+}
 
 .last-digit{
-height:120px;
-border-radius:12px;
-background:#081321;
-border:1px solid #1a3148;
-display:flex;
-align-items:center;
-justify-content:center;
-margin-bottom:14px;
+  height:115px;
+  border-radius:12px;
+  background:#081321;
+  border:1px solid #1a3148;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin-bottom:14px;
 }
 
 .big-digit{
-font-size:62px;
-font-weight:800;
-color:#19d58b;
-text-shadow:0 0 25px rgba(25,213,139,.2);
+  font-size:62px;
+  font-weight:800;
+  color:#19d58b;
+  text-shadow:0 0 25px rgba(25,213,139,.2);
 }
 
 .digit-label{
-font-size:10px;
-color:#667b92;
-text-align:center;
-margin-top:-8px;
-margin-bottom:15px;
+  font-size:10px;
+  color:#667b92;
+  text-align:center;
+  margin-top:-8px;
+  margin-bottom:15px;
 }
 
-/* HISTORY */
-.history-digits{
-display:flex;
-gap:7px;
-overflow:hidden;
-margin-bottom:18px;
+/* =========================
+   DIGIT TRACKER
+========================= */
+
+.tracker{
+  margin-top:12px;
+  background:#081321;
+  border:1px solid #1a3148;
+  border-radius:12px;
+  padding:18px 12px 14px;
+  overflow:hidden;
 }
 
-.history-digit{
-min-width:36px;
-height:36px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:7px;
-background:#12243a;
-border:1px solid #1d354e;
-font-weight:700;
-font-size:13px;
+.tracker-title{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:18px;
+  font-size:10px;
+  color:#6d8198;
 }
 
-.history-digit.latest{
-background:#19d58b;
-color:#04150e;
+.tracker-title b{
+  color:#fff;
+  font-size:11px;
 }
 
-/* FREQUENCY */
-.freq-title{
-font-size:11px;
-color:#72849a;
-margin-bottom:10px;
+/* bars + numbers */
+
+.digit-track{
+  position:relative;
+  height:155px;
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:4px;
+  align-items:end;
 }
 
-.frequency{
-display:grid;
-grid-template-columns:repeat(10,1fr);
-gap:6px;
+.digit-column{
+  height:130px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
 }
 
-/*
-   FREQUENCY VISUALIZER
-
-   Green = most occurring
-   Red   = least occurring
-*/
-.frequency-board{
-position:relative;
-background:#081321;
-border:1px solid #1a3148;
-border-radius:12px;
-padding:16px 10px 13px;
-overflow:hidden;
+.bar-area{
+  width:100%;
+  height:105px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  position:relative;
 }
 
-.frequency-grid{
-display:grid;
-grid-template-columns:repeat(10,minmax(0,1fr));
-gap:6px;
-align-items:end;
-position:relative;
-z-index:2;
+/* HALF ROUND GREEN */
+
+.green-bar{
+  position:absolute;
+  bottom:0;
+  width:25px;
+  min-height:4px;
+  border-radius:16px 16px 0 0;
+  background:#19d58b;
+  box-shadow:0 0 9px rgba(25,213,139,.18);
+  transition:
+    height .35s ease,
+    opacity .25s ease;
 }
 
-.frequency-column{
-position:relative;
-min-width:0;
-text-align:center;
+/* HALF ROUND RED */
+
+.red-bar{
+  position:absolute;
+  bottom:0;
+  width:25px;
+  min-height:4px;
+  border-radius:16px 16px 0 0;
+  background:#ff626c;
+  box-shadow:0 0 9px rgba(255,98,108,.18);
+  transition:
+    height .35s ease,
+    opacity .25s ease;
 }
 
-.frequency-bar-area{
-height:76px;
-display:flex;
-align-items:flex-end;
-justify-content:center;
-position:relative;
+/* when both bars are on same number */
+
+.green-bar,
+.red-bar{
+  transform-origin:bottom center;
 }
 
-.frequency-bar{
-width:25px;
-height:8px;
-min-height:8px;
-border-radius:50% 50% 6px 6px;
-background:#263b52;
-transition:
-height .35s ease,
-background .25s ease,
-transform .25s ease;
+.digit-number{
+  width:30px;
+  height:30px;
+  margin-top:6px;
+  border-radius:50%;
+  background:#12243a;
+  border:1px solid #243a53;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800;
+  font-size:12px;
+  position:relative;
+  z-index:3;
 }
 
-.frequency-column.most .frequency-bar{
-background:#19d58b;
-box-shadow:0 0 12px rgba(25,213,139,.35);
+.digit-number.hot{
+  border-color:#19d58b;
+  color:#19d58b;
 }
 
-.frequency-column.least .frequency-bar{
-background:#ff626c;
-box-shadow:0 0 12px rgba(255,98,108,.25);
+.digit-number.cold{
+  border-color:#ff626c;
+  color:#ff626c;
 }
 
-/*
-   HALF-ROUND CAPS
-*/
-.frequency-column.most .frequency-bar::before,
-.frequency-column.least .frequency-bar::before{
-content:"";
-display:block;
-height:9px;
-width:25px;
-border-radius:50%;
-position:absolute;
-bottom:0;
-left:50%;
-transform:translateX(-50%);
-}
+/* moving pointer */
 
-.frequency-column.most .frequency-bar::before{
-background:#19d58b;
-}
-
-.frequency-column.least .frequency-bar::before{
-background:#ff626c;
-}
-
-/*
-   MOVING POINTER
-*/
 .moving-pointer{
-position:absolute;
-top:4px;
-bottom:7px;
-width:0;
-z-index:5;
-pointer-events:none;
-transition:left .35s cubic-bezier(.2,.8,.2,1);
+  position:absolute;
+  top:0;
+  left:5%;
+  width:30px;
+  height:26px;
+  transform:translateX(-50%);
+  z-index:8;
+  transition:left .28s ease;
+  pointer-events:none;
 }
 
-.pointer-line{
-position:absolute;
-top:0;
-bottom:0;
-left:0;
-width:2px;
-background:#fff;
-box-shadow:0 0 8px rgba(255,255,255,.55);
-}
-
-.pointer-head{
-position:absolute;
-top:-1px;
-left:50%;
-transform:translateX(-50%);
-width:0;
-height:0;
-border-left:6px solid transparent;
-border-right:6px solid transparent;
-border-top:8px solid #fff;
+.pointer-arrow{
+  width:0;
+  height:0;
+  margin:auto;
+  border-left:7px solid transparent;
+  border-right:7px solid transparent;
+  border-top:11px solid #f4c95d;
+  filter:drop-shadow(0 0 5px rgba(244,201,93,.45));
 }
 
 .pointer-label{
-position:absolute;
-top:10px;
-left:50%;
-transform:translateX(-50%);
-font-size:8px;
-font-weight:800;
-color:#fff;
-white-space:nowrap;
-background:#15283d;
-border:1px solid #2a4159;
-padding:3px 5px;
-border-radius:4px;
+  text-align:center;
+  color:#f4c95d;
+  font-size:8px;
+  font-weight:800;
+  margin-top:2px;
 }
 
-.frequency-number{
-font-size:12px;
-font-weight:800;
-color:#d9e3ed;
+/* legends */
+
+.tracker-legend{
+  display:flex;
+  justify-content:center;
+  gap:18px;
+  margin-top:12px;
+  font-size:9px;
+  color:#71839a;
 }
 
-.frequency-percent{
-font-size:8px;
-color:#71849a;
-margin-top:4px;
-}
-
-.frequency-column.most .frequency-number{
-color:#19d58b;
-}
-
-.frequency-column.least .frequency-number{
-color:#ff626c;
-}
-
-.frequency-legend{
-display:flex;
-justify-content:center;
-gap:18px;
-margin-top:12px;
-font-size:9px;
-color:#70839a;
-}
-
-.legend-item{
-display:flex;
-align-items:center;
-gap:5px;
+.legend{
+  display:flex;
+  align-items:center;
+  gap:5px;
 }
 
 .legend-dot{
-width:8px;
-height:8px;
-border-radius:50%;
+  width:8px;
+  height:8px;
+  border-radius:50%;
 }
 
-.legend-green{background:#19d58b}
-.legend-red{background:#ff626c}
-.legend-white{background:#fff}
+.legend-green{
+  background:#19d58b;
+}
 
-/* OVER UNDER */
+.legend-red{
+  background:#ff626c;
+}
+
+.legend-yellow{
+  background:#f4c95d;
+}
+
+/* =========================
+   HISTORY DIGITS
+========================= */
+
+.history-digits{
+  display:flex;
+  gap:7px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+
+.history-digit{
+  min-width:36px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:7px;
+  background:#12243a;
+  border:1px solid #1d354e;
+  font-weight:700;
+  font-size:13px;
+}
+
+.history-digit.latest{
+  background:#19d58b;
+  color:#04150e;
+}
+
+/* =========================
+   FREQUENCY
+========================= */
+
+.freq-title{
+  font-size:11px;
+  color:#72849a;
+  margin-bottom:10px;
+}
+
+.frequency{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:6px;
+}
+
+.freq-box{
+  background:#101f32;
+  border:1px solid #1c334b;
+  border-radius:7px;
+  padding:9px 3px;
+  text-align:center;
+}
+
+.freq-box b{
+  display:block;
+  font-size:13px;
+}
+
+.freq-box span{
+  display:block;
+  font-size:9px;
+  color:#71849a;
+  margin-top:4px;
+}
+
+.freq-box.most{
+  border-color:#19d58b;
+}
+
+.freq-box.most b{
+  color:#19d58b;
+}
+
+.freq-box.least{
+  border-color:#ff626c;
+}
+
+.freq-box.least b{
+  color:#ff626c;
+}
+
+/* =========================
+   OVER UNDER
+========================= */
+
 .ou-analysis{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:10px;
-margin-top:15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:15px;
 }
 
 .ou-box{
-padding:13px;
-border-radius:9px;
-background:#101f32;
-border:1px solid #1d344c;
+  padding:13px;
+  border-radius:9px;
+  background:#101f32;
+  border:1px solid #1d344c;
 }
 
 .ou-box small{
-display:block;
-color:#70839a;
-font-size:10px;
-margin-bottom:6px;
+  display:block;
+  color:#70839a;
+  font-size:10px;
+  margin-bottom:6px;
 }
 
-.ou-box strong{font-size:18px}
+.ou-box strong{
+  font-size:18px;
+}
 
-.over-text{color:#19d58b}
-.under-text{color:#ff626c}
+.over-text{
+  color:#19d58b;
+}
 
-/* TRADE */
+.under-text{
+  color:#ff626c;
+}
+
+/* =========================
+   TRADE PANEL
+========================= */
+
 .trade-panel{
-position:sticky;
-top:15px;
+  position:sticky;
+  top:85px;
+  align-self:start;
 }
 
-.control{margin-bottom:14px}
+.control{
+  margin-bottom:14px;
+}
 
 .control label{
-display:block;
-font-size:11px;
-color:#75879c;
-margin-bottom:7px;
+  display:block;
+  font-size:11px;
+  color:#75879c;
+  margin-bottom:7px;
 }
 
-.control select,.control input{
-width:100%;
-background:#101f32;
-border:1px solid #253b54;
-color:#fff;
-padding:12px;
-border-radius:8px;
-outline:none;
+.control select,
+.control input{
+  width:100%;
+  background:#101f32;
+  border:1px solid #253b54;
+  color:#fff;
+  padding:12px;
+  border-radius:8px;
+  outline:none;
 }
 
 .contract-tabs{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:7px;
-margin-bottom:15px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-bottom:15px;
 }
 
 .contract-tab{
-padding:11px;
-background:#101f32;
-color:#77899e;
-border:1px solid #253b54;
-border-radius:8px;
+  padding:11px;
+  background:#101f32;
+  color:#77899e;
+  border:1px solid #253b54;
+  border-radius:8px;
 }
 
 .contract-tab.active{
-background:#132d29;
-color:#19d58b;
-border-color:#19d58b;
+  background:#132d29;
+  color:#19d58b;
+  border-color:#19d58b;
 }
 
 .prediction{
-display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:6px;
-margin-bottom:15px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+  margin-bottom:15px;
 }
 
 .prediction button{
-padding:9px 4px;
-background:#101f32;
-color:#8798ab;
-border:1px solid #253b54;
-border-radius:7px;
+  padding:9px 4px;
+  background:#101f32;
+  color:#8798ab;
+  border:1px solid #253b54;
+  border-radius:7px;
 }
 
 .prediction button.active{
-background:#16352e;
-color:#19d58b;
-border-color:#19d58b;
+  background:#16352e;
+  color:#19d58b;
+  border-color:#19d58b;
 }
 
 .payout{
-display:flex;
-justify-content:space-between;
-background:#101f32;
-border:1px solid #1e344b;
-padding:12px;
-border-radius:8px;
-margin-bottom:14px;
-font-size:11px;
-color:#7b8da2;
+  display:flex;
+  justify-content:space-between;
+  background:#101f32;
+  border:1px solid #1e344b;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:14px;
+  font-size:11px;
+  color:#7b8da2;
 }
 
-.payout strong{color:#fff}
+.payout strong{
+  color:#fff;
+}
 
 .buy-buttons{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:8px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
 }
 
 .buy{
-padding:15px 6px;
-border-radius:8px;
-font-size:12px;
-font-weight:800;
+  padding:15px 6px;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:800;
 }
 
 .buy-over{
-background:#19d58b;
-color:#03150e;
+  background:#19d58b;
+  color:#03150e;
 }
 
 .buy-under{
-background:#ff626c;
-color:#fff;
+  background:#ff626c;
+  color:#fff;
 }
 
-.buy:hover{opacity:.88}
+.buy:hover{
+  opacity:.88;
+}
 
-/* TABLE */
-.history-panel{margin-top:18px}
+.notice{
+  font-size:10px;
+  color:#61758d;
+  line-height:1.5;
+  margin-top:13px;
+}
 
-.table-wrap{overflow-x:auto}
+/* =========================
+   TABLE
+========================= */
+
+.history-panel{
+  margin-top:18px;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
 
 table{
-width:100%;
-border-collapse:collapse;
-min-width:700px;
+  width:100%;
+  border-collapse:collapse;
+  min-width:700px;
 }
 
 th,td{
-padding:13px 15px;
-text-align:left;
-font-size:11px;
-border-bottom:1px solid #172c42;
+  padding:13px 15px;
+  text-align:left;
+  font-size:11px;
+  border-bottom:1px solid #172c42;
 }
 
 th{
-color:#6f8197;
-font-weight:500;
+  color:#6f8197;
+  font-weight:500;
 }
 
 .empty{
-text-align:center;
-padding:30px;
-color:#64778e;
+  text-align:center;
+  padding:30px;
+  color:#64778e;
 }
+
+/* =========================
+   MOBILE
+========================= */
 
 .mobile{
-display:none;
-background:#12243a;
-color:#fff;
-padding:9px 11px;
-border-radius:7px;
+  display:none;
+  background:#12243a;
+  color:#fff;
+  padding:9px 11px;
+  border-radius:7px;
 }
 
-/* MOBILE */
 @media(max-width:1050px){
 
-.stats{grid-template-columns:1fr 1fr}
+  .stats{
+    grid-template-columns:1fr 1fr;
+  }
 
-.grid{grid-template-columns:1fr}
+  .grid{
+    grid-template-columns:1fr;
+  }
 
-.trade-panel{position:static}
-
+  .trade-panel{
+    position:static;
+  }
 }
 
 @media(max-width:720px){
 
-.sidebar{display:none}
+  .sidebar{
+    display:none;
+  }
 
-.main{
-margin-left:0;
-width:100%;
+  .main{
+    margin-left:0;
+    width:100%;
+  }
+
+  .mobile{
+    display:block;
+  }
+
+  .topbar{
+    padding:0 14px;
+  }
+
+  .connection{
+    display:none;
+  }
+
+  .content{
+    padding:13px;
+  }
+
+  .stats{
+    gap:8px;
+  }
+
+  .stat{
+    padding:13px;
+  }
+
+  .stat-value{
+    font-size:17px;
+  }
+
+  .market-bar{
+    flex-direction:column;
+    align-items:stretch;
+  }
+
+  .price{
+    width:100%;
+  }
+
+  .frequency{
+    gap:3px;
+  }
+
+  .freq-box{
+    padding:7px 1px;
+  }
+
+  .big-digit{
+    font-size:54px;
+  }
+
+  .tracker{
+    padding-left:6px;
+    padding-right:6px;
+  }
+
+  .green-bar,
+  .red-bar{
+    width:18px;
+  }
+
+  .digit-number{
+    width:27px;
+    height:27px;
+    font-size:11px;
+  }
 }
+</style>
+</head>
 
-.mobile{display:block}
+<body>
 
-.topbar{padding:0 14px}
+<div class="app">
 
-.connection{display:none}
+<!-- =========================
+     SIDEBAR
+========================= -->
 
-.content{padding:13px}
+<aside class="sidebar">
 
-.stats{gap:8px}
+  <div class="logo">
+    Dollar<span>Ticks</span>
+  </div>
 
-.stat{padding:13px}
+  <div class="section-title">
+    Trading
+  </div>
 
-.stat-value{font-size:17px}
+  <button class="nav-btn active">
+    ▦ Dashboard
+  </button>
 
-.market-bar{
-flex-direction:column;
-align-items:stretch;
-}
+  <button class="nav-btn">
+    ↗ Over / Under
+  </button>
 
-.price{width:100%}
+  <button class="nav-btn">
+    ◉ Live Digits
+  </button>
 
-.frequency{
-gap:3px;
-}
+  <button class="nav-btn">
+    ◷ Trade History
+  </button>
 
-.frequency-board{
-padding-left:5px;
-padding-right:5px;
-}
+  <div class="section-title">
+    Account
+  </div>
 
-.frequency-grid{
-gap:3px;
-}
+  <button class="nav-btn">
+    ◎ Account
+  </button>
 
-.frequency-bar{
-width:19px;
-}
+  <button class="nav-btn">
+    ⚙ Settings
+  </button>
 
-.frequency-column.most .frequency-bar::before,
-.frequency-column.least .frequency-bar::before{
-width:19px;
-}
+  <div class="sidebar-account">
 
-.big-digit{font-size:54px}
+    <small>ACCOUNT</small>
 
-.frequency-legend{
-gap:9px;
-font-size:8px;
-}
+    <strong id="sideAccount">
+      Demo Account
+    </strong>
 
-}
+  </div>
 
-/* SMALL MOBILE */
-@media(max-width:380px){
+</aside>
 
-.frequency-percent{
-font-size:7px;
-}
 
-.frequency-number{
-font-size:11px;
-}
+<!-- =========================
+     MAIN
+========================= -->
 
-.frequency-bar{
-width:16px;
-}
+<main class="main">
 
-.frequency-column.most .frequency-bar::before,
-.frequency-column.least .frequency-bar::before{
-width:16px;
-}
+<header class="topbar">
 
-}
-</style></head><body><div class="app"><!-- SIDEBAR --><aside class="sidebar"><div class="logo">
-Dollar<span>Ticks</span>
-</div><div class="section-title">Trading</div><button class="nav-btn active">▦ Dashboard</button>
-<button class="nav-btn">↗ Over / Under</button>
-<button class="nav-btn">◉ Live Digits</button>
-<button class="nav-btn">◷ Trade History</button>
+  <div style="display:flex;align-items:center;gap:10px">
 
-<div class="section-title">Account</div><button class="nav-btn">◎ Account</button>
-<button class="nav-btn">⚙ Settings</button>
+    <button class="mobile">
+      ☰
+    </button>
 
-<div class="sidebar-account">
-<small>ACCOUNT</small>
-<strong id="sideAccount">Demo Account</strong>
-</div></aside><!-- MAIN --><main class="main"><header class="topbar"><div style="display:flex;align-items:center;gap:10px"><button class="mobile">☰</button>
+    <div class="title">
+      Over / Under
+    </div>
 
-<div class="title">
-Over / Under
-</div></div><div class="top-right"><div class="connection">
-<span class="green-dot"></span>
-Connected
-</div><select class="account-select" id="account"><option value="demo">
-Demo $10,000
-</option><option value="real">
-Real Account
-</option></select></div></header><section class="content"><!-- STATS --><div class="stats"><div class="stat">
-<div class="stat-label">BALANCE</div>
-<div class="stat-value" id="balance">$10,000.00</div>
-</div><div class="stat">
-<div class="stat-label">TODAY'S P/L</div>
-<div class="stat-value profit">$0.00</div>
-</div><div class="stat">
-<div class="stat-label">LAST TRADE</div>
-<div class="stat-value" id="lastTrade">—</div>
-</div><div class="stat">
-<div class="stat-label">STATUS</div>
-<div class="stat-value profit" style="font-size:16px">
-READY
+  </div>
+
+  <div class="top-right">
+
+    <div class="connection">
+
+      <span class="green-dot"></span>
+
+      <span id="connectionText">
+        Connecting...
+      </span>
+
+    </div>
+
+    <select
+      class="account-select"
+      id="account"
+    >
+
+      <option value="demo">
+        Demo $10,000
+      </option>
+
+      <option value="real">
+        Real Account
+      </option>
+
+    </select>
+
+  </div>
+
+</header>
+
+
+<section class="content">
+
+<!-- =========================
+     STATS
+========================= -->
+
+<div class="stats">
+
+  <div class="stat">
+
+    <div class="stat-label">
+      BALANCE
+    </div>
+
+    <div
+      class="stat-value"
+      id="balance"
+    >
+      $10,000.00
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      TODAY'S P/L
+    </div>
+
+    <div
+      class="stat-value profit"
+      id="todayPL"
+    >
+      $0.00
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      LAST TRADE
+    </div>
+
+    <div
+      class="stat-value"
+      id="lastTrade"
+    >
+      —
+    </div>
+
+  </div>
+
+
+  <div class="stat">
+
+    <div class="stat-label">
+      STATUS
+    </div>
+
+    <div
+      class="stat-value profit"
+      style="font-size:16px"
+      id="status"
+    >
+      READY
+    </div>
+
+  </div>
+
 </div>
-</div></div><!-- MARKET --><div class="market-bar"><select class="market-select" id="market"><option value="R_100">
-Volatility 100 (1s) Index
-</option><option value="R_75">
-Volatility 75 (1s) Index
-</option><option value="R_50">
-Volatility 50 (1s) Index
-</option><option value="R_25">
-Volatility 25 (1s) Index
-</option><option value="R_10">
-Volatility 10 (1s) Index
-</option></select><div class="price" id="price">
-Waiting for tick...
-</div></div><!-- GRID --><div class="grid"><div><!-- LIVE MARKET --><div class="panel"><div class="panel-head"><strong>Live Market</strong>
 
-<span id="tickState">
-WAITING
-</span></div><div class="panel-body"><div class="live-status"><span>LAST DIGIT</span>
 
-<b id="liveConnection">
-LIVE
-</b></div><div class="last-digit"><div class="big-digit" id="bigDigit">
-—
-</div></div><div class="digit-label">
-CURRENT LAST DIGIT
-</div><!-- HISTORY --><div class="history-digits" id="historyDigits"></div><!-- FREQUENCY --><div class="freq-title">
-LAST 100 TICKS — DIGIT FREQUENCY
-</div><div class="frequency-board"><!-- POINTER --><div class="moving-pointer" id="movingPointer"><div class="pointer-line"></div><div class="pointer-head"></div><div class="pointer-label">
-MOVING
-</div></div><div class="frequency-grid" id="frequency"></div><div class="frequency-legend"><div class="legend-item">
-<span class="legend-dot legend-green"></span>
-MOST OCCURRING
-</div><div class="legend-item">
-<span class="legend-dot legend-red"></span>
-LEAST OCCURRING
-</div><div class="legend-item">
-<span class="legend-dot legend-white"></span>
-MOVING DIGIT
-</div></div></div><!-- OVER UNDER --><div class="ou-analysis"><div class="ou-box"><small>
-OVER 5 — 6,7,8,9
-</small><strong class="over-text" id="overPercent">
-0%
-</strong></div><div class="ou-box"><small>
-UNDER 5 — 0,1,2,3,4
-</small><strong class="under-text" id="underPercent">
-0%
-</strong></div></div></div>
-</div><!-- HISTORY --><div class="panel history-panel"><div class="panel-head"><strong>
-Recent Manual Trades
-</strong><span>
-MANUAL ONLY
-</span></div><div class="table-wrap"><table><thead><tr>
-<th>TIME</th>
-<th>MARKET</th>
-<th>TYPE</th>
-<th>ENTRY</th>
-<th>EXIT</th>
-<th>STAKE</th>
-<th>RESULT</th>
-</tr></thead><tbody id="tradeHistory"><tr>
-<td colspan="7" class="empty">
-No trades yet
-</td>
-</tr></tbody></table></div></div></div><!-- RIGHT TRADE PANEL --><div class="panel trade-panel"><div class="panel-head"><strong>
-Manual Trade
-</strong><span>
-OVER / UNDER
-</span></div><div class="panel-body"><!-- CONTRACT --><div class="control"><label>CONTRACT</label>
+<!-- =========================
+     MARKET BAR
+========================= -->
 
-<div class="contract-tabs"><button
-type="button"
-class="contract-tab active"
-id="overTab">
-OVER
-</button>
+<div class="market-bar">
 
-<button
-type="button"
-class="contract-tab"
-id="underTab">
-UNDER
-</button>
+  <select
+    class="market-select"
+    id="market"
+  >
 
-</div></div><!-- PREDICTION --><div class="control"><label>PREDICTION</label>
+    <option value="1HZ100V">
+      Volatility 100 (1s) Index
+    </option>
 
-<div class="prediction"><button type="button" data-prediction="4">4</button>
-<button type="button" data-prediction="5">5</button>
-<button type="button" class="active" data-prediction="6">6</button>
-<button type="button" data-prediction="7">7</button>
-<button type="button" data-prediction="8">8</button>
+    <option value="1HZ75V">
+      Volatility 75 (1s) Index
+    </option>
 
-</div></div><!-- STAKE --><div class="control"><label>STAKE</label>
+    <option value="1HZ50V">
+      Volatility 50 (1s) Index
+    </option>
 
-<input
-type="number"
-id="stake"
-value="1"
-min="0.35"
-step="0.01">
+    <option value="1HZ25V">
+      Volatility 25 (1s) Index
+    </option>
 
-</div><!-- DURATION --><div class="control"><label>DURATION</label>
+    <option value="1HZ10V">
+      Volatility 10 (1s) Index
+    </option>
 
-<select id="duration"><option value="1">
-1 Tick
-</option><option value="2">
-2 Ticks
-</option><option value="3">
-3 Ticks
-</option><option value="5">
-5 Ticks
-</option><option value="10">
-10 Ticks
-</option></select></div><!-- PAYOUT --><div class="payout"><span>
-EXPECTED PAYOUT
-</span><strong id="payout">
-—
-</strong></div><!-- BUY --><div class="buy-buttons"><button
-type="button"
-class="buy buy-over"
-id="buyOver">
-BUY OVER
-</button>
+  </select>
 
-<button
-type="button"
-class="buy buy-under"
-id="buyUnder">
-BUY UNDER
-</button>
 
-</div><div style="
-font-size:10px;
-color:#61758d;
-line-height:1.5;
-margin-top:13px;
-">Manual trading only. DollarTicks does not
-automatically open trades.
+  <div
+    class="price"
+    id="price"
+  >
+    Waiting for tick...
+  </div>
 
-</div></div>
-</div></div></section></main></div><script>
+</div>
+
+
+<!-- =========================
+     GRID
+========================= -->
+
+<div class="grid">
+
+
+<!-- =========================
+     LEFT
+========================= -->
+
+<div>
+
+
+<!-- LIVE MARKET -->
+
+<div class="panel">
+
+<div class="panel-head">
+
+  <strong>
+    Live Market
+  </strong>
+
+  <span id="tickState">
+    CONNECTING
+  </span>
+
+</div>
+
+
+<div class="panel-body">
+
+<div class="live-status">
+
+  <span>
+    LAST DIGIT
+  </span>
+
+  <b id="liveConnection">
+    LIVE
+  </b>
+
+</div>
+
+
+<div class="last-digit">
+
+  <div
+    class="big-digit"
+    id="bigDigit"
+  >
+    —
+  </div>
+
+</div>
+
+
+<div class="digit-label">
+  CURRENT LAST DIGIT
+</div>
+
+
+<!-- =========================
+     GREEN / RED TRACKER
+========================= -->
+
+<div class="tracker">
+
+  <div class="tracker-title">
+
+    <span>
+      DIGIT OCCURRENCE MAP
+    </span>
+
+    <b id="trackerInfo">
+      Waiting for data
+    </b>
+
+  </div>
+
+
+  <div
+    class="digit-track"
+    id="digitTrack"
+  >
+
+    <!-- pointer -->
+
+    <div
+      class="moving-pointer"
+      id="movingPointer"
+    >
+
+      <div class="pointer-arrow"></div>
+
+      <div class="pointer-label">
+        MOVING
+      </div>
+
+    </div>
+
+
+    <!-- 0 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar0"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar0"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber0"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <!-- 1 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar1"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar1"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber1"
+      >
+        1
+      </div>
+
+    </div>
+
+
+    <!-- 2 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar2"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar2"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber2"
+      >
+        2
+      </div>
+
+    </div>
+
+
+    <!-- 3 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar3"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar3"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber3"
+      >
+        3
+      </div>
+
+    </div>
+
+
+    <!-- 4 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar4"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar4"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber4"
+      >
+        4
+      </div>
+
+    </div>
+
+
+    <!-- 5 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar5"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar5"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber5"
+      >
+        5
+      </div>
+
+    </div>
+
+
+    <!-- 6 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar6"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar6"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber6"
+      >
+        6
+      </div>
+
+    </div>
+
+
+    <!-- 7 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar7"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar7"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber7"
+      >
+        7
+      </div>
+
+    </div>
+
+
+    <!-- 8 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar8"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar8"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber8"
+      >
+        8
+      </div>
+
+    </div>
+
+
+    <!-- 9 -->
+
+    <div class="digit-column">
+
+      <div class="bar-area">
+
+        <div
+          class="green-bar"
+          id="greenBar9"
+        ></div>
+
+        <div
+          class="red-bar"
+          id="redBar9"
+        ></div>
+
+      </div>
+
+      <div
+        class="digit-number"
+        id="digitNumber9"
+      >
+        9
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="tracker-legend">
+
+    <div class="legend">
+
+      <span class="legend-dot legend-green"></span>
+
+      Most occurring
+
+    </div>
+
+
+    <div class="legend">
+
+      <span class="legend-dot legend-red"></span>
+
+      Least occurring
+
+    </div>
+
+
+    <div class="legend">
+
+      <span class="legend-dot legend-yellow"></span>
+
+      Moving tick
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     HISTORY
+========================= -->
+
+<div
+  class="history-digits"
+  id="historyDigits"
+  style="margin-top:18px"
+></div>
+
+
+<!-- =========================
+     FREQUENCY
+========================= -->
+
+<div class="freq-title">
+  LAST 100 TICKS — DIGIT FREQUENCY
+</div>
+
+
+<div
+  class="frequency"
+  id="frequency"
+></div>
+
+
+<!-- =========================
+     OVER UNDER
+========================= -->
+
+<div class="ou-analysis">
+
+  <div class="ou-box">
+
+    <small>
+      OVER 5 — 6,7,8,9
+    </small>
+
+    <strong
+      class="over-text"
+      id="overPercent"
+    >
+      0%
+    </strong>
+
+  </div>
+
+
+  <div class="ou-box">
+
+    <small>
+      UNDER 5 — 0,1,2,3,4
+    </small>
+
+    <strong
+      class="under-text"
+      id="underPercent"
+    >
+      0%
+    </strong>
+
+  </div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     TRADE HISTORY
+========================= -->
+
+<div class="panel history-panel">
+
+  <div class="panel-head">
+
+    <strong>
+      Recent Manual Trades
+    </strong>
+
+    <span>
+      MANUAL ONLY
+    </span>
+
+  </div>
+
+
+  <div class="table-wrap">
+
+    <table>
+
+      <thead>
+
+        <tr>
+          <th>TIME</th>
+          <th>MARKET</th>
+          <th>TYPE</th>
+          <th>ENTRY</th>
+          <th>EXIT</th>
+          <th>STAKE</th>
+          <th>RESULT</th>
+        </tr>
+
+      </thead>
+
+      <tbody id="tradeHistory">
+
+        <tr>
+
+          <td
+            colspan="7"
+            class="empty"
+          >
+            No trades yet
+          </td>
+
+        </tr>
+
+      </tbody>
+
+    </table>
+
+  </div>
+
+</div>
+
+</div>
+
+
+<!-- =========================
+     RIGHT TRADE PANEL
+========================= -->
+
+<div class="panel trade-panel">
+
+  <div class="panel-head">
+
+    <strong>
+      Manual Trade
+    </strong>
+
+    <span>
+      OVER / UNDER
+    </span>
+
+  </div>
+
+
+  <div class="panel-body">
+
+
+    <!-- CONTRACT -->
+
+    <div class="control">
+
+      <label>
+        CONTRACT
+      </label>
+
+      <div class="contract-tabs">
+
+        <button
+          class="contract-tab active"
+          id="overTab"
+          onclick="setType('OVER')"
+        >
+          OVER
+        </button>
+
+        <button
+          class="contract-tab"
+          id="underTab"
+          onclick="setType('UNDER')"
+        >
+          UNDER
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- PREDICTION -->
+
+    <div class="control">
+
+      <label>
+        PREDICTION
+      </label>
+
+      <div class="prediction">
+
+        <button onclick="setPrediction(4)">
+          4
+        </button>
+
+        <button onclick="setPrediction(5)">
+          5
+        </button>
+
+        <button
+          class="active"
+          onclick="setPrediction(6)"
+        >
+          6
+        </button>
+
+        <button onclick="setPrediction(7)">
+          7
+        </button>
+
+        <button onclick="setPrediction(8)">
+          8
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- STAKE -->
+
+    <div class="control">
+
+      <label>
+        STAKE
+      </label>
+
+      <input
+        type="number"
+        id="stake"
+        value="1"
+        min="0.35"
+        step="0.01"
+      >
+
+    </div>
+
+
+    <!-- DURATION -->
+
+    <div class="control">
+
+      <label>
+        DURATION
+      </label>
+
+      <select id="duration">
+
+        <option value="1">
+          1 Tick
+        </option>
+
+        <option value="2">
+          2 Ticks
+        </option>
+
+        <option value="3">
+          3 Ticks
+        </option>
+
+        <option value="5">
+          5 Ticks
+        </option>
+
+        <option value="10">
+          10 Ticks
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- PAYOUT -->
+
+    <div class="payout">
+
+      <span>
+        EXPECTED PAYOUT
+      </span>
+
+      <strong id="payout">
+        —
+      </strong>
+
+    </div>
+
+
+    <!-- BUY -->
+
+    <div class="buy-buttons">
+
+      <button
+        class="buy buy-over"
+        onclick="buy('OVER')"
+      >
+        BUY OVER
+      </button>
+
+      <button
+        class="buy buy-under"
+        onclick="buy('UNDER')"
+      >
+        BUY UNDER
+      </button>
+
+    </div>
+
+
+    <div class="notice">
+
+      Manual trading only.
+      DollarTicks will not automatically
+      open trades from this page.
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
+
+</section>
+
+</main>
+
+</div>
+
+
+<script>
 
 /* =====================================================
    STATE
@@ -928,299 +1876,457 @@ let selectedType = "OVER";
 
 let selectedPrediction = 6;
 
+let ws = null;
+
+let reconnectTimer = null;
+
+let currentSymbol = "1HZ100V";
+
+let currentPrice = null;
+
 
 /* =====================================================
    ELEMENTS
 ===================================================== */
 
-const bigDigit =
-document.getElementById("bigDigit");
-
-const price =
-document.getElementById("price");
-
-const tickState =
-document.getElementById("tickState");
-
-const historyDigits =
-document.getElementById("historyDigits");
-
-const frequency =
-document.getElementById("frequency");
-
-const movingPointer =
-document.getElementById("movingPointer");
-
-const overPercent =
-document.getElementById("overPercent");
-
-const underPercent =
-document.getElementById("underPercent");
-
-const stakeInput =
-document.getElementById("stake");
-
-const payout =
-document.getElementById("payout");
-
-const account =
-document.getElementById("account");
-
-const sideAccount =
-document.getElementById("sideAccount");
-
-const tradeHistory =
-document.getElementById("tradeHistory");
-
-const lastTrade =
-document.getElementById("lastTrade");
+const $ = id =>
+  document.getElementById(id);
 
 
 /* =====================================================
-   RANDOM TICK SIMULATION
-   =====================================================
-   This keeps the visual dashboard alive while the
-   real Deriv tick stream is connected later.
+   LAST DIGIT
 ===================================================== */
 
-function generateTick(){
+function getLastDigit(quote){
 
-const digit =
-Math.floor(Math.random()*10);
+  const text =
+    String(quote);
 
-tickHistory.push(digit);
+  const cleaned =
+    text.replace(
+      /[^0-9]/g,
+      ""
+    );
 
-if(tickHistory.length > 100){
-tickHistory.shift();
-}
+  if(!cleaned){
+    return null;
+  }
 
-bigDigit.textContent = digit;
-
-price.textContent =
-"733." +
-String(Math.floor(Math.random()*100))
-.padStart(2,"0");
-
-tickState.textContent = "LIVE";
-
-renderHistory();
-
-renderFrequency();
-
-movePointer(digit);
+  return Number(
+    cleaned.slice(-1)
+  );
 
 }
 
 
 /* =====================================================
-   HISTORY DIGITS
+   ADD TICK
+===================================================== */
+
+function addTick(
+  quote,
+  digit
+){
+
+  if(
+    digit === null ||
+    digit < 0 ||
+    digit > 9
+  ){
+    return;
+  }
+
+  currentPrice = quote;
+
+  tickHistory.push(digit);
+
+  if(
+    tickHistory.length > 100
+  ){
+    tickHistory.shift();
+  }
+
+  $("bigDigit").textContent =
+    digit;
+
+  $("price").textContent =
+    Number(quote).toFixed(2);
+
+  $("tickState").textContent =
+    "LIVE";
+
+  $("connectionText").textContent =
+    "Connected";
+
+  renderHistory();
+
+  renderFrequency();
+
+  renderTracker();
+
+}
+
+
+/* =====================================================
+   HISTORY
 ===================================================== */
 
 function renderHistory(){
 
-historyDigits.innerHTML = "";
+  const box =
+    $("historyDigits");
 
-const recent =
-tickHistory.slice(-20);
+  box.innerHTML = "";
 
-recent.forEach(
-(digit,index)=>{
+  const recent =
+    tickHistory.slice(-20);
 
-const el =
-document.createElement("div");
+  recent.forEach(
+    (digit,index)=>{
 
-el.className =
-"history-digit";
+      const el =
+        document.createElement("div");
 
-if(
-index ===
-recent.length-1
-){
+      el.className =
+        "history-digit";
 
-el.classList.add("latest");
+      if(
+        index ===
+        recent.length - 1
+      ){
 
-}
+        el.classList.add(
+          "latest"
+        );
 
-el.textContent = digit;
+      }
 
-historyDigits.appendChild(el);
+      el.textContent =
+        digit;
 
-});
+      box.appendChild(el);
+
+    }
+  );
 
 }
 
 
 /* =====================================================
-   FREQUENCY + GREEN/RED BARS
+   FREQUENCY
 ===================================================== */
+
+function getCounts(){
+
+  const counts =
+    new Array(10).fill(0);
+
+  tickHistory.forEach(
+    digit=>{
+      counts[digit]++;
+    }
+  );
+
+  return counts;
+
+}
+
 
 function renderFrequency(){
 
-const counts =
-new Array(10).fill(0);
+  const counts =
+    getCounts();
 
-tickHistory.forEach(
-digit=>{
-counts[digit]++;
-}
-);
+  const box =
+    $("frequency");
 
-let max =
-Math.max(...counts);
+  box.innerHTML = "";
 
-let min =
-Math.min(...counts);
+  let most =
+    -1;
 
-/*
-   If some digits have not appeared yet,
-   they correctly qualify for least occurring.
-*/
-
-const mostDigits =
-[];
-
-const leastDigits =
-[];
-
-for(let i=0;i<10;i++){
-
-if(counts[i] === max){
-mostDigits.push(i);
-}
-
-if(counts[i] === min){
-leastDigits.push(i);
-}
-
-}
-
-frequency.innerHTML = "";
-
-for(let i=0;i<10;i++){
-
-const percentage =
-tickHistory.length
-?
-(counts[i]/tickHistory.length)*100
-:
-0;
-
-const column =
-document.createElement("div");
-
-column.className =
-"frequency-column";
-
-if(
-mostDigits.includes(i) &&
-max > 0
-){
-
-column.classList.add("most");
-
-}
-
-if(
-leastDigits.includes(i)
-){
-
-column.classList.add("least");
-
-}
-
-const barHeight =
-tickHistory.length
-?
-Math.max(
-8,
-Math.round(
-(percentage / 100) * 70
-)
-)
-:
-8;
-
-column.innerHTML = `
-
-<div class="frequency-bar-area">
-
-<div
-class="frequency-bar"
-style="height:${barHeight}px">
-</div>
-
-</div>
-
-<div class="frequency-number">
-${i}
-</div>
-
-<div class="frequency-percent">
-${percentage.toFixed(1)}%
-</div>
-
-`;
-
-frequency.appendChild(column);
-
-}
+  let least =
+    Infinity;
 
 
-/* OVER / UNDER */
+  for(
+    let i=0;
+    i<10;
+    i++
+  ){
 
-const over =
-tickHistory.filter(
-d => d >= 6
-).length;
+    if(
+      counts[i] > most
+    ){
+      most =
+        counts[i];
+    }
 
-const under =
-tickHistory.filter(
-d => d <= 5
-).length;
+    if(
+      counts[i] < least
+    ){
+      least =
+        counts[i];
+    }
 
-const total =
-tickHistory.length;
+  }
 
-overPercent.textContent =
-total
-?
-((over/total)*100).toFixed(1)+"%"
-:
-"0%";
 
-underPercent.textContent =
-total
-?
-((under/total)*100).toFixed(1)+"%"
-:
-"0%";
+  for(
+    let i=0;
+    i<10;
+    i++
+  ){
+
+    const percentage =
+      tickHistory.length
+        ? (
+            counts[i] /
+            tickHistory.length *
+            100
+          ).toFixed(1)
+        : "0.0";
+
+
+    const el =
+      document.createElement("div");
+
+    el.className =
+      "freq-box";
+
+
+    if(
+      counts[i] === most &&
+      most > 0
+    ){
+      el.classList.add("most");
+    }
+
+
+    if(
+      counts[i] === least
+    ){
+      el.classList.add("least");
+    }
+
+
+    el.innerHTML = `
+      <b>${i}</b>
+      <span>${percentage}%</span>
+    `;
+
+    box.appendChild(el);
+
+  }
+
+
+  const over =
+    tickHistory.filter(
+      d => d >= 6
+    ).length;
+
+
+  const under =
+    tickHistory.filter(
+      d => d <= 5
+    ).length;
+
+
+  const total =
+    tickHistory.length;
+
+
+  $("overPercent").textContent =
+    total
+      ? (
+          over /
+          total *
+          100
+        ).toFixed(1) + "%"
+      : "0%";
+
+
+  $("underPercent").textContent =
+    total
+      ? (
+          under /
+          total *
+          100
+        ).toFixed(1) + "%"
+      : "0%";
 
 }
 
 
 /* =====================================================
-   MOVING POINTER
+   GREEN / RED HALF ROUND BARS
 ===================================================== */
 
-function movePointer(digit){
+function renderTracker(){
 
-/*
-   10 equal columns.
+  const counts =
+    getCounts();
 
-   Put pointer in the center of the
-   selected digit's column.
-*/
 
-const percentage =
-((digit + 0.5) / 10) * 100;
+  if(!tickHistory.length){
 
-movingPointer.style.left =
-percentage + "%";
+    return;
 
-movingPointer.querySelector(
-".pointer-label"
-).textContent =
-"MOVING " + digit;
+  }
+
+
+  let most =
+    Math.max(
+      ...counts
+    );
+
+
+  let least =
+    Math.min(
+      ...counts
+    );
+
+
+  /*
+   * Give the bars enough height
+   * to remain visible.
+   */
+
+  for(
+    let i=0;
+    i<10;
+    i++
+  ){
+
+    const green =
+      $("greenBar"+i);
+
+    const red =
+      $("redBar"+i);
+
+    const number =
+      $("digitNumber"+i);
+
+
+    /*
+     * Green bar:
+     * most occurring digit
+     */
+
+    if(
+      counts[i] === most &&
+      most > 0
+    ){
+
+      green.style.height =
+        Math.max(
+          18,
+          Math.min(
+            100,
+            20 +
+            (
+              counts[i] /
+              Math.max(
+                1,
+                most
+              )
+            ) * 80
+          )
+        ) + "px";
+
+      green.style.opacity =
+        "1";
+
+      number.classList.add(
+        "hot"
+      );
+
+    }else{
+
+      green.style.height =
+        "4px";
+
+      green.style.opacity =
+        ".18";
+
+      number.classList.remove(
+        "hot"
+      );
+
+    }
+
+
+    /*
+     * Red bar:
+     * least occurring digit
+     */
+
+    if(
+      counts[i] === least
+    ){
+
+      red.style.height =
+        "58px";
+
+      red.style.opacity =
+        "1";
+
+      number.classList.add(
+        "cold"
+      );
+
+    }else{
+
+      red.style.height =
+        "4px";
+
+      red.style.opacity =
+        ".10";
+
+      number.classList.remove(
+        "cold"
+      );
+
+    }
+
+  }
+
+
+  /*
+   * Moving pointer.
+   */
+
+  const moving =
+    tickHistory[
+      tickHistory.length - 1
+    ];
+
+
+  const pointer =
+    $("movingPointer");
+
+
+  /*
+   * Centers:
+   * 0 = 5%
+   * 9 = 95%
+   */
+
+  const left =
+    5 +
+    (
+      moving *
+      (90 / 9)
+    );
+
+
+  pointer.style.left =
+    left + "%";
+
+
+  $("trackerInfo").textContent =
+    "Green = most • Red = least • Moving = " +
+    moving;
 
 }
 
@@ -1231,22 +2337,20 @@ movingPointer.querySelector(
 
 function setType(type){
 
-selectedType =
-type;
+  selectedType =
+    type;
 
-document
-.getElementById("overTab")
-.classList.toggle(
-"active",
-type === "OVER"
-);
+  $("overTab")
+    .classList.toggle(
+      "active",
+      type === "OVER"
+    );
 
-document
-.getElementById("underTab")
-.classList.toggle(
-"active",
-type === "UNDER"
-);
+  $("underTab")
+    .classList.toggle(
+      "active",
+      type === "UNDER"
+    );
 
 }
 
@@ -1257,24 +2361,25 @@ type === "UNDER"
 
 function setPrediction(number){
 
-selectedPrediction =
-number;
+  selectedPrediction =
+    number;
 
-document
-.querySelectorAll(
-"[data-prediction]"
-)
-.forEach(
-button=>{
+  document
+    .querySelectorAll(
+      ".prediction button"
+    )
+    .forEach(
+      btn=>{
 
-button.classList.toggle(
-"active",
-Number(
-button.dataset.prediction
-) === number
-);
+        btn.classList.toggle(
+          "active",
+          Number(
+            btn.textContent
+          ) === number
+        );
 
-});
+      }
+    );
 
 }
 
@@ -1283,38 +2388,51 @@ button.dataset.prediction
    PAYOUT
 ===================================================== */
 
+$("stake")
+  .addEventListener(
+    "input",
+    updatePayout
+  );
+
+
 function updatePayout(){
 
-const stake =
-parseFloat(
-stakeInput.value
-);
+  const stake =
+    parseFloat(
+      $("stake").value
+    ) || 0;
 
-if(
-!Number.isFinite(stake) ||
-stake <= 0
-){
 
-payout.textContent =
-"—";
+  if(
+    stake <= 0
+  ){
 
-return;
+    $("payout").textContent =
+      "—";
+
+    return;
+
+  }
+
+
+  /*
+   * Front-end preview only.
+   * Real payout must come from
+   * the Deriv proposal response.
+   */
+
+  const estimated =
+    stake * 1.90;
+
+
+  $("payout").textContent =
+    "$" +
+    estimated.toFixed(2);
 
 }
 
-const estimated =
-stake * 1.90;
 
-payout.textContent =
-"$" +
-estimated.toFixed(2);
-
-}
-
-stakeInput.addEventListener(
-"input",
-updatePayout
-);
+updatePayout();
 
 
 /* =====================================================
@@ -1323,224 +2441,88 @@ updatePayout
 
 function buy(type){
 
-const stake =
-parseFloat(
-stakeInput.value
-);
-
-if(
-!Number.isFinite(stake) ||
-stake <= 0
-){
-
-alert(
-"Please enter a valid stake."
-);
-
-return;
-
-}
-
-const market =
-document.getElementById(
-"market"
-).selectedOptions[0].text;
-
-const entry =
-tickHistory.length
-?
-tickHistory[
-tickHistory.length-1
-]
-:
-"—";
-
-if(
-tradeHistory.children.length === 1 &&
-tradeHistory.children[0]
-.querySelector(".empty")
-){
-
-tradeHistory.innerHTML = "";
-
-}
-
-const row =
-document.createElement("tr");
-
-row.innerHTML = `
-
-<td>
-${new Date().toLocaleTimeString()}
-</td>
-
-<td>
-${market.replace(
-" Index",
-""
-)}
-</td>
-
-<td>
-${type} ${selectedPrediction}
-</td>
-
-<td>
-${entry}
-</td>
-
-<td>
-—
-</td>
-
-<td>
-$${stake.toFixed(2)}
-</td>
-
-<td style="color:#f4c95d">
-PENDING
-</td>
-
-`;
-
-tradeHistory.prepend(row);
-
-lastTrade.textContent =
-type +
-" " +
-selectedPrediction;
-
-}
+  const stake =
+    parseFloat(
+      $("stake").value
+    );
 
 
-/* =====================================================
-   ACCOUNT
-===================================================== */
+  if(
+    !stake ||
+    stake <= 0
+  ){
 
-account.addEventListener(
-"change",
-function(){
+    alert(
+      "Please enter a valid stake."
+    );
 
-if(
-this.value === "real"
-){
+    return;
 
-sideAccount.textContent =
-"Real Account";
-
-}else{
-
-sideAccount.textContent =
-"Demo Account";
-
-}
-
-});
+  }
 
 
-/* =====================================================
-   BUTTON EVENTS
-===================================================== */
-
-document
-.getElementById("overTab")
-.addEventListener(
-"click",
-()=>{
-setType("OVER");
-});
-
-document
-.getElementById("underTab")
-.addEventListener(
-"click",
-()=>{
-setType("UNDER");
-});
-
-document
-.querySelectorAll(
-"[data-prediction]"
-)
-.forEach(
-button=>{
-
-button.addEventListener(
-"click",
-()=>{
-
-setPrediction(
-Number(
-button.dataset.prediction
-)
-);
-
-});
-
-});
-
-document
-.getElementById("buyOver")
-.addEventListener(
-"click",
-()=>{
-buy("OVER");
-});
-
-document
-.getElementById("buyUnder")
-.addEventListener(
-"click",
-()=>{
-buy("UNDER");
-});
+  const marketName =
+    $("market")
+      .selectedOptions[0]
+      .textContent
+      .trim();
 
 
-/* =====================================================
-   INITIAL DATA
-===================================================== */
-
-for(
-let i=0;
-i<30;
-i++
-){
-
-tickHistory.push(
-Math.floor(
-Math.random()*10
-)
-);
-
-}
-
-renderHistory();
-
-renderFrequency();
-
-if(
-tickHistory.length
-){
-
-movePointer(
-tickHistory[
-tickHistory.length-1
-]
-);
-
-}
-
-updatePayout();
+  const duration =
+    $("duration").value;
 
 
-/* =====================================================
-   LIVE SIMULATION
-===================================================== */
+  const entry =
+    tickHistory.length
+      ? tickHistory[
+          tickHistory.length - 1
+        ]
+      : "—";
 
-setInterval(
-generateTick,
-1000
-);
 
-</script></body>
-   </html>
+  const table =
+    $("tradeHistory");
+
+
+  if(
+    table.children.length === 1 &&
+    table.children[0]
+      .querySelector(".empty")
+  ){
+
+    table.innerHTML = "";
+
+  }
+
+
+  const row =
+    document.createElement("tr");
+
+
+  row.innerHTML = `
+
+    <td>
+      ${new Date().toLocaleTimeString()}
+    </td>
+
+    <td>
+      ${marketName.replace(" Index","")}
+    </td>
+
+    <td>
+      ${type} ${selectedPrediction}
+    </td>
+
+    <td>
+      ${entry}
+    </td>
+
+    <td>
+      —
+    </td>
+
+    <td>
+      $${stake.toFixed(2)}
+    </td>
+
+    <td style="color:#f4c95d">
