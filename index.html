@@ -1,11 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>DollarTicks — Over / Under</title>
-
-<style>
+<title>DollarTicks — Over / Under</title><style>
 *{
   box-sizing:border-box;
   margin:0;
@@ -33,9 +30,7 @@ button{
   min-height:100vh;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* ================= SIDEBAR ================= */
 
 .sidebar{
   width:240px;
@@ -46,7 +41,6 @@ button{
   background:#091625;
   border-right:1px solid #17283c;
   padding:20px 14px;
-  z-index:20;
 }
 
 .logo{
@@ -101,9 +95,7 @@ button{
   margin-bottom:5px;
 }
 
-/* =========================
-   MAIN
-========================= */
+/* ================= MAIN ================= */
 
 .main{
   margin-left:240px;
@@ -118,9 +110,6 @@ button{
   align-items:center;
   justify-content:space-between;
   padding:0 24px;
-  position:sticky;
-  top:0;
-  z-index:10;
 }
 
 .title{
@@ -158,17 +147,11 @@ button{
   outline:none;
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* ================= CONTENT ================= */
 
 .content{
   padding:22px;
 }
-
-/* =========================
-   STATS
-========================= */
 
 .stats{
   display:grid;
@@ -199,9 +182,7 @@ button{
   color:#19d58b;
 }
 
-/* =========================
-   MARKET
-========================= */
+/* ================= MARKET ================= */
 
 .market-bar{
   background:#0b192b;
@@ -234,15 +215,15 @@ button{
   font-weight:700;
 }
 
-/* =========================
-   GRID
-========================= */
+/* ================= GRID ================= */
 
 .grid{
   display:grid;
   grid-template-columns:minmax(0,1fr) 350px;
   gap:18px;
 }
+
+/* ================= PANELS ================= */
 
 .panel{
   background:#0b192b;
@@ -272,9 +253,7 @@ button{
   padding:17px;
 }
 
-/* =========================
-   LIVE DIGIT
-========================= */
+/* ================= LIVE DIGIT ================= */
 
 .live-status{
   display:flex;
@@ -289,7 +268,7 @@ button{
 }
 
 .last-digit{
-  height:115px;
+  height:120px;
   border-radius:12px;
   background:#081321;
   border:1px solid #1a3148;
@@ -314,194 +293,124 @@ button{
   margin-bottom:15px;
 }
 
-/* =========================
-   DIGIT TRACKER
-========================= */
-
-.tracker{
-  margin-top:12px;
-  background:#081321;
-  border:1px solid #1a3148;
-  border-radius:12px;
-  padding:18px 12px 14px;
-  overflow:hidden;
-}
-
-.tracker-title{
-  display:flex;
-  justify-content:space-between;
-  margin-bottom:18px;
-  font-size:10px;
-  color:#6d8198;
-}
-
-.tracker-title b{
-  color:#fff;
-  font-size:11px;
-}
-
-/* bars + numbers */
+/* ================= DIGIT TRACK ================= */
 
 .digit-track{
   position:relative;
-  height:155px;
   display:grid;
   grid-template-columns:repeat(10,1fr);
-  gap:4px;
-  align-items:end;
+  gap:5px;
+  height:86px;
+  padding-top:20px;
+  margin-bottom:18px;
 }
 
 .digit-column{
-  height:130px;
   position:relative;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:flex-end;
-}
-
-.bar-area{
-  width:100%;
-  height:105px;
+  height:62px;
   display:flex;
   align-items:flex-end;
   justify-content:center;
-  position:relative;
-}
-
-/* HALF ROUND GREEN */
-
-.green-bar{
-  position:absolute;
-  bottom:0;
-  width:25px;
-  min-height:4px;
-  border-radius:16px 16px 0 0;
-  background:#19d58b;
-  box-shadow:0 0 9px rgba(25,213,139,.18);
-  transition:
-    height .35s ease,
-    opacity .25s ease;
-}
-
-/* HALF ROUND RED */
-
-.red-bar{
-  position:absolute;
-  bottom:0;
-  width:25px;
-  min-height:4px;
-  border-radius:16px 16px 0 0;
-  background:#ff626c;
-  box-shadow:0 0 9px rgba(255,98,108,.18);
-  transition:
-    height .35s ease,
-    opacity .25s ease;
-}
-
-/* when both bars are on same number */
-
-.green-bar,
-.red-bar{
-  transform-origin:bottom center;
 }
 
 .digit-number{
-  width:30px;
-  height:30px;
-  margin-top:6px;
+  position:absolute;
+  bottom:0;
+  width:32px;
+  height:32px;
   border-radius:50%;
   background:#12243a;
-  border:1px solid #243a53;
+  border:1px solid #27405a;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:800;
   font-size:12px;
-  position:relative;
+  font-weight:800;
   z-index:3;
 }
 
-.digit-number.hot{
+.digit-column.most .digit-number{
   border-color:#19d58b;
   color:#19d58b;
 }
 
-.digit-number.cold{
+.digit-column.least .digit-number{
   border-color:#ff626c;
   color:#ff626c;
 }
 
-/* moving pointer */
+/* GREEN HALF BAR */
+
+.half-bar{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:29px;
+  width:29px;
+  height:20px;
+  border-radius:20px 20px 0 0;
+  z-index:2;
+  display:none;
+}
+
+.digit-column.most .green-half{
+  display:block;
+  background:#19d58b;
+  box-shadow:0 0 10px rgba(25,213,139,.25);
+}
+
+/* RED HALF BAR */
+
+.digit-column.least .red-half{
+  display:block;
+  background:#ff626c;
+  box-shadow:0 0 10px rgba(255,98,108,.2);
+}
+
+/* ================= MOVING POINTER ================= */
 
 .moving-pointer{
   position:absolute;
   top:0;
   left:5%;
-  width:30px;
-  height:26px;
-  transform:translateX(-50%);
-  z-index:8;
-  transition:left .28s ease;
+  width:0;
+  height:22px;
+  z-index:10;
+  transition:left .22s linear;
   pointer-events:none;
 }
 
+.pointer-line{
+  position:absolute;
+  left:-1px;
+  top:0;
+  width:2px;
+  height:20px;
+  background:#fff;
+  box-shadow:0 0 8px rgba(255,255,255,.7);
+}
+
 .pointer-arrow{
+  position:absolute;
+  top:17px;
+  left:-5px;
   width:0;
   height:0;
-  margin:auto;
-  border-left:7px solid transparent;
-  border-right:7px solid transparent;
-  border-top:11px solid #f4c95d;
-  filter:drop-shadow(0 0 5px rgba(244,201,93,.45));
+  border-left:5px solid transparent;
+  border-right:5px solid transparent;
+  border-top:7px solid #fff;
 }
 
-.pointer-label{
-  text-align:center;
-  color:#f4c95d;
-  font-size:8px;
-  font-weight:800;
-  margin-top:2px;
-}
-
-/* legends */
-
-.tracker-legend{
-  display:flex;
-  justify-content:center;
-  gap:18px;
-  margin-top:12px;
+.pointer-digit{
+  position:absolute;
+  top:-17px;
+  left:-10px;
   font-size:9px;
-  color:#71839a;
+  color:#fff;
+  font-weight:700;
 }
 
-.legend{
-  display:flex;
-  align-items:center;
-  gap:5px;
-}
-
-.legend-dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-}
-
-.legend-green{
-  background:#19d58b;
-}
-
-.legend-red{
-  background:#ff626c;
-}
-
-.legend-yellow{
-  background:#f4c95d;
-}
-
-/* =========================
-   HISTORY DIGITS
-========================= */
+/* ================= HISTORY ================= */
 
 .history-digits{
   display:flex;
@@ -528,9 +437,7 @@ button{
   color:#04150e;
 }
 
-/* =========================
-   FREQUENCY
-========================= */
+/* ================= FREQUENCY ================= */
 
 .freq-title{
   font-size:11px;
@@ -580,9 +487,7 @@ button{
   color:#ff626c;
 }
 
-/* =========================
-   OVER UNDER
-========================= */
+/* ================= OVER UNDER ================= */
 
 .ou-analysis{
   display:grid;
@@ -617,14 +522,11 @@ button{
   color:#ff626c;
 }
 
-/* =========================
-   TRADE PANEL
-========================= */
+/* ================= TRADE PANEL ================= */
 
 .trade-panel{
   position:sticky;
-  top:85px;
-  align-self:start;
+  top:15px;
 }
 
 .control{
@@ -734,16 +636,7 @@ button{
   opacity:.88;
 }
 
-.notice{
-  font-size:10px;
-  color:#61758d;
-  line-height:1.5;
-  margin-top:13px;
-}
-
-/* =========================
-   TABLE
-========================= */
+/* ================= TABLE ================= */
 
 .history-panel{
   margin-top:18px;
@@ -777,9 +670,7 @@ th{
   color:#64778e;
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* ================= MOBILE ================= */
 
 .mobile{
   display:none;
@@ -864,1007 +755,267 @@ th{
     font-size:54px;
   }
 
-  .tracker{
-    padding-left:6px;
-    padding-right:6px;
-  }
-
-  .green-bar,
-  .red-bar{
-    width:18px;
+  .digit-track{
+    gap:2px;
   }
 
   .digit-number{
-    width:27px;
-    height:27px;
+    width:28px;
+    height:28px;
     font-size:11px;
   }
+
+  .half-bar{
+    width:25px;
+  }
 }
-</style>
-</head>
-
-<body>
-
-<div class="app">
-
-<!-- =========================
-     SIDEBAR
-========================= -->
-
-<aside class="sidebar">
-
-  <div class="logo">
+</style></head><body><div class="app"><!-- ================= SIDEBAR ================= --><aside class="sidebar">  <div class="logo">
     Dollar<span>Ticks</span>
-  </div>
+  </div>  <div class="section-title">Trading</div><button class="nav-btn active">▦ Dashboard</button>
+<button class="nav-btn">↗ Over / Under</button>
+<button class="nav-btn">◉ Live Digits</button>
+<button class="nav-btn">◷ Trade History</button>
 
-  <div class="section-title">
-    Trading
-  </div>
-
-  <button class="nav-btn active">
-    ▦ Dashboard
-  </button>
-
-  <button class="nav-btn">
-    ↗ Over / Under
-  </button>
-
-  <button class="nav-btn">
-    ◉ Live Digits
-  </button>
-
-  <button class="nav-btn">
-    ◷ Trade History
-  </button>
-
-  <div class="section-title">
-    Account
-  </div>
-
-  <button class="nav-btn">
-    ◎ Account
-  </button>
-
-  <button class="nav-btn">
-    ⚙ Settings
-  </button>
+  <div class="section-title">Account</div><button class="nav-btn">◎ Account</button>
+<button class="nav-btn">⚙ Settings</button>
 
   <div class="sidebar-account">
-
     <small>ACCOUNT</small>
+    <strong id="sideAccount">Demo Account</strong>
+  </div></aside><!-- ================= MAIN ================= --><main class="main"><header class="topbar">  <div style="display:flex;align-items:center;gap:10px"><button class="mobile">☰</button>
 
-    <strong id="sideAccount">
-      Demo Account
-    </strong>
+<div class="title">
+  Over / Under
+</div>
 
-  </div>
+  </div>  <div class="top-right"><div class="connection">
+  <span class="green-dot"></span>
+  Connected
+</div>
 
-</aside>
+<select class="account-select" id="account">
 
+  <option value="demo">
+    Demo $10,000
+  </option>
 
-<!-- =========================
-     MAIN
-========================= -->
+  <option value="real">
+    Real Account
+  </option>
 
-<main class="main">
+</select>
 
-<header class="topbar">
-
-  <div style="display:flex;align-items:center;gap:10px">
-
-    <button class="mobile">
-      ☰
-    </button>
-
-    <div class="title">
-      Over / Under
-    </div>
-
-  </div>
-
-  <div class="top-right">
-
-    <div class="connection">
-
-      <span class="green-dot"></span>
-
-      <span id="connectionText">
-        Connecting...
-      </span>
-
-    </div>
-
-    <select
-      class="account-select"
-      id="account"
-    >
-
-      <option value="demo">
-        Demo $10,000
-      </option>
-
-      <option value="real">
-        Real Account
-      </option>
-
-    </select>
-
-  </div>
-
-</header>
-
-
-<section class="content">
-
-<!-- =========================
-     STATS
-========================= -->
-
-<div class="stats">
-
-  <div class="stat">
-
-    <div class="stat-label">
-      BALANCE
-    </div>
-
-    <div
-      class="stat-value"
-      id="balance"
-    >
+  </div></header><section class="content"><!-- ================= STATS ================= --><div class="stats">  <div class="stat">
+    <div class="stat-label">BALANCE</div>
+    <div class="stat-value" id="balance">
       $10,000.00
     </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="stat-label">
-      TODAY'S P/L
-    </div>
-
-    <div
-      class="stat-value profit"
-      id="todayPL"
-    >
+  </div>  <div class="stat">
+    <div class="stat-label">TODAY'S P/L</div>
+    <div class="stat-value profit">
       $0.00
     </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="stat-label">
-      LAST TRADE
-    </div>
-
-    <div
-      class="stat-value"
-      id="lastTrade"
-    >
+  </div>  <div class="stat">
+    <div class="stat-label">LAST TRADE</div>
+    <div class="stat-value" id="lastTrade">
       —
     </div>
-
-  </div>
-
-
-  <div class="stat">
-
-    <div class="stat-label">
-      STATUS
-    </div>
-
-    <div
-      class="stat-value profit"
-      style="font-size:16px"
-      id="status"
-    >
+  </div>  <div class="stat">
+    <div class="stat-label">STATUS</div>
+    <div class="stat-value profit" style="font-size:16px">
       READY
     </div>
+  </div></div><!-- ================= MARKET ================= --><div class="market-bar">  <select class="market-select" id="market"><option value="1HZ100V">
+  Volatility 100 (1s) Index
+</option>
 
-  </div>
+<option value="1HZ75V">
+  Volatility 75 (1s) Index
+</option>
 
-</div>
+<option value="1HZ50V">
+  Volatility 50 (1s) Index
+</option>
 
+<option value="1HZ25V">
+  Volatility 25 (1s) Index
+</option>
 
-<!-- =========================
-     MARKET BAR
-========================= -->
+<option value="1HZ10V">
+  Volatility 10 (1s) Index
+</option>
 
-<div class="market-bar">
-
-  <select
-    class="market-select"
-    id="market"
-  >
-
-    <option value="1HZ100V">
-      Volatility 100 (1s) Index
-    </option>
-
-    <option value="1HZ75V">
-      Volatility 75 (1s) Index
-    </option>
-
-    <option value="1HZ50V">
-      Volatility 50 (1s) Index
-    </option>
-
-    <option value="1HZ25V">
-      Volatility 25 (1s) Index
-    </option>
-
-    <option value="1HZ10V">
-      Volatility 10 (1s) Index
-    </option>
-
-  </select>
-
-
-  <div
-    class="price"
-    id="price"
-  >
+  </select>  <div class="price" id="price">
     Waiting for tick...
-  </div>
-
-</div>
-
-
-<!-- =========================
-     GRID
-========================= -->
-
-<div class="grid">
-
-
-<!-- =========================
-     LEFT
-========================= -->
-
-<div>
-
-
-<!-- LIVE MARKET -->
-
-<div class="panel">
-
-<div class="panel-head">
-
-  <strong>
-    Live Market
-  </strong>
+  </div></div><!-- ================= GRID ================= --><div class="grid"><div><!-- ================= LIVE MARKET ================= --><div class="panel"><div class="panel-head"><strong>Live Market</strong>
 
   <span id="tickState">
-    CONNECTING
-  </span>
-
-</div>
-
-
-<div class="panel-body">
-
-<div class="live-status">
-
-  <span>
+    WAITING
+  </span></div><div class="panel-body"><div class="live-status">  <span>
     LAST DIGIT
-  </span>
-
-  <b id="liveConnection">
+  </span>  <b id="liveConnection">
     LIVE
-  </b>
-
-</div>
-
-
-<div class="last-digit">
-
-  <div
-    class="big-digit"
-    id="bigDigit"
-  >
+  </b></div><div class="last-digit">  <div class="big-digit" id="bigDigit">
     —
-  </div>
-
-</div>
-
-
-<div class="digit-label">
+  </div></div><div class="digit-label">
   CURRENT LAST DIGIT
+</div><!-- ================= DIGIT TRACK ================= --><div class="digit-track" id="digitTrack">  <div class="moving-pointer" id="movingPointer"><div class="pointer-digit" id="pointerDigit">
+  —
 </div>
 
-
-<!-- =========================
-     GREEN / RED TRACKER
-========================= -->
-
-<div class="tracker">
-
-  <div class="tracker-title">
-
-    <span>
-      DIGIT OCCURRENCE MAP
-    </span>
-
-    <b id="trackerInfo">
-      Waiting for data
-    </b>
-
-  </div>
-
-
-  <div
-    class="digit-track"
-    id="digitTrack"
-  >
-
-    <!-- pointer -->
-
-    <div
-      class="moving-pointer"
-      id="movingPointer"
-    >
-
-      <div class="pointer-arrow"></div>
-
-      <div class="pointer-label">
-        MOVING
-      </div>
-
-    </div>
-
-
-    <!-- 0 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar0"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar0"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber0"
-      >
-        0
-      </div>
-
-    </div>
-
-
-    <!-- 1 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar1"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar1"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber1"
-      >
-        1
-      </div>
-
-    </div>
-
-
-    <!-- 2 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar2"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar2"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber2"
-      >
-        2
-      </div>
-
-    </div>
-
-
-    <!-- 3 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar3"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar3"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber3"
-      >
-        3
-      </div>
-
-    </div>
-
-
-    <!-- 4 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar4"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar4"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber4"
-      >
-        4
-      </div>
-
-    </div>
-
-
-    <!-- 5 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar5"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar5"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber5"
-      >
-        5
-      </div>
-
-    </div>
-
-
-    <!-- 6 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar6"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar6"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber6"
-      >
-        6
-      </div>
-
-    </div>
-
-
-    <!-- 7 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar7"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar7"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber7"
-      >
-        7
-      </div>
-
-    </div>
-
-
-    <!-- 8 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar8"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar8"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber8"
-      >
-        8
-      </div>
-
-    </div>
-
-
-    <!-- 9 -->
-
-    <div class="digit-column">
-
-      <div class="bar-area">
-
-        <div
-          class="green-bar"
-          id="greenBar9"
-        ></div>
-
-        <div
-          class="red-bar"
-          id="redBar9"
-        ></div>
-
-      </div>
-
-      <div
-        class="digit-number"
-        id="digitNumber9"
-      >
-        9
-      </div>
-
-    </div>
-
-  </div>
-
-
-  <div class="tracker-legend">
-
-    <div class="legend">
-
-      <span class="legend-dot legend-green"></span>
-
-      Most occurring
-
-    </div>
-
-
-    <div class="legend">
-
-      <span class="legend-dot legend-red"></span>
-
-      Least occurring
-
-    </div>
-
-
-    <div class="legend">
-
-      <span class="legend-dot legend-yellow"></span>
-
-      Moving tick
-
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- =========================
-     HISTORY
-========================= -->
-
-<div
-  class="history-digits"
-  id="historyDigits"
-  style="margin-top:18px"
-></div>
-
-
-<!-- =========================
-     FREQUENCY
-========================= -->
-
-<div class="freq-title">
+<div class="pointer-line"></div>
+
+<div class="pointer-arrow"></div>
+
+  </div>  <div class="digit-column" data-digit="0">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">0</div>
+  </div>  <div class="digit-column" data-digit="1">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">1</div>
+  </div>  <div class="digit-column" data-digit="2">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">2</div>
+  </div>  <div class="digit-column" data-digit="3">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">3</div>
+  </div>  <div class="digit-column" data-digit="4">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">4</div>
+  </div>  <div class="digit-column" data-digit="5">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">5</div>
+  </div>  <div class="digit-column" data-digit="6">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">6</div>
+  </div>  <div class="digit-column" data-digit="7">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">7</div>
+  </div>  <div class="digit-column" data-digit="8">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">8</div>
+  </div>  <div class="digit-column" data-digit="9">
+    <div class="half-bar green-half"></div>
+    <div class="half-bar red-half"></div>
+    <div class="digit-number">9</div>
+  </div></div><!-- ================= HISTORY ================= --><div class="history-digits" id="historyDigits"></div><!-- ================= FREQUENCY ================= --><div class="freq-title">
   LAST 100 TICKS — DIGIT FREQUENCY
-</div>
-
-
-<div
-  class="frequency"
-  id="frequency"
-></div>
-
-
-<!-- =========================
-     OVER UNDER
-========================= -->
-
-<div class="ou-analysis">
-
-  <div class="ou-box">
-
-    <small>
-      OVER 5 — 6,7,8,9
-    </small>
-
-    <strong
-      class="over-text"
-      id="overPercent"
-    >
-      0%
-    </strong>
-
-  </div>
-
-
-  <div class="ou-box">
-
-    <small>
-      UNDER 5 — 0,1,2,3,4
-    </small>
-
-    <strong
-      class="under-text"
-      id="underPercent"
-    >
-      0%
-    </strong>
-
-  </div>
-
-</div>
-
-</div>
-
-</div>
-
-
-<!-- =========================
-     TRADE HISTORY
-========================= -->
-
-<div class="panel history-panel">
-
-  <div class="panel-head">
-
-    <strong>
-      Recent Manual Trades
-    </strong>
-
-    <span>
-      MANUAL ONLY
-    </span>
-
-  </div>
-
-
-  <div class="table-wrap">
-
-    <table>
-
-      <thead>
-
-        <tr>
-          <th>TIME</th>
-          <th>MARKET</th>
-          <th>TYPE</th>
-          <th>ENTRY</th>
-          <th>EXIT</th>
-          <th>STAKE</th>
-          <th>RESULT</th>
-        </tr>
-
-      </thead>
-
-      <tbody id="tradeHistory">
-
-        <tr>
-
-          <td
-            colspan="7"
-            class="empty"
-          >
-            No trades yet
-          </td>
-
-        </tr>
-
-      </tbody>
-
-    </table>
-
-  </div>
-
-</div>
-
-</div>
-
-
-<!-- =========================
-     RIGHT TRADE PANEL
-========================= -->
-
-<div class="panel trade-panel">
-
-  <div class="panel-head">
-
-    <strong>
-      Manual Trade
-    </strong>
-
-    <span>
-      OVER / UNDER
-    </span>
-
-  </div>
-
-
-  <div class="panel-body">
-
-
-    <!-- CONTRACT -->
-
-    <div class="control">
-
-      <label>
-        CONTRACT
-      </label>
-
-      <div class="contract-tabs">
-
-        <button
-          class="contract-tab active"
-          id="overTab"
-          onclick="setType('OVER')"
-        >
-          OVER
-        </button>
-
-        <button
-          class="contract-tab"
-          id="underTab"
-          onclick="setType('UNDER')"
-        >
-          UNDER
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- PREDICTION -->
-
-    <div class="control">
-
-      <label>
-        PREDICTION
-      </label>
-
-      <div class="prediction">
-
-        <button onclick="setPrediction(4)">
-          4
-        </button>
-
-        <button onclick="setPrediction(5)">
-          5
-        </button>
-
-        <button
-          class="active"
-          onclick="setPrediction(6)"
-        >
-          6
-        </button>
-
-        <button onclick="setPrediction(7)">
-          7
-        </button>
-
-        <button onclick="setPrediction(8)">
-          8
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <!-- STAKE -->
-
-    <div class="control">
-
-      <label>
-        STAKE
-      </label>
-
-      <input
-        type="number"
-        id="stake"
-        value="1"
-        min="0.35"
-        step="0.01"
-      >
-
-    </div>
-
-
-    <!-- DURATION -->
-
-    <div class="control">
-
-      <label>
-        DURATION
-      </label>
-
-      <select id="duration">
-
-        <option value="1">
-          1 Tick
-        </option>
-
-        <option value="2">
-          2 Ticks
-        </option>
-
-        <option value="3">
-          3 Ticks
-        </option>
-
-        <option value="5">
-          5 Ticks
-        </option>
-
-        <option value="10">
-          10 Ticks
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <!-- PAYOUT -->
-
-    <div class="payout">
-
-      <span>
-        EXPECTED PAYOUT
-      </span>
-
-      <strong id="payout">
-        —
-      </strong>
-
-    </div>
-
-
-    <!-- BUY -->
-
-    <div class="buy-buttons">
-
-      <button
-        class="buy buy-over"
-        onclick="buy('OVER')"
-      >
-        BUY OVER
-      </button>
-
-      <button
-        class="buy buy-under"
-        onclick="buy('UNDER')"
-      >
-        BUY UNDER
-      </button>
-
-    </div>
-
-
-    <div class="notice">
-
-      Manual trading only.
-      DollarTicks will not automatically
-      open trades from this page.
-
-    </div>
-
-  </div>
-
-</div>
-
-</div>
-
-</section>
-
-</main>
-
-</div>
-
-
-<script>
+</div><div class="frequency" id="frequency"></div><!-- ================= OVER UNDER ================= --><div class="ou-analysis">  <div class="ou-box"><small>
+  OVER 5 — 6,7,8,9
+</small>
+
+<strong class="over-text" id="overPercent">
+  0%
+</strong>
+
+  </div>  <div class="ou-box"><small>
+  UNDER 5 — 0,1,2,3,4
+</small>
+
+<strong class="under-text" id="underPercent">
+  0%
+</strong>
+
+  </div></div></div>
+</div><!-- ================= TRADE HISTORY ================= --><div class="panel history-panel"><div class="panel-head">  <strong>
+    Recent Manual Trades
+  </strong>  <span>
+    MANUAL ONLY
+  </span></div><div class="table-wrap"><table><thead><tr>
+  <th>TIME</th>
+  <th>MARKET</th>
+  <th>TYPE</th>
+  <th>ENTRY</th>
+  <th>EXIT</th>
+  <th>STAKE</th>
+  <th>RESULT</th>
+</tr></thead><tbody id="tradeHistory"><tr><td colspan="7" class="empty">
+  No trades yet
+</td></tr></tbody></table></div></div></div><!-- ================= TRADE PANEL ================= --><div class="panel trade-panel"><div class="panel-head">  <strong>
+    Manual Trade
+  </strong>  <span>
+    OVER / UNDER
+  </span></div><div class="panel-body"><!-- CONTRACT --><div class="control"><label>
+  CONTRACT
+</label><div class="contract-tabs"><button
+class="contract-tab active"
+id="overTab"
+onclick="setType('OVER')">
+OVER
+</button>
+
+<button
+class="contract-tab"
+id="underTab"
+onclick="setType('UNDER')">
+UNDER
+</button>
+
+</div></div><!-- PREDICTION --><div class="control"><label>
+  PREDICTION
+</label><div class="prediction"><button onclick="setPrediction(4)">4</button>
+<button onclick="setPrediction(5)">5</button>
+<button class="active" onclick="setPrediction(6)">6</button>
+<button onclick="setPrediction(7)">7</button>
+<button onclick="setPrediction(8)">8</button>
+
+</div></div><!-- STAKE --><div class="control"><label>
+  STAKE
+</label><input
+type="number"
+id="stake"
+value="1"
+min="0.35"
+step="0.01">
+
+</div><!-- DURATION --><div class="control"><label>
+  DURATION
+</label><select id="duration"><option value="1">
+  1 Tick
+</option><option value="2">
+  2 Ticks
+</option><option value="3">
+  3 Ticks
+</option><option value="5">
+  5 Ticks
+</option><option value="10">
+  10 Ticks
+</option></select></div><!-- PAYOUT --><div class="payout"><span>
+  EXPECTED PAYOUT
+</span><strong id="payout">
+  —
+</strong></div><!-- BUY --><div class="buy-buttons"><button
+class="buy buy-over"
+onclick="buy('OVER')">
+BUY OVER
+</button>
+
+<button
+class="buy buy-under"
+onclick="buy('UNDER')">
+BUY UNDER
+</button>
+
+</div><div style="
+font-size:10px;
+color:#61758d;
+line-height:1.5;
+margin-top:13px;
+">Manual trading only.
+DollarTicks does not automatically open trades.
+
+</div></div>
+</div></div></section></main>
+</div><script>
 
 /* =====================================================
    STATE
@@ -1876,105 +1027,120 @@ let selectedType = "OVER";
 
 let selectedPrediction = 6;
 
-let ws = null;
-
-let reconnectTimer = null;
-
-let currentSymbol = "1HZ100V";
-
-let currentPrice = null;
-
 
 /* =====================================================
-   ELEMENTS
+   RANDOM DEMO TICKS
+   This keeps the interface moving until the
+   Deriv tick WebSocket is connected.
 ===================================================== */
 
-const $ = id =>
-  document.getElementById(id);
+function generateTick(){
 
+  const digit =
+    Math.floor(Math.random() * 10);
 
-/* =====================================================
-   LAST DIGIT
-===================================================== */
+  const price =
+    (
+      700 +
+      Math.random() * 100
+    ).toFixed(2);
 
-function getLastDigit(quote){
+  tickHistory.push(digit);
 
-  const text =
-    String(quote);
-
-  const cleaned =
-    text.replace(
-      /[^0-9]/g,
-      ""
-    );
-
-  if(!cleaned){
-    return null;
+  if(tickHistory.length > 100){
+    tickHistory.shift();
   }
 
-  return Number(
-    cleaned.slice(-1)
+  updateLiveDisplay(
+    digit,
+    price
   );
-
 }
 
 
 /* =====================================================
-   ADD TICK
+   LIVE DISPLAY
 ===================================================== */
 
-function addTick(
-  quote,
-  digit
+function updateLiveDisplay(
+  digit,
+  price
 ){
 
-  if(
-    digit === null ||
-    digit < 0 ||
-    digit > 9
-  ){
-    return;
-  }
+  document.getElementById(
+    "bigDigit"
+  ).textContent = digit;
 
-  currentPrice = quote;
+  document.getElementById(
+    "price"
+  ).textContent = price;
 
-  tickHistory.push(digit);
+  document.getElementById(
+    "tickState"
+  ).textContent = "LIVE";
 
-  if(
-    tickHistory.length > 100
-  ){
-    tickHistory.shift();
-  }
+  document.getElementById(
+    "liveConnection"
+  ).textContent = "LIVE";
 
-  $("bigDigit").textContent =
-    digit;
-
-  $("price").textContent =
-    Number(quote).toFixed(2);
-
-  $("tickState").textContent =
-    "LIVE";
-
-  $("connectionText").textContent =
-    "Connected";
+  updatePointer(digit);
 
   renderHistory();
 
   renderFrequency();
 
-  renderTracker();
+}
+
+
+/* =====================================================
+   MOVING POINTER
+===================================================== */
+
+function updatePointer(
+  digit
+){
+
+  const pointer =
+    document.getElementById(
+      "movingPointer"
+    );
+
+  const pointerDigit =
+    document.getElementById(
+      "pointerDigit"
+    );
+
+  if(!pointer){
+    return;
+  }
+
+  /*
+    0 = 5%
+    9 = 95%
+  */
+
+  const left =
+    5 + (Number(digit) * 10);
+
+  pointer.style.left =
+    left + "%";
+
+  pointerDigit.textContent =
+    digit;
 
 }
 
 
 /* =====================================================
-   HISTORY
+   HISTORY DIGITS
 ===================================================== */
 
 function renderHistory(){
 
   const box =
-    $("historyDigits");
+    document.getElementById(
+      "historyDigits"
+    );
 
   box.innerHTML = "";
 
@@ -1985,7 +1151,9 @@ function renderHistory(){
     (digit,index)=>{
 
       const el =
-        document.createElement("div");
+        document.createElement(
+          "div"
+        );
 
       el.className =
         "history-digit";
@@ -2013,10 +1181,10 @@ function renderHistory(){
 
 
 /* =====================================================
-   FREQUENCY
+   FREQUENCY + MOST/LEAST BARS
 ===================================================== */
 
-function getCounts(){
+function renderFrequency(){
 
   const counts =
     new Array(10).fill(0);
@@ -2027,86 +1195,144 @@ function getCounts(){
     }
   );
 
-  return counts;
 
-}
+  /*
+   * Determine the most and least
+   * occurring digits.
+   */
 
+  let mostDigit = 0;
 
-function renderFrequency(){
-
-  const counts =
-    getCounts();
-
-  const box =
-    $("frequency");
-
-  box.innerHTML = "";
-
-  let most =
-    -1;
-
-  let least =
-    Infinity;
+  let leastDigit = 0;
 
 
   for(
-    let i=0;
-    i<10;
+    let i = 1;
+    i < 10;
     i++
   ){
 
     if(
-      counts[i] > most
+      counts[i] >
+      counts[mostDigit]
     ){
-      most =
-        counts[i];
+
+      mostDigit = i;
+
     }
 
     if(
-      counts[i] < least
+      counts[i] <
+      counts[leastDigit]
     ){
-      least =
-        counts[i];
+
+      leastDigit = i;
+
     }
 
   }
 
 
+  /* ==============================
+     DIGIT TRACK BARS
+  ============================== */
+
+  document
+    .querySelectorAll(
+      ".digit-column"
+    )
+    .forEach(
+      column=>{
+
+        const digit =
+          Number(
+            column.dataset.digit
+          );
+
+        column.classList.remove(
+          "most",
+          "least"
+        );
+
+        if(
+          digit === mostDigit
+        ){
+
+          column.classList.add(
+            "most"
+          );
+
+        }
+
+        /*
+         * Only show red if the
+         * least digit is different
+         * from the most digit.
+         */
+
+        if(
+          digit === leastDigit &&
+          digit !== mostDigit
+        ){
+
+          column.classList.add(
+            "least"
+          );
+
+        }
+
+      }
+    );
+
+
+  /* ==============================
+     FREQUENCY BOXES
+  ============================== */
+
+  const box =
+    document.getElementById(
+      "frequency"
+    );
+
+  box.innerHTML = "";
+
+
   for(
-    let i=0;
-    i<10;
+    let i = 0;
+    i < 10;
     i++
   ){
 
     const percentage =
       tickHistory.length
-        ? (
-            counts[i] /
-            tickHistory.length *
-            100
-          ).toFixed(1)
-        : "0.0";
+      ? (
+          counts[i] /
+          tickHistory.length *
+          100
+        ).toFixed(1)
+      : "0.0";
 
 
     const el =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     el.className =
       "freq-box";
 
 
-    if(
-      counts[i] === most &&
-      most > 0
-    ){
+    if(i === mostDigit){
       el.classList.add("most");
     }
 
-
     if(
-      counts[i] === least
+      i === leastDigit &&
+      i !== mostDigit
     ){
+
       el.classList.add("least");
+
     }
 
 
@@ -2115,10 +1341,15 @@ function renderFrequency(){
       <span>${percentage}%</span>
     `;
 
+
     box.appendChild(el);
 
   }
 
+
+  /* ==============================
+     OVER / UNDER
+  ============================== */
 
   const over =
     tickHistory.filter(
@@ -2136,7 +1367,9 @@ function renderFrequency(){
     tickHistory.length;
 
 
-  $("overPercent").textContent =
+  document.getElementById(
+    "overPercent"
+  ).textContent =
     total
       ? (
           over /
@@ -2146,7 +1379,9 @@ function renderFrequency(){
       : "0%";
 
 
-  $("underPercent").textContent =
+  document.getElementById(
+    "underPercent"
+  ).textContent =
     total
       ? (
           under /
@@ -2154,179 +1389,6 @@ function renderFrequency(){
           100
         ).toFixed(1) + "%"
       : "0%";
-
-}
-
-
-/* =====================================================
-   GREEN / RED HALF ROUND BARS
-===================================================== */
-
-function renderTracker(){
-
-  const counts =
-    getCounts();
-
-
-  if(!tickHistory.length){
-
-    return;
-
-  }
-
-
-  let most =
-    Math.max(
-      ...counts
-    );
-
-
-  let least =
-    Math.min(
-      ...counts
-    );
-
-
-  /*
-   * Give the bars enough height
-   * to remain visible.
-   */
-
-  for(
-    let i=0;
-    i<10;
-    i++
-  ){
-
-    const green =
-      $("greenBar"+i);
-
-    const red =
-      $("redBar"+i);
-
-    const number =
-      $("digitNumber"+i);
-
-
-    /*
-     * Green bar:
-     * most occurring digit
-     */
-
-    if(
-      counts[i] === most &&
-      most > 0
-    ){
-
-      green.style.height =
-        Math.max(
-          18,
-          Math.min(
-            100,
-            20 +
-            (
-              counts[i] /
-              Math.max(
-                1,
-                most
-              )
-            ) * 80
-          )
-        ) + "px";
-
-      green.style.opacity =
-        "1";
-
-      number.classList.add(
-        "hot"
-      );
-
-    }else{
-
-      green.style.height =
-        "4px";
-
-      green.style.opacity =
-        ".18";
-
-      number.classList.remove(
-        "hot"
-      );
-
-    }
-
-
-    /*
-     * Red bar:
-     * least occurring digit
-     */
-
-    if(
-      counts[i] === least
-    ){
-
-      red.style.height =
-        "58px";
-
-      red.style.opacity =
-        "1";
-
-      number.classList.add(
-        "cold"
-      );
-
-    }else{
-
-      red.style.height =
-        "4px";
-
-      red.style.opacity =
-        ".10";
-
-      number.classList.remove(
-        "cold"
-      );
-
-    }
-
-  }
-
-
-  /*
-   * Moving pointer.
-   */
-
-  const moving =
-    tickHistory[
-      tickHistory.length - 1
-    ];
-
-
-  const pointer =
-    $("movingPointer");
-
-
-  /*
-   * Centers:
-   * 0 = 5%
-   * 9 = 95%
-   */
-
-  const left =
-    5 +
-    (
-      moving *
-      (90 / 9)
-    );
-
-
-  pointer.style.left =
-    left + "%";
-
-
-  $("trackerInfo").textContent =
-    "Green = most • Red = least • Moving = " +
-    moving;
 
 }
 
@@ -2340,13 +1402,21 @@ function setType(type){
   selectedType =
     type;
 
-  $("overTab")
+
+  document
+    .getElementById(
+      "overTab"
+    )
     .classList.toggle(
       "active",
       type === "OVER"
     );
 
-  $("underTab")
+
+  document
+    .getElementById(
+      "underTab"
+    )
     .classList.toggle(
       "active",
       type === "UNDER"
@@ -2359,10 +1429,13 @@ function setType(type){
    PREDICTION
 ===================================================== */
 
-function setPrediction(number){
+function setPrediction(
+  number
+){
 
   selectedPrediction =
     number;
+
 
   document
     .querySelectorAll(
@@ -2388,7 +1461,10 @@ function setPrediction(number){
    PAYOUT
 ===================================================== */
 
-$("stake")
+document
+  .getElementById(
+    "stake"
+  )
   .addEventListener(
     "input",
     updatePayout
@@ -2399,15 +1475,17 @@ function updatePayout(){
 
   const stake =
     parseFloat(
-      $("stake").value
+      document.getElementById(
+        "stake"
+      ).value
     ) || 0;
 
 
-  if(
-    stake <= 0
-  ){
+  if(stake <= 0){
 
-    $("payout").textContent =
+    document.getElementById(
+      "payout"
+    ).textContent =
       "—";
 
     return;
@@ -2415,17 +1493,13 @@ function updatePayout(){
   }
 
 
-  /*
-   * Front-end preview only.
-   * Real payout must come from
-   * the Deriv proposal response.
-   */
-
   const estimated =
     stake * 1.90;
 
 
-  $("payout").textContent =
+  document.getElementById(
+    "payout"
+  ).textContent =
     "$" +
     estimated.toFixed(2);
 
@@ -2436,14 +1510,16 @@ updatePayout();
 
 
 /* =====================================================
-   MANUAL BUY
+   MANUAL BUY INTERFACE
 ===================================================== */
 
 function buy(type){
 
   const stake =
     parseFloat(
-      $("stake").value
+      document.getElementById(
+        "stake"
+      ).value
     );
 
 
@@ -2461,15 +1537,14 @@ function buy(type){
   }
 
 
-  const marketName =
-    $("market")
-      .selectedOptions[0]
-      .textContent
-      .trim();
-
-
-  const duration =
-    $("duration").value;
+  const market =
+    document.getElementById(
+      "market"
+    ).options[
+      document.getElementById(
+        "market"
+      ).selectedIndex
+    ].text;
 
 
   const entry =
@@ -2481,13 +1556,17 @@ function buy(type){
 
 
   const table =
-    $("tradeHistory");
+    document.getElementById(
+      "tradeHistory"
+    );
 
 
   if(
     table.children.length === 1 &&
     table.children[0]
-      .querySelector(".empty")
+      .querySelector(
+        ".empty"
+      )
   ){
 
     table.innerHTML = "";
@@ -2496,7 +1575,9 @@ function buy(type){
 
 
   const row =
-    document.createElement("tr");
+    document.createElement(
+      "tr"
+    );
 
 
   row.innerHTML = `
@@ -2506,7 +1587,7 @@ function buy(type){
     </td>
 
     <td>
-      ${marketName.replace(" Index","")}
+      ${market.replace(" Index","")}
     </td>
 
     <td>
@@ -2526,3 +1607,91 @@ function buy(type){
     </td>
 
     <td style="color:#f4c95d">
+      PENDING
+    </td>
+
+  `;
+
+
+  table.prepend(row);
+
+
+  document.getElementById(
+    "lastTrade"
+  ).textContent =
+    type +
+    " " +
+    selectedPrediction;
+
+}
+
+
+/* =====================================================
+   ACCOUNT
+===================================================== */
+
+document
+  .getElementById(
+    "account"
+  )
+  .addEventListener(
+    "change",
+    function(){
+
+      if(
+        this.value === "real"
+      ){
+
+        document.getElementById(
+          "sideAccount"
+        ).textContent =
+          "Real Account";
+
+      }else{
+
+        document.getElementById(
+          "sideAccount"
+        ).textContent =
+          "Demo Account";
+
+      }
+
+    }
+  );
+
+
+/* =====================================================
+   INITIAL DATA
+===================================================== */
+
+for(
+  let i = 0;
+  i < 30;
+  i++
+){
+
+  tickHistory.push(
+    Math.floor(
+      Math.random() * 10
+    )
+  );
+
+}
+
+
+renderHistory();
+
+renderFrequency();
+
+
+/* =====================================================
+   START MOVING TICKS
+===================================================== */
+
+setInterval(
+  generateTick,
+  1000
+);
+
+</script></body>
+</html>
