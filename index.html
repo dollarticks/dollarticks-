@@ -1,1023 +1,1084 @@
 <!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DollarTicks — Manual Trading</title><style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:Inter,Arial,sans-serif;
-}
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>DollarTicks — Over/Under</title><style>
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-  background:#07111f;
-  color:#fff;
-  min-height:100vh;
+font-family:Inter,Arial,sans-serif;
+background:#07111f;
+color:#fff;
+min-height:100vh;
 }
 
-button,input,select{
-  font:inherit;
-}
+button,input,select{font:inherit}
 
-button{
-  cursor:pointer;
-  border:0;
-}
+button{cursor:pointer;border:0}
 
 .app{
-  display:flex;
-  min-height:100vh;
+display:flex;
+min-height:100vh;
 }
 
 /* SIDEBAR */
+
 .sidebar{
-  width:245px;
-  background:#0b1728;
-  border-right:1px solid #1a2a3d;
-  padding:22px 15px;
-  position:fixed;
-  left:0;
-  top:0;
-  bottom:0;
+width:240px;
+position:fixed;
+top:0;
+bottom:0;
+left:0;
+background:#091625;
+border-right:1px solid #17283c;
+padding:20px 14px;
 }
 
 .logo{
-  font-size:25px;
-  font-weight:800;
-  letter-spacing:.3px;
-  padding:0 12px 28px;
+font-size:25px;
+font-weight:800;
+padding:7px 13px 28px;
 }
 
-.logo span{
-  color:#16d98b;
+.logo span{color:#19d58b}
+
+.section-title{
+font-size:10px;
+color:#61738a;
+text-transform:uppercase;
+padding:10px 13px;
 }
 
-.nav-title{
-  color:#718198;
-  font-size:11px;
-  text-transform:uppercase;
-  margin:12px 12px 10px;
+.nav-btn{
+width:100%;
+background:transparent;
+color:#92a2b6;
+padding:13px;
+margin:2px 0;
+border-radius:9px;
+text-align:left;
+font-size:13px;
 }
 
-.nav button{
-  width:100%;
-  padding:13px 14px;
-  margin:3px 0;
-  background:transparent;
-  color:#aab7c8;
-  text-align:left;
-  border-radius:9px;
+.nav-btn:hover,
+.nav-btn.active{
+background:#12243a;
+color:#fff;
 }
 
-.nav button:hover,
-.nav button.active{
-  background:#13263b;
-  color:#fff;
+.sidebar-account{
+position:absolute;
+bottom:18px;
+left:14px;
+right:14px;
+padding:13px;
+border:1px solid #1b3047;
+background:#0e1d30;
+border-radius:11px;
 }
 
-.bottom-account{
-  position:absolute;
-  bottom:20px;
-  left:15px;
-  right:15px;
-  background:#101f32;
-  border:1px solid #1b3047;
-  border-radius:12px;
-  padding:13px;
-}
-
-.account-label{
-  font-size:11px;
-  color:#74859b;
-}
-
-.account-value{
-  margin-top:5px;
-  font-weight:700;
+.sidebar-account small{
+display:block;
+color:#667b92;
+font-size:10px;
+margin-bottom:5px;
 }
 
 /* MAIN */
+
 .main{
-  margin-left:245px;
-  width:calc(100% - 245px);
+margin-left:240px;
+width:calc(100% - 240px);
 }
 
 .topbar{
-  height:72px;
-  background:#0b1728;
-  border-bottom:1px solid #1a2a3d;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 28px;
+height:70px;
+border-bottom:1px solid #17283c;
+background:#091625;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 24px;
 }
 
-.page-title{
-  font-size:19px;
-  font-weight:700;
+.title{
+font-size:18px;
+font-weight:700;
 }
 
-.top-actions{
-  display:flex;
-  align-items:center;
-  gap:12px;
+.top-right{
+display:flex;
+align-items:center;
+gap:12px;
 }
 
-.status{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  color:#94a5ba;
-  font-size:12px;
+.connection{
+font-size:11px;
+color:#8b9caf;
 }
 
-.dot{
-  width:8px;
-  height:8px;
-  background:#16d98b;
-  border-radius:50%;
-  box-shadow:0 0 10px #16d98b;
+.green-dot{
+display:inline-block;
+width:7px;
+height:7px;
+border-radius:50%;
+background:#19d58b;
+box-shadow:0 0 8px #19d58b;
+margin-right:5px;
 }
 
-.account-switch{
-  background:#13263b;
-  border:1px solid #223a54;
-  color:#fff;
-  padding:9px 12px;
-  border-radius:8px;
+.account-select{
+background:#12243a;
+border:1px solid #263c55;
+color:#fff;
+padding:9px 12px;
+border-radius:8px;
+outline:none;
 }
+
+/* CONTENT */
 
 .content{
-  padding:24px;
+padding:22px;
 }
 
-/* CARDS */
-.cards{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:15px;
-  margin-bottom:20px;
+/* BALANCE CARDS */
+
+.stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:13px;
+margin-bottom:18px;
 }
 
-.card{
-  background:#0c1a2c;
-  border:1px solid #1a2d43;
-  border-radius:13px;
-  padding:18px;
+.stat{
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:12px;
+padding:16px;
 }
 
-.card-label{
-  color:#77899f;
-  font-size:12px;
+.stat-label{
+font-size:11px;
+color:#71839a;
 }
 
-.card-value{
-  margin-top:9px;
-  font-size:23px;
-  font-weight:750;
+.stat-value{
+font-size:21px;
+font-weight:750;
+margin-top:8px;
 }
 
-.green{
-  color:#16d98b;
-}
+.profit{color:#19d58b}
 
-.red{
-  color:#ff5f69;
-}
+/* MARKET BAR */
 
-/* TRADING GRID */
-.trading-grid{
-  display:grid;
-  grid-template-columns:1fr 340px;
-  gap:18px;
-}
-
-.panel{
-  background:#0c1a2c;
-  border:1px solid #1a2d43;
-  border-radius:14px;
-  overflow:hidden;
-}
-
-.panel-header{
-  padding:16px 18px;
-  border-bottom:1px solid #1a2d43;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.panel-title{
-  font-weight:700;
-}
-
-.panel-body{
-  padding:18px;
-}
-
-/* MARKET */
-.market-row{
-  display:flex;
-  gap:10px;
-  align-items:center;
-  margin-bottom:18px;
+.market-bar{
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:12px;
+padding:14px;
+display:flex;
+gap:12px;
+align-items:center;
+margin-bottom:18px;
 }
 
 .market-select{
-  flex:1;
-  background:#101f32;
-  color:#fff;
-  border:1px solid #253a52;
-  padding:12px;
-  border-radius:8px;
-  outline:none;
+flex:1;
+background:#101f32;
+color:#fff;
+border:1px solid #253a53;
+padding:12px;
+border-radius:8px;
+outline:none;
 }
 
-.tick-price{
-  background:#101f32;
-  border:1px solid #253a52;
-  padding:12px 15px;
-  border-radius:8px;
-  min-width:145px;
-  text-align:center;
-  font-weight:700;
+.price{
+min-width:170px;
+text-align:center;
+background:#101f32;
+border:1px solid #253a53;
+padding:12px;
+border-radius:8px;
+font-weight:700;
 }
 
-/* DIGITS */
-.live-box{
-  background:#081321;
-  border:1px solid #1a2b40;
-  border-radius:12px;
-  padding:16px;
+/* MAIN GRID */
+
+.grid{
+display:grid;
+grid-template-columns:minmax(0,1fr) 350px;
+gap:18px;
 }
 
-.live-title{
-  display:flex;
-  justify-content:space-between;
-  color:#8292a7;
-  font-size:12px;
-  margin-bottom:13px;
+/* PANELS */
+
+.panel{
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:13px;
+overflow:hidden;
 }
 
-.digits{
-  display:grid;
-  grid-template-columns:repeat(10,1fr);
-  gap:7px;
+.panel-head{
+padding:15px 17px;
+border-bottom:1px solid #172d44;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.digit{
-  height:55px;
-  border-radius:8px;
-  background:#122238;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-  font-weight:700;
-  border:1px solid #1c344d;
+.panel-head strong{
+font-size:14px;
 }
 
-.digit.latest{
-  background:#16d98b;
-  color:#04130d;
+.panel-head span{
+font-size:10px;
+color:#6e8198;
 }
 
-/* ANALYSIS */
-.analysis{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:15px;
+.panel-body{
+padding:17px;
 }
 
-.metric{
-  background:#101f32;
-  border:1px solid #1c3148;
-  padding:13px;
-  border-radius:9px;
+/* DIGIT DISPLAY */
+
+.live-status{
+display:flex;
+justify-content:space-between;
+font-size:11px;
+color:#70839a;
+margin-bottom:12px;
 }
 
-.metric small{
-  color:#71839a;
-  display:block;
-  margin-bottom:6px;
+.live-status b{
+color:#19d58b;
 }
 
-.metric strong{
-  font-size:17px;
+.last-digit{
+height:120px;
+border-radius:12px;
+background:#081321;
+border:1px solid #1a3148;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-bottom:14px;
 }
+
+.big-digit{
+font-size:62px;
+font-weight:800;
+color:#19d58b;
+text-shadow:0 0 25px rgba(25,213,139,.2);
+}
+
+.digit-label{
+font-size:10px;
+color:#667b92;
+text-align:center;
+margin-top:-8px;
+margin-bottom:15px;
+}
+
+/* DIGIT HISTORY */
+
+.history-digits{
+display:flex;
+gap:7px;
+overflow:hidden;
+margin-bottom:18px;
+}
+
+.history-digit{
+min-width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:7px;
+background:#12243a;
+border:1px solid #1d354e;
+font-weight:700;
+font-size:13px;
+}
+
+.history-digit.latest{
+background:#19d58b;
+color:#04150e;
+}
+
+/* FREQUENCY */
+
+.freq-title{
+font-size:11px;
+color:#72849a;
+margin-bottom:10px;
+}
+
+.frequency{
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:6px;
+}
+
+.freq-box{
+background:#101f32;
+border:1px solid #1c334b;
+border-radius:7px;
+padding:9px 3px;
+text-align:center;
+}
+
+.freq-box b{
+display:block;
+font-size:13px;
+}
+
+.freq-box span{
+display:block;
+font-size:9px;
+color:#71849a;
+margin-top:4px;
+}
+
+/* OVER UNDER ANALYSIS */
+
+.ou-analysis{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:15px;
+}
+
+.ou-box{
+padding:13px;
+border-radius:9px;
+background:#101f32;
+border:1px solid #1d344c;
+}
+
+.ou-box small{
+display:block;
+color:#70839a;
+font-size:10px;
+margin-bottom:6px;
+}
+
+.ou-box strong{
+font-size:18px;
+}
+
+.over-text{color:#19d58b}
+.under-text{color:#ff626c}
 
 /* TRADE PANEL */
+
+.trade-panel{
+position:sticky;
+top:15px;
+}
+
 .control{
-  margin-bottom:15px;
+margin-bottom:14px;
 }
 
 .control label{
-  display:block;
-  font-size:12px;
-  color:#7e90a6;
-  margin-bottom:7px;
+display:block;
+font-size:11px;
+color:#75879c;
+margin-bottom:7px;
 }
 
 .control select,
 .control input{
-  width:100%;
-  background:#101f32;
-  color:#fff;
-  border:1px solid #253a52;
-  padding:12px;
-  border-radius:8px;
-  outline:none;
+width:100%;
+background:#101f32;
+border:1px solid #253b54;
+color:#fff;
+padding:12px;
+border-radius:8px;
+outline:none;
 }
 
-.trade-buttons{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:20px;
+.contract-tabs{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:7px;
+margin-bottom:15px;
 }
 
-.trade-btn{
-  padding:15px 8px;
-  border-radius:9px;
-  font-weight:800;
-  font-size:14px;
+.contract-tab{
+padding:11px;
+background:#101f32;
+color:#77899e;
+border:1px solid #253b54;
+border-radius:8px;
 }
 
-.over{
-  background:#16d98b;
-  color:#04130d;
+.contract-tab.active{
+background:#132d29;
+color:#19d58b;
+border-color:#19d58b;
 }
 
-.under{
-  background:#ff5f69;
-  color:#fff;
+.prediction{
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:6px;
+margin-bottom:15px;
 }
 
-.trade-btn:hover{
-  opacity:.88;
-  transform:translateY(-1px);
+.prediction button{
+padding:9px 4px;
+background:#101f32;
+color:#8798ab;
+border:1px solid #253b54;
+border-radius:7px;
 }
 
-.warning{
-  color:#708197;
-  font-size:11px;
-  line-height:1.5;
-  margin-top:14px;
+.prediction button.active{
+background:#16352e;
+color:#19d58b;
+border-color:#19d58b;
 }
 
-/* HISTORY */
-.history{
-  margin-top:18px;
+.payout{
+display:flex;
+justify-content:space-between;
+background:#101f32;
+border:1px solid #1e344b;
+padding:12px;
+border-radius:8px;
+margin-bottom:14px;
+font-size:11px;
+color:#7b8da2;
 }
 
-.history-table{
-  width:100%;
-  border-collapse:collapse;
+.payout strong{
+color:#fff;
 }
 
-.history-table th,
-.history-table td{
-  padding:13px 14px;
-  text-align:left;
-  border-bottom:1px solid #172a40;
-  font-size:12px;
+.buy-buttons{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
 }
 
-.history-table th{
-  color:#71839a;
-  font-weight:500;
+.buy{
+padding:15px 6px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
+}
+
+.buy-over{
+background:#19d58b;
+color:#03150e;
+}
+
+.buy-under{
+background:#ff626c;
+color:#fff;
+}
+
+.buy:hover{
+opacity:.88;
+}
+
+/* TABLE */
+
+.history-panel{
+margin-top:18px;
+}
+
+.table-wrap{
+overflow-x:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+min-width:700px;
+}
+
+th,td{
+padding:13px 15px;
+text-align:left;
+font-size:11px;
+border-bottom:1px solid #172c42;
+}
+
+th{
+color:#6f8197;
+font-weight:500;
 }
 
 .empty{
-  text-align:center;
-  color:#667991;
-  padding:30px !important;
+text-align:center;
+padding:30px;
+color:#64778e;
 }
 
 /* MOBILE */
-.mobile-menu{
-  display:none;
-  background:#13263b;
-  color:#fff;
-  padding:9px 11px;
-  border-radius:7px;
+
+.mobile{
+display:none;
+background:#12243a;
+color:#fff;
+padding:9px 11px;
+border-radius:7px;
 }
 
-@media(max-width:1000px){
-  .cards{
-    grid-template-columns:repeat(2,1fr);
-  }
+@media(max-width:1050px){
 
-  .trading-grid{
-    grid-template-columns:1fr;
-  }
+.stats{
+grid-template-columns:1fr 1fr;
+}
+
+.grid{
+grid-template-columns:1fr;
+}
+
+.trade-panel{
+position:static;
+}
+
 }
 
 @media(max-width:720px){
-  .sidebar{
-    display:none;
-  }
 
-  .main{
-    margin-left:0;
-    width:100%;
-  }
-
-  .mobile-menu{
-    display:block;
-  }
-
-  .topbar{
-    padding:0 15px;
-  }
-
-  .status{
-    display:none;
-  }
-
-  .content{
-    padding:14px;
-  }
-
-  .cards{
-    grid-template-columns:1fr 1fr;
-    gap:9px;
-  }
-
-  .card{
-    padding:13px;
-  }
-
-  .card-value{
-    font-size:18px;
-  }
-
-  .digits{
-    gap:4px;
-  }
-
-  .digit{
-    height:43px;
-    font-size:14px;
-  }
-
-  .analysis{
-    grid-template-columns:1fr;
-  }
-
-  .market-row{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .tick-price{
-    width:100%;
-  }
-
-  .history-table{
-    min-width:650px;
-  }
-
-  .history{
-    overflow-x:auto;
-  }
+.sidebar{
+display:none;
 }
-</style></head><body><div class="app">  <!-- SIDEBAR -->  <aside class="sidebar"><div class="logo">
-  Dollar<span>Ticks</span>
-</div>
 
-<div class="nav-title">Trading</div>
-
-<div class="nav">
-  <button class="active" onclick="showSection('dashboard')">▦ Dashboard</button>
-  <button onclick="showSection('trade')">↗ Manual Trade</button>
-  <button onclick="showSection('digits')">◉ Live Digits</button>
-  <button onclick="showSection('history')">◷ Trade History</button>
-</div>
-
-<div class="nav-title">Account</div>
-
-<div class="nav">
-  <button onclick="showSection('account')">◎ Account</button>
-  <button onclick="showSection('settings')">⚙ Settings</button>
-</div>
-
-<div class="bottom-account">
-  <div class="account-label">ACCOUNT</div>
-  <div class="account-value" id="sideAccount">Demo</div>
-</div>
-
-  </aside>  <!-- MAIN -->  <main class="main"><header class="topbar">
-
-  <div style="display:flex;align-items:center;gap:10px;">
-    <button class="mobile-menu" onclick="alert('Mobile menu coming next')">☰</button>
-    <div class="page-title">Manual Trading</div>
-  </div>
-
-  <div class="top-actions">
-
-    <div class="status">
-      <span class="dot"></span>
-      Platform Online
-    </div>
-
-    <select class="account-switch" id="accountMode" onchange="changeAccount()">
-      <option value="demo">Demo Account</option>
-      <option value="real">Real Account</option>
-    </select>
-
-  </div>
-
-</header>
-
-<section class="content">
-
-  <!-- ACCOUNT CARDS -->
-  <div class="cards">
-
-    <div class="card">
-      <div class="card-label">Account Balance</div>
-      <div class="card-value" id="balance">$10,000.00</div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Today's P/L</div>
-      <div class="card-value green" id="profit">+$0.00</div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Open Trades</div>
-      <div class="card-value" id="openTrades">0</div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Connection</div>
-      <div class="card-value green" style="font-size:17px;">
-        Connected
-      </div>
-    </div>
-
-  </div>
-
-  <!-- TRADING -->
-  <div class="trading-grid">
-
-    <!-- MARKET / DIGITS -->
-    <div class="panel">
-
-      <div class="panel-header">
-        <div class="panel-title">Market</div>
-        <div style="font-size:11px;color:#73859a;">LIVE</div>
-      </div>
-
-      <div class="panel-body">
-
-        <div class="market-row">
-
-          <select class="market-select" id="market">
-            <option>Volatility 100 (1s) Index</option>
-            <option>Volatility 75 (1s) Index</option>
-            <option>Volatility 50 (1s) Index</option>
-            <option>Volatility 25 (1s) Index</option>
-            <option>Volatility 10 (1s) Index</option>
-          </select>
-
-          <div class="tick-price" id="price">
-            Waiting...
-          </div>
-
-        </div>
-
-        <div class="live-box">
-
-          <div class="live-title">
-            <span>LIVE LAST DIGITS</span>
-            <span id="tickStatus">Waiting for ticks...</span>
-          </div>
-
-          <div class="digits" id="digitsContainer">
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-            <div class="digit">-</div>
-          </div>
-
-        </div>
-
-        <div class="analysis">
-
-          <div class="metric">
-            <small>Most Frequent</small>
-            <strong id="most">—</strong>
-          </div>
-
-          <div class="metric">
-            <small>Least Frequent</small>
-            <strong id="least">—</strong>
-          </div>
-
-          <div class="metric">
-            <small>Last Digit</small>
-            <strong id="last">—</strong>
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- TRADE -->
-    <div class="panel" id="tradePanel">
-
-      <div class="panel-header">
-        <div class="panel-title">Place Manual Trade</div>
-      </div>
-
-      <div class="panel-body">
-
-        <div class="control">
-
-          <label>Contract Type</label>
-
-          <select id="contractType">
-            <option value="over">Over</option>
-            <option value="under">Under</option>
-          </select>
-
-        </div>
-
-        <div class="control">
-
-          <label>Prediction</label>
-
-          <select id="prediction">
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="7">7</option>
-            <option value="8">8</option>
-          </select>
-
-        </div>
-
-        <div class="control">
-
-          <label>Stake</label>
-
-          <input
-            id="stake"
-            type="number"
-            min="0.35"
-            step="0.01"
-            value="1.00"
-          >
-
-        </div>
-
-        <div class="control">
-
-          <label>Duration (Ticks)</label>
-
-          <select id="duration">
-            <option value="1">1 Tick</option>
-            <option value="2">2 Ticks</option>
-            <option value="3">3 Ticks</option>
-            <option value="5">5 Ticks</option>
-            <option value="10">10 Ticks</option>
-          </select>
-
-        </div>
-
-        <div class="trade-buttons">
-
-          <button class="trade-btn over" onclick="manualTrade('OVER')">
-            BUY OVER
-          </button>
-
-          <button class="trade-btn under" onclick="manualTrade('UNDER')">
-            BUY UNDER
-          </button>
-
-        </div>
-
-        <div class="warning">
-          Manual trading only. No automated trading or bot execution
-          is included in this DollarTicks interface.
-        </div>
-
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- HISTORY -->
-  <div class="panel history">
-
-    <div class="panel-header">
-      <div class="panel-title">Recent Trades</div>
-      <div style="font-size:11px;color:#73859a;">MANUAL</div>
-    </div>
-
-    <div style="overflow-x:auto;">
-
-      <table class="history-table">
-
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Market</th>
-            <th>Contract</th>
-            <th>Entry</th>
-            <th>Exit</th>
-            <th>Stake</th>
-            <th>Result</th>
-          </tr>
-        </thead>
-
-        <tbody id="historyBody">
-
-          <tr>
-            <td colspan="7" class="empty">
-              No trades yet
-            </td>
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</section>
-
-  </main></div><script>
-
-/* ----------------------------------
-   DEMO FRONT-END DATA
-   ---------------------------------- */
-
-let digits = [];
-let balance = 10000;
-let profit = 0;
-
-function randomDigit(){
-  return Math.floor(Math.random() * 10);
+.main{
+margin-left:0;
+width:100%;
 }
+
+.mobile{
+display:block;
+}
+
+.topbar{
+padding:0 14px;
+}
+
+.connection{
+display:none;
+}
+
+.content{
+padding:13px;
+}
+
+.stats{
+gap:8px;
+}
+
+.stat{
+padding:13px;
+}
+
+.stat-value{
+font-size:17px;
+}
+
+.market-bar{
+flex-direction:column;
+align-items:stretch;
+}
+
+.price{
+width:100%;
+}
+
+.frequency{
+gap:3px;
+}
+
+.freq-box{
+padding:7px 1px;
+}
+
+.big-digit{
+font-size:54px;
+}
+
+}
+
+</style></head><body><div class="app"><!-- SIDEBAR --><aside class="sidebar"><div class="logo">
+Dollar<span>Ticks</span>
+</div><div class="section-title">Trading</div><button class="nav-btn active">▦ Dashboard</button>
+<button class="nav-btn">↗ Over / Under</button>
+<button class="nav-btn">◉ Live Digits</button>
+<button class="nav-btn">◷ Trade History</button>
+
+<div class="section-title">Account</div><button class="nav-btn">◎ Account</button>
+<button class="nav-btn">⚙ Settings</button>
+
+<div class="sidebar-account">
+<small>ACCOUNT</small>
+<strong id="sideAccount">Demo Account</strong>
+</div></aside><!-- MAIN --><main class="main"><header class="topbar"><div style="display:flex;align-items:center;gap:10px"><button class="mobile">☰</button>
+
+<div class="title">
+Over / Under
+</div></div><div class="top-right"><div class="connection">
+<span class="green-dot"></span>
+Connected
+</div><select class="account-select" id="account">
+<option value="demo">Demo $10,000</option>
+<option value="real">Real Account</option>
+</select></div></header><section class="content"><!-- STATS --><div class="stats"><div class="stat">
+<div class="stat-label">BALANCE</div>
+<div class="stat-value" id="balance">$10,000.00</div>
+</div><div class="stat">
+<div class="stat-label">TODAY'S P/L</div>
+<div class="stat-value profit">$0.00</div>
+</div><div class="stat">
+<div class="stat-label">LAST TRADE</div>
+<div class="stat-value" id="lastTrade">—</div>
+</div><div class="stat">
+<div class="stat-label">STATUS</div>
+<div class="stat-value profit" style="font-size:16px">
+READY
+</div>
+</div></div><!-- MARKET --><div class="market-bar"><select class="market-select" id="market"><option>Volatility 100 (1s) Index</option>
+<option>Volatility 75 (1s) Index</option>
+<option>Volatility 50 (1s) Index</option>
+<option>Volatility 25 (1s) Index</option>
+<option>Volatility 10 (1s) Index</option></select><div class="price" id="price">
+Waiting for tick...
+</div></div><!-- GRID --><div class="grid"><!-- LEFT --><div><!-- LIVE MARKET --><div class="panel"><div class="panel-head"><strong>Live Market</strong>
+
+<span id="tickState">
+WAITING
+</span></div><div class="panel-body"><div class="live-status"><span>LAST DIGIT</span>
+
+<b id="liveConnection">LIVE</b>
+
+</div><div class="last-digit"><div class="big-digit" id="bigDigit">
+—
+</div></div><div class="digit-label">
+CURRENT LAST DIGIT
+</div><!-- DIGIT HISTORY --><div class="history-digits" id="historyDigits"></div><!-- FREQUENCY --><div class="freq-title">
+LAST 100 TICKS — DIGIT FREQUENCY
+</div><div class="frequency" id="frequency"></div><!-- OVER UNDER --><div class="ou-analysis"><div class="ou-box"><small>OVER 5 — 6,7,8,9</small>
+
+<strong class="over-text" id="overPercent">
+0%
+</strong></div><div class="ou-box"><small>UNDER 5 — 0,1,2,3,4</small>
+
+<strong class="under-text" id="underPercent">
+0%
+</strong></div></div></div></div><!-- HISTORY --><div class="panel history-panel"><div class="panel-head"><strong>Recent Manual Trades</strong>
+
+<span>MANUAL ONLY</span>
+
+</div><div class="table-wrap"><table><thead><tr>
+<th>TIME</th>
+<th>MARKET</th>
+<th>TYPE</th>
+<th>ENTRY</th>
+<th>EXIT</th>
+<th>STAKE</th>
+<th>RESULT</th>
+</tr></thead><tbody id="tradeHistory"><tr>
+<td colspan="7" class="empty">
+No trades yet
+</td>
+</tr></tbody></table></div></div></div><!-- RIGHT TRADE PANEL --><div class="panel trade-panel"><div class="panel-head"><strong>Manual Trade</strong>
+
+<span>OVER / UNDER</span>
+
+</div><div class="panel-body"><!-- CONTRACT --><div class="control"><label>CONTRACT</label>
+
+<div class="contract-tabs"><button
+class="contract-tab active"
+id="overTab"
+onclick="setType('OVER')">
+OVER
+</button>
+
+<button
+class="contract-tab"
+id="underTab"
+onclick="setType('UNDER')">
+UNDER
+</button>
+
+</div></div><!-- PREDICTION --><div class="control"><label>PREDICTION</label>
+
+<div class="prediction"><button onclick="setPrediction(4)">4</button>
+<button onclick="setPrediction(5)">5</button>
+<button class="active" onclick="setPrediction(6)">6</button>
+<button onclick="setPrediction(7)">7</button>
+<button onclick="setPrediction(8)">8</button>
+
+</div></div><!-- STAKE --><div class="control"><label>STAKE</label>
+
+<input
+type="number"
+id="stake"
+value="1"
+min="0.35"
+step="0.01">
+
+</div><!-- DURATION --><div class="control"><label>DURATION</label>
+
+<select id="duration"><option value="1">1 Tick</option>
+<option value="2">2 Ticks</option>
+<option value="3">3 Ticks</option>
+<option value="5">5 Ticks</option>
+<option value="10">10 Ticks</option></select></div><!-- PAYOUT --><div class="payout"><span>EXPECTED PAYOUT</span>
+
+<strong id="payout">
+— 
+</strong></div><!-- BUY --><div class="buy-buttons"><button
+class="buy buy-over"
+onclick="buy('OVER')">
+BUY OVER
+</button>
+
+<button
+class="buy buy-under"
+onclick="buy('UNDER')">
+BUY UNDER
+</button>
+
+</div><div style="
+font-size:10px;
+color:#61758d;
+line-height:1.5;
+margin-top:13px;
+">Manual trading only. DollarTicks does not automatically
+open trades. The real Buy buttons will be connected to
+Deriv's authorized trading API in the next stage.
+
+</div></div></div></div></section></main></div><script>
+
+/* ============================
+   STATE
+============================ */
+
+let tickHistory=[];
+let selectedType="OVER";
+let selectedPrediction=6;
+
+
+/* ============================
+   DIGIT GENERATOR
+============================ */
 
 function generateTick(){
 
-  const digit = randomDigit();
+const digit=Math.floor(Math.random()*10);
 
-  digits.push(digit);
+tickHistory.push(digit);
 
-  if(digits.length > 10){
-    digits.shift();
-  }
-
-  renderDigits();
-  updateAnalysis();
-
-  document.getElementById("price").textContent =
-    "10" + Math.floor(Math.random()*100000);
-
-  document.getElementById("tickStatus").textContent =
-    "Receiving ticks";
-
+if(tickHistory.length>100){
+tickHistory.shift();
 }
 
-function renderDigits(){
+document.getElementById("bigDigit").textContent=digit;
 
-  const container =
-    document.getElementById("digitsContainer");
+document.getElementById("price").textContent=
+"10"+Math.floor(Math.random()*100000);
 
-  container.innerHTML = "";
+document.getElementById("tickState").textContent="LIVE";
 
-  digits.forEach((digit,index)=>{
+renderHistory();
 
-    const div = document.createElement("div");
-
-    div.className = "digit";
-
-    if(index === digits.length - 1){
-      div.classList.add("latest");
-    }
-
-    div.textContent = digit;
-
-    container.appendChild(div);
-
-  });
-
-}
-
-function updateAnalysis(){
-
-  if(!digits.length) return;
-
-  const counts = {};
-
-  for(let i=0;i<10;i++){
-    counts[i]=0;
-  }
-
-  digits.forEach(d=>{
-    counts[d]++;
-  });
-
-  let most = 0;
-  let least = 0;
-
-  for(let i=1;i<10;i++){
-
-    if(counts[i] > counts[most]){
-      most=i;
-    }
-
-    if(counts[i] < counts[least]){
-      least=i;
-    }
-
-  }
-
-  document.getElementById("most").textContent =
-    most + " (" + counts[most] + ")";
-
-  document.getElementById("least").textContent =
-    least + " (" + counts[least] + ")";
-
-  document.getElementById("last").textContent =
-    digits[digits.length-1];
+renderFrequency();
 
 }
 
 
-/* ----------------------------------
-   ACCOUNT SWITCH
-   ---------------------------------- */
+/* ============================
+   HISTORY DIGITS
+============================ */
 
-function changeAccount(){
+function renderHistory(){
 
-  const mode =
-    document.getElementById("accountMode").value;
+const box=document.getElementById("historyDigits");
 
-  if(mode === "real"){
+box.innerHTML="";
 
-    document.getElementById("sideAccount").textContent =
-      "Real";
+const recent=tickHistory.slice(-20);
 
-    /*
-      Real account will be connected through
-      Deriv OAuth/API in the next integration stage.
-    */
+recent.forEach((digit,index)=>{
 
-    alert(
-      "Real account connection will use your Deriv authorization."
-    );
+const el=document.createElement("div");
 
-  }else{
+el.className="history-digit";
 
-    document.getElementById("sideAccount").textContent =
-      "Demo";
+if(index===recent.length-1){
+el.classList.add("latest");
+}
 
-    document.getElementById("balance").textContent =
-      "$10,000.00";
+el.textContent=digit;
 
-  }
+box.appendChild(el);
+
+});
 
 }
 
 
-/* ----------------------------------
-   MANUAL TRADE
-   ---------------------------------- */
+/* ============================
+   FREQUENCY
+============================ */
 
-function manualTrade(direction){
+function renderFrequency(){
 
-  const stake =
-    parseFloat(document.getElementById("stake").value);
+const counts=new Array(10).fill(0);
 
-  const prediction =
-    document.getElementById("prediction").value;
+tickHistory.forEach(d=>{
+counts[d]++;
+});
 
-  const duration =
-    document.getElementById("duration").value;
+const box=document.getElementById("frequency");
 
-  const market =
-    document.getElementById("market").value;
+box.innerHTML="";
 
-  if(!stake || stake <= 0){
+for(let i=0;i<10;i++){
 
-    alert("Enter a valid stake.");
+const percentage=
+tickHistory.length
+?
+((counts[i]/tickHistory.length)*100).toFixed(1)
+:
+"0.0";
 
-    return;
+const el=document.createElement("div");
 
-  }
+el.className="freq-box";
 
-  /*
-    This button is currently front-end only.
+el.innerHTML=`
+<b>${i}</b>
+<span>${percentage}%</span>
+`;
 
-    The next stage will replace this function with
-    the real Deriv proposal + buy API flow.
-  */
+box.appendChild(el);
 
-  const tbody =
-    document.getElementById("historyBody");
+}
 
-  if(tbody.children.length === 1 &&
-     tbody.children[0].querySelector(".empty")){
+const over=
+tickHistory.filter(d=>d>=6).length;
 
-    tbody.innerHTML = "";
+const under=
+tickHistory.filter(d=>d<=5).length;
 
-  }
+const total=tickHistory.length;
 
-  const row =
-    document.createElement("tr");
+document.getElementById("overPercent").textContent=
+total ? ((over/total)*100).toFixed(1)+"%" : "0%";
 
-  row.innerHTML = `
-    <td>${new Date().toLocaleTimeString()}</td>
-    <td>${market}</td>
-    <td>${direction} ${prediction}</td>
-    <td>Waiting</td>
-    <td>—</td>
-    <td>$${stake.toFixed(2)}</td>
-    <td style="color:#f5c451;">Pending</td>
-  `;
-
-  tbody.prepend(row);
-
-  document.getElementById("openTrades").textContent = "1";
+document.getElementById("underPercent").textContent=
+total ? ((under/total)*100).toFixed(1)+"%" : "0%";
 
 }
 
 
-/* ----------------------------------
-   NAVIGATION
-   ---------------------------------- */
+/* ============================
+   CONTRACT TYPE
+============================ */
 
-function showSection(section){
+function setType(type){
 
-  if(section === "history"){
+selectedType=type;
 
-    document.querySelector(".history")
-      .scrollIntoView({behavior:"smooth"});
+document.getElementById("overTab")
+.classList.toggle("active",type==="OVER");
 
-    return;
-
-  }
-
-  if(section === "trade"){
-
-    document.getElementById("tradePanel")
-      .scrollIntoView({behavior:"smooth"});
-
-    return;
-
-  }
-
-  if(section === "digits"){
-
-    document.querySelector(".live-box")
-      .scrollIntoView({behavior:"smooth"});
-
-    return;
-
-  }
-
-  if(section === "dashboard"){
-
-    window.scrollTo({
-      top:0,
-      behavior:"smooth"
-    });
-
-  }
+document.getElementById("underTab")
+.classList.toggle("active",type==="UNDER");
 
 }
 
 
-/* ----------------------------------
-   DEMO TICK STREAM
-   ---------------------------------- */
+/* ============================
+   PREDICTION
+============================ */
+
+function setPrediction(number){
+
+selectedPrediction=number;
+
+document.querySelectorAll(".prediction button")
+.forEach(btn=>{
+
+btn.classList.toggle(
+"active",
+Number(btn.textContent)===number
+);
+
+});
+
+}
+
+
+/* ============================
+   PAYOUT PREVIEW
+============================ */
+
+document.getElementById("stake")
+.addEventListener("input",updatePayout);
+
+function updatePayout(){
+
+const stake=
+parseFloat(document.getElementById("stake").value)||0;
+
+if(stake<=0){
+
+document.getElementById("payout").textContent="—";
+
+return;
+
+}
+
+/*
+ Front-end estimate only.
+ Actual payout will come from the
+ Deriv proposal response.
+*/
+
+const estimated=stake*1.90;
+
+document.getElementById("payout").textContent=
+"$"+estimated.toFixed(2);
+
+}
+
+updatePayout();
+
+
+/* ============================
+   BUY
+============================ */
+
+function buy(type){
+
+const stake=
+parseFloat(document.getElementById("stake").value);
+
+if(!stake || stake<=0){
+
+alert("Please enter a valid stake.");
+
+return;
+
+}
+
+const market=
+document.getElementById("market").value;
+
+const duration=
+document.getElementById("duration").value;
+
+const entry=
+tickHistory.length
+?
+tickHistory[tickHistory.length-1]
+:
+"—";
+
+const table=
+document.getElementById("tradeHistory");
+
+if(table.children.length===1 &&
+table.children[0].querySelector(".empty")){
+
+table.innerHTML="";
+
+}
+
+const row=document.createElement("tr");
+
+row.innerHTML=`
+
+<td>${new Date().toLocaleTimeString()}</td>
+
+<td>${market.replace(" Index","")}</td>
+
+<td>${type} ${selectedPrediction}</td>
+
+<td>${entry}</td>
+
+<td>—</td>
+
+<td>$${stake.toFixed(2)}</td>
+
+<td style="color:#f4c95d">
+PENDING
+</td>
+
+`;
+
+table.prepend(row);
+
+document.getElementById("lastTrade").textContent=
+type+" "+selectedPrediction;
+
+/*
+ This is currently only the interface.
+
+ Next integration:
+ 1. Deriv proposal
+ 2. Proposal ID
+ 3. Buy contract
+ 4. Contract ID
+ 5. Monitor contract
+ 6. Capture entry spot
+ 7. Capture exit spot
+ 8. Update result
+*/
+
+}
+
+
+/* ============================
+   ACCOUNT
+============================ */
+
+document.getElementById("account")
+.addEventListener("change",function(){
+
+if(this.value==="real"){
+
+document.getElementById("sideAccount")
+.textContent="Real Account";
+
+}else{
+
+document.getElementById("sideAccount")
+.textContent="Demo Account";
+
+}
+
+});
+
+
+/* ============================
+   INITIAL DATA
+============================ */
+
+for(let i=0;i<30;i++){
+
+tickHistory.push(
+Math.floor(Math.random()*10)
+);
+
+}
+
+renderHistory();
+renderFrequency();
 
 setInterval(generateTick,1000);
 
-for(let i=0;i<10;i++){
-  digits.push(randomDigit());
-}
-
-renderDigits();
-updateAnalysis();
-
 </script></body>
-              </html>
+</html>
