@@ -6,776 +6,728 @@
 <title>DollarTicks — Manual Trading</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
 
 body{
-    font-family:Inter,Arial,sans-serif;
-    background:#07111f;
-    color:#fff;
-    min-height:100vh;
+font-family:Inter,Arial,sans-serif;
+background:#07111f;
+color:#fff;
+min-height:100vh;
 }
 
-button,input,select{
-    font:inherit;
-}
-
-button{
-    cursor:pointer;
-    border:0;
-}
+button,input,select{font:inherit}
+button{cursor:pointer;border:0}
 
 .app{
-    display:flex;
-    min-height:100vh;
+display:flex;
+min-height:100vh;
 }
 
-/* =========================
-   SIDEBAR
-========================= */
+/* SIDEBAR */
 
 .sidebar{
-    width:240px;
-    position:fixed;
-    top:0;
-    bottom:0;
-    left:0;
-    background:#091625;
-    border-right:1px solid #17283c;
-    padding:20px 14px;
-    z-index:20;
+width:240px;
+position:fixed;
+top:0;
+bottom:0;
+left:0;
+background:#091625;
+border-right:1px solid #17283c;
+padding:20px 14px;
+z-index:20;
 }
 
 .logo{
-    font-size:25px;
-    font-weight:800;
-    padding:7px 13px 28px;
+font-size:25px;
+font-weight:800;
+padding:7px 13px 28px;
 }
 
-.logo span{
-    color:#19d58b;
-}
+.logo span{color:#19d58b}
 
 .section-title{
-    font-size:10px;
-    color:#61738a;
-    text-transform:uppercase;
-    padding:10px 13px;
+font-size:10px;
+color:#61738a;
+text-transform:uppercase;
+padding:10px 13px;
 }
 
 .nav-btn{
-    width:100%;
-    background:transparent;
-    color:#92a2b6;
-    padding:13px;
-    margin:2px 0;
-    border-radius:9px;
-    text-align:left;
-    font-size:13px;
-    transition:.2s;
+width:100%;
+background:transparent;
+color:#92a2b6;
+padding:13px;
+margin:2px 0;
+border-radius:9px;
+text-align:left;
+font-size:13px;
 }
 
 .nav-btn:hover,
 .nav-btn.active{
-    background:#12243a;
-    color:#fff;
+background:#12243a;
+color:#fff;
 }
 
 .sidebar-account{
-    position:absolute;
-    bottom:18px;
-    left:14px;
-    right:14px;
-    padding:13px;
-    border:1px solid #1b3047;
-    background:#0e1d30;
-    border-radius:11px;
+position:absolute;
+bottom:18px;
+left:14px;
+right:14px;
+padding:13px;
+border:1px solid #1b3047;
+background:#0e1d30;
+border-radius:11px;
 }
 
 .sidebar-account small{
-    display:block;
-    color:#667b92;
-    font-size:10px;
-    margin-bottom:5px;
+display:block;
+color:#667b92;
+font-size:10px;
+margin-bottom:5px;
 }
 
-/* =========================
-   MAIN
-========================= */
+/* MAIN */
 
 .main{
-    margin-left:240px;
-    width:calc(100% - 240px);
+margin-left:240px;
+width:calc(100% - 240px);
 }
 
 .topbar{
-    height:70px;
-    border-bottom:1px solid #17283c;
-    background:#091625;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 24px;
+height:70px;
+border-bottom:1px solid #17283c;
+background:#091625;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 24px;
 }
 
 .title{
-    font-size:18px;
-    font-weight:700;
+font-size:18px;
+font-weight:700;
 }
 
 .top-right{
-    display:flex;
-    align-items:center;
-    gap:12px;
+display:flex;
+align-items:center;
+gap:12px;
 }
 
 .connection{
-    font-size:11px;
-    color:#8b9caf;
+font-size:11px;
+color:#8b9caf;
 }
 
 .green-dot{
-    display:inline-block;
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:#19d58b;
-    box-shadow:0 0 8px #19d58b;
-    margin-right:5px;
+display:inline-block;
+width:7px;
+height:7px;
+border-radius:50%;
+background:#19d58b;
+box-shadow:0 0 8px #19d58b;
+margin-right:5px;
 }
 
 .account-select{
-    background:#12243a;
-    border:1px solid #263c55;
-    color:#fff;
-    padding:9px 12px;
-    border-radius:8px;
-    outline:none;
+background:#12243a;
+border:1px solid #263c55;
+color:#fff;
+padding:9px 12px;
+border-radius:8px;
+outline:none;
 }
 
-/* =========================
-   CONTENT
-========================= */
+/* CONTENT */
 
 .content{
-    padding:22px;
+padding:22px;
 }
 
-/* =========================
-   STATS
-========================= */
+/* STATS */
 
 .stats{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:13px;
-    margin-bottom:18px;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:13px;
+margin-bottom:18px;
 }
 
 .stat{
-    background:#0b192b;
-    border:1px solid #172d44;
-    border-radius:12px;
-    padding:16px;
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:12px;
+padding:16px;
 }
 
 .stat-label{
-    font-size:11px;
-    color:#71839a;
+font-size:11px;
+color:#71839a;
 }
 
 .stat-value{
-    font-size:21px;
-    font-weight:750;
-    margin-top:8px;
+font-size:21px;
+font-weight:750;
+margin-top:8px;
 }
 
-.profit{
-    color:#19d58b;
-}
+.profit{color:#19d58b}
 
-/* =========================
-   MARKET BAR
-========================= */
+/* MARKET */
 
 .market-bar{
-    background:#0b192b;
-    border:1px solid #172d44;
-    border-radius:12px;
-    padding:14px;
-    display:flex;
-    gap:12px;
-    align-items:center;
-    margin-bottom:18px;
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:12px;
+padding:14px;
+display:flex;
+gap:12px;
+align-items:center;
+margin-bottom:18px;
 }
 
 .market-select{
-    flex:1;
-    background:#101f32;
-    color:#fff;
-    border:1px solid #253a53;
-    padding:12px;
-    border-radius:8px;
-    outline:none;
+flex:1;
+background:#101f32;
+color:#fff;
+border:1px solid #253a53;
+padding:12px;
+border-radius:8px;
+outline:none;
 }
 
 .price{
-    min-width:190px;
-    text-align:center;
-    background:#101f32;
-    border:1px solid #253a53;
-    padding:12px;
-    border-radius:8px;
-    font-weight:700;
+min-width:190px;
+text-align:center;
+background:#101f32;
+border:1px solid #253a53;
+padding:12px;
+border-radius:8px;
+font-weight:700;
 }
 
-/* =========================
-   MAIN GRID
-========================= */
+/* GRID */
 
 .grid{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 350px;
-    gap:18px;
+display:grid;
+grid-template-columns:minmax(0,1fr) 350px;
+gap:18px;
 }
 
-/* =========================
-   PANELS
-========================= */
+/* PANELS */
 
 .panel{
-    background:#0b192b;
-    border:1px solid #172d44;
-    border-radius:13px;
-    overflow:hidden;
+background:#0b192b;
+border:1px solid #172d44;
+border-radius:13px;
+overflow:hidden;
 }
 
 .panel-head{
-    padding:15px 17px;
-    border-bottom:1px solid #172d44;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+padding:15px 17px;
+border-bottom:1px solid #172d44;
+display:flex;
+justify-content:space-between;
+align-items:center;
 }
 
-.panel-head strong{
-    font-size:14px;
-}
+.panel-head strong{font-size:14px}
 
 .panel-head span{
-    font-size:10px;
-    color:#6e8198;
+font-size:10px;
+color:#6e8198;
 }
 
-.panel-body{
-    padding:17px;
-}
+.panel-body{padding:17px}
 
-/* =========================
-   LIVE CHART
-========================= */
+/* CHART */
 
 .chart-wrap{
-    position:relative;
-    height:300px;
-    background:#081321;
-    border:1px solid #1a3148;
-    border-radius:11px;
-    overflow:hidden;
+position:relative;
+height:300px;
+background:#081321;
+border:1px solid #1a3148;
+border-radius:11px;
+overflow:hidden;
 }
 
 .chart-grid{
-    position:absolute;
-    inset:0;
+position:absolute;
+inset:0;
 
-    background-image:
-        linear-gradient(rgba(94,116,139,.08) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(94,116,139,.08) 1px,transparent 1px);
+background-image:
+linear-gradient(rgba(94,116,139,.08) 1px,transparent 1px),
+linear-gradient(90deg,rgba(94,116,139,.08) 1px,transparent 1px);
 
-    background-size:50px 50px;
+background-size:50px 50px;
 }
 
 #chart{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
+position:absolute;
+inset:0;
+width:100%;
+height:100%;
 }
 
 .chart-price{
-    position:absolute;
-    right:9px;
-    top:12px;
-    background:#12243a;
-    border:1px solid #29415a;
-    border-radius:6px;
-    padding:6px 8px;
-    font-size:10px;
-    font-weight:700;
+position:absolute;
+right:9px;
+top:12px;
+background:#12243a;
+border:1px solid #29415a;
+border-radius:6px;
+padding:6px 8px;
+font-size:10px;
+font-weight:700;
 }
 
 .chart-digit{
-    position:absolute;
-    right:9px;
-    bottom:10px;
-    background:#19d58b;
-    color:#04150e;
-    border-radius:6px;
-    padding:5px 8px;
-    font-size:11px;
-    font-weight:800;
+position:absolute;
+right:9px;
+bottom:10px;
+background:#19d58b;
+color:#04150e;
+border-radius:6px;
+padding:5px 8px;
+font-size:11px;
+font-weight:800;
 }
 
-/* =========================
-   LIVE DIGIT
-========================= */
+/* LIVE DIGIT */
 
 .live-status{
-    display:flex;
-    justify-content:space-between;
-    font-size:11px;
-    color:#70839a;
-    margin-bottom:12px;
+display:flex;
+justify-content:space-between;
+font-size:11px;
+color:#70839a;
+margin-bottom:12px;
 }
 
-.live-status b{
-    color:#19d58b;
-}
+.live-status b{color:#19d58b}
 
 .last-digit{
-    height:105px;
-    border-radius:12px;
-    background:#081321;
-    border:1px solid #1a3148;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    margin-bottom:10px;
+height:105px;
+border-radius:12px;
+background:#081321;
+border:1px solid #1a3148;
+display:flex;
+align-items:center;
+justify-content:center;
+margin-bottom:10px;
 }
 
 .big-digit{
-    font-size:58px;
-    font-weight:800;
-    color:#19d58b;
-    text-shadow:0 0 25px rgba(25,213,139,.2);
+font-size:58px;
+font-weight:800;
+color:#19d58b;
+text-shadow:0 0 25px rgba(25,213,139,.2);
 }
 
 .digit-label{
-    font-size:10px;
-    color:#667b92;
-    text-align:center;
-    margin-bottom:15px;
+font-size:10px;
+color:#667b92;
+text-align:center;
+margin-bottom:15px;
 }
 
-/* =========================
-   DIGIT HISTORY
-========================= */
+/* HISTORY DIGITS */
 
 .history-digits{
-    display:flex;
-    gap:7px;
-    overflow:hidden;
-    margin-bottom:18px;
+display:flex;
+gap:7px;
+overflow:hidden;
+margin-bottom:18px;
 }
 
 .history-digit{
-    min-width:36px;
-    height:36px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:7px;
-    background:#12243a;
-    border:1px solid #1d354e;
-    font-weight:700;
-    font-size:13px;
+min-width:36px;
+height:36px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:7px;
+background:#12243a;
+border:1px solid #1d354e;
+font-weight:700;
+font-size:13px;
 }
 
 .history-digit.latest{
-    background:#19d58b;
-    color:#04150e;
+background:#19d58b;
+color:#04150e;
 }
 
-/* =========================
-   FREQUENCY
-========================= */
+/* FREQUENCY */
 
 .freq-title{
-    font-size:11px;
-    color:#72849a;
-    margin-bottom:10px;
+font-size:11px;
+color:#72849a;
+margin-bottom:10px;
 }
 
 .frequency{
-    display:grid;
-    grid-template-columns:repeat(10,1fr);
-    gap:6px;
+display:grid;
+grid-template-columns:repeat(10,1fr);
+gap:6px;
 }
 
 .freq-box{
-    background:#101f32;
-    border:1px solid #1c334b;
-    border-radius:7px;
-    padding:9px 3px;
-    text-align:center;
+background:#101f32;
+border:1px solid #1c334b;
+border-radius:7px;
+padding:9px 3px;
+text-align:center;
 }
 
 .freq-box b{
-    display:block;
-    font-size:13px;
+display:block;
+font-size:13px;
 }
 
 .freq-box span{
-    display:block;
-    font-size:9px;
-    color:#71849a;
-    margin-top:4px;
+display:block;
+font-size:9px;
+color:#71849a;
+margin-top:4px;
 }
 
-/* =========================
-   OVER UNDER ANALYSIS
-========================= */
+/* OVER UNDER */
 
 .ou-analysis{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-    margin-top:15px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;
+margin-top:15px;
 }
 
 .ou-box{
-    padding:13px;
-    border-radius:9px;
-    background:#101f32;
-    border:1px solid #1d344c;
+padding:13px;
+border-radius:9px;
+background:#101f32;
+border:1px solid #1d344c;
 }
 
 .ou-box small{
-    display:block;
-    color:#70839a;
-    font-size:10px;
-    margin-bottom:6px;
+display:block;
+color:#70839a;
+font-size:10px;
+margin-bottom:6px;
 }
 
-.ou-box strong{
-    font-size:18px;
-}
+.ou-box strong{font-size:18px}
 
-.over-text{
-    color:#19d58b;
-}
+.over-text{color:#19d58b}
+.under-text{color:#ff626c}
 
-.under-text{
-    color:#ff626c;
-}
-
-/* =========================
-   TRADE PANEL
-========================= */
+/* TRADE */
 
 .trade-panel{
-    position:sticky;
-    top:15px;
+position:sticky;
+top:15px;
 }
 
 .control{
-    margin-bottom:14px;
+margin-bottom:14px;
 }
 
 .control label{
-    display:block;
-    font-size:11px;
-    color:#75879c;
-    margin-bottom:7px;
+display:block;
+font-size:11px;
+color:#75879c;
+margin-bottom:7px;
 }
 
 .control select,
 .control input{
-    width:100%;
-    background:#101f32;
-    border:1px solid #253b54;
-    color:#fff;
-    padding:12px;
-    border-radius:8px;
-    outline:none;
+width:100%;
+background:#101f32;
+border:1px solid #253b54;
+color:#fff;
+padding:12px;
+border-radius:8px;
+outline:none;
 }
 
-/* =========================
-   CONTRACT TABS
-========================= */
-
 .contract-tabs{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-    margin-bottom:15px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:7px;
+margin-bottom:15px;
 }
 
 .contract-tab{
-    padding:11px;
-    background:#101f32;
-    color:#77899e;
-    border:1px solid #253b54;
-    border-radius:8px;
+padding:11px;
+background:#101f32;
+color:#77899e;
+border:1px solid #253b54;
+border-radius:8px;
 }
 
 .contract-tab.active{
-    background:#132d29;
-    color:#19d58b;
-    border-color:#19d58b;
+background:#132d29;
+color:#19d58b;
+border-color:#19d58b;
 }
 
-/* =========================
-   PREDICTION
-========================= */
+/* PREDICTION */
 
 .prediction{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:6px;
-    margin-bottom:15px;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:6px;
+margin-bottom:15px;
 }
 
 .prediction button{
-    padding:10px 4px;
-    background:#101f32;
-    color:#8798ab;
-    border:1px solid #253b54;
-    border-radius:7px;
+padding:10px 4px;
+background:#101f32;
+color:#8798ab;
+border:1px solid #253b54;
+border-radius:7px;
 }
 
 .prediction button.active{
-    background:#16352e;
-    color:#19d58b;
-    border-color:#19d58b;
+background:#16352e;
+color:#19d58b;
+border-color:#19d58b;
 }
 
-/* =========================
-   PAYOUT
-========================= */
+/* PAYOUT */
 
 .payout{
-    display:flex;
-    justify-content:space-between;
-    background:#101f32;
-    border:1px solid #1e344b;
-    padding:12px;
-    border-radius:8px;
-    margin-bottom:14px;
-    font-size:11px;
-    color:#7b8da2;
+display:flex;
+justify-content:space-between;
+background:#101f32;
+border:1px solid #1e344b;
+padding:12px;
+border-radius:8px;
+margin-bottom:14px;
+font-size:11px;
+color:#7b8da2;
 }
 
-.payout strong{
-    color:#fff;
-}
+.payout strong{color:#fff}
 
-/* =========================
-   BUY BUTTONS
-========================= */
+/* BUY */
 
 .buy-buttons{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:8px;
 }
 
 .buy{
-    padding:15px 6px;
-    border-radius:8px;
-    font-size:12px;
-    font-weight:800;
-    transition:.2s;
+padding:15px 6px;
+border-radius:8px;
+font-size:12px;
+font-weight:800;
+transition:.2s;
 }
 
 .buy-over{
-    background:#19d58b;
-    color:#03150e;
+background:#19d58b;
+color:#03150e;
 }
 
 .buy-under{
-    background:#ff626c;
-    color:#fff;
+background:#ff626c;
+color:#fff;
 }
 
 .buy:hover{
-    opacity:.88;
-    transform:translateY(-1px);
+opacity:.88;
+transform:translateY(-1px);
 }
 
-.buy:active{
-    transform:scale(.98);
+.buy:disabled{
+opacity:.45;
+cursor:not-allowed;
+transform:none;
 }
 
-/* =========================
-   SELECTED CONTRACT
-========================= */
+/* SELECTED */
 
 .selected-contract{
-    margin-top:15px;
-    padding:12px;
-    background:#081321;
-    border:1px solid #1a3148;
-    border-radius:8px;
-    font-size:10px;
-    color:#71849a;
-    line-height:1.7;
+margin-top:15px;
+padding:12px;
+background:#081321;
+border:1px solid #1a3148;
+border-radius:8px;
+font-size:10px;
+color:#71849a;
+line-height:1.7;
 }
 
-.selected-contract strong{
-    color:#fff;
-}
+.selected-contract strong{color:#fff}
 
-/* =========================
-   TRADE HISTORY
-========================= */
+/* TABLE */
 
 .history-panel{
-    margin-top:18px;
+margin-top:18px;
 }
 
-.table-wrap{
-    overflow-x:auto;
-}
+.table-wrap{overflow-x:auto}
 
 table{
-    width:100%;
-    border-collapse:collapse;
-    min-width:700px;
+width:100%;
+border-collapse:collapse;
+min-width:700px;
 }
 
-th,
-td{
-    padding:13px 15px;
-    text-align:left;
-    font-size:11px;
-    border-bottom:1px solid #172c42;
+th,td{
+padding:13px 15px;
+text-align:left;
+font-size:11px;
+border-bottom:1px solid #172c42;
 }
 
 th{
-    color:#6f8197;
-    font-weight:500;
+color:#6f8197;
+font-weight:500;
 }
 
 .empty{
-    text-align:center;
-    padding:30px;
-    color:#64778e;
+text-align:center;
+padding:30px;
+color:#64778e;
 }
 
 .win{
-    color:#19d58b;
-    font-weight:700;
+color:#19d58b;
+font-weight:700;
 }
 
 .loss{
-    color:#ff626c;
-    font-weight:700;
+color:#ff626c;
+font-weight:700;
 }
 
 .pending{
-    color:#f4c95d;
-    font-weight:700;
+color:#f4c95d;
+font-weight:700;
 }
 
-/* =========================
-   MOBILE
-========================= */
+/* NOTIFICATION */
+
+.notice{
+display:none;
+margin-bottom:15px;
+padding:12px;
+border-radius:8px;
+font-size:11px;
+line-height:1.5;
+}
+
+.notice.show{display:block}
+
+.notice.error{
+background:#32151b;
+border:1px solid #73313c;
+color:#ff8790;
+}
+
+.notice.success{
+background:#102d25;
+border:1px solid #245f4d;
+color:#67e8b2;
+}
+
+/* MOBILE */
 
 .mobile{
-    display:none;
-    background:#12243a;
-    color:#fff;
-    padding:9px 11px;
-    border-radius:7px;
+display:none;
+background:#12243a;
+color:#fff;
+padding:9px 11px;
+border-radius:7px;
 }
 
 @media(max-width:1050px){
 
-    .stats{
-        grid-template-columns:1fr 1fr;
-    }
+.stats{
+grid-template-columns:1fr 1fr;
+}
 
-    .grid{
-        grid-template-columns:1fr;
-    }
+.grid{
+grid-template-columns:1fr;
+}
 
-    .trade-panel{
-        position:static;
-    }
+.trade-panel{
+position:static;
+}
+
 }
 
 @media(max-width:720px){
 
-    .sidebar{
-        display:none;
-    }
+.sidebar{
+display:none;
+}
 
-    .main{
-        margin-left:0;
-        width:100%;
-    }
+.main{
+margin-left:0;
+width:100%;
+}
 
-    .mobile{
-        display:block;
-    }
+.mobile{
+display:block;
+}
 
-    .topbar{
-        padding:0 14px;
-    }
+.topbar{
+padding:0 14px;
+}
 
-    .connection{
-        display:none;
-    }
+.connection{
+display:none;
+}
 
-    .content{
-        padding:13px;
-    }
+.content{
+padding:13px;
+}
 
-    .stats{
-        gap:8px;
-    }
+.stats{
+gap:8px;
+}
 
-    .stat{
-        padding:13px;
-    }
+.stat{
+padding:13px;
+}
 
-    .stat-value{
-        font-size:17px;
-    }
+.stat-value{
+font-size:17px;
+}
 
-    .market-bar{
-        flex-direction:column;
-        align-items:stretch;
-    }
+.market-bar{
+flex-direction:column;
+align-items:stretch;
+}
 
-    .price{
-        width:100%;
-    }
+.price{
+width:100%;
+}
 
-    .chart-wrap{
-        height:240px;
-    }
+.chart-wrap{
+height:240px;
+}
 
-    .frequency{
-        gap:3px;
-    }
+.frequency{
+gap:3px;
+}
 
-    .freq-box{
-        padding:7px 1px;
-    }
+.freq-box{
+padding:7px 1px;
+}
 
-    .big-digit{
-        font-size:52px;
-    }
+.big-digit{
+font-size:52px;
+}
 
-    .history-digits{
-        overflow-x:auto;
-        padding-bottom:3px;
-    }
+.history-digits{
+overflow-x:auto;
+padding-bottom:3px;
+}
+
 }
 </style>
 </head>
@@ -784,100 +736,99 @@ th{
 
 <div class="app">
 
-<!-- =========================
-     SIDEBAR
-========================= -->
+<!-- SIDEBAR -->
 
 <aside class="sidebar">
 
-    <div class="logo">
-        Dollar<span>Ticks</span>
-    </div>
+<div class="logo">
+Dollar<span>Ticks</span>
+</div>
 
-    <div class="section-title">
-        Trading
-    </div>
+<div class="section-title">
+Trading
+</div>
 
-    <button class="nav-btn active">
-        ▦ Dashboard
-    </button>
+<button class="nav-btn active">
+▦ Dashboard
+</button>
 
-    <button class="nav-btn">
-        ↗ Over / Under
-    </button>
+<button class="nav-btn">
+↗ Over / Under
+</button>
 
-    <button class="nav-btn">
-        ◉ Live Digits
-    </button>
+<button class="nav-btn">
+◉ Live Digits
+</button>
 
-    <button class="nav-btn">
-        ◷ Trade History
-    </button>
+<button class="nav-btn">
+◷ Trade History
+</button>
 
-    <div class="section-title">
-        Account
-    </div>
+<div class="section-title">
+Account
+</div>
 
-    <button class="nav-btn">
-        ◎ Account
-    </button>
+<button class="nav-btn">
+◎ Account
+</button>
 
-    <button class="nav-btn">
-        ⚙ Settings
-    </button>
+<button class="nav-btn">
+⚙ Settings
+</button>
 
-    <div class="sidebar-account">
-        <small>ACCOUNT</small>
-        <strong id="sideAccount">
-            Demo Account
-        </strong>
-    </div>
+<div class="sidebar-account">
+
+<small>ACCOUNT</small>
+
+<strong id="sideAccount">
+Demo Account
+</strong>
+
+</div>
 
 </aside>
 
 
-<!-- =========================
-     MAIN
-========================= -->
+<!-- MAIN -->
 
 <main class="main">
 
 <header class="topbar">
 
-    <div style="display:flex;align-items:center;gap:10px">
+<div style="display:flex;align-items:center;gap:10px">
 
-        <button class="mobile">
-            ☰
-        </button>
+<button class="mobile">
+☰
+</button>
 
-        <div class="title">
-            Manual Trading
-        </div>
+<div class="title">
+Manual Trading
+</div>
 
-    </div>
+</div>
 
-    <div class="top-right">
+<div class="top-right">
 
-        <div class="connection">
-            <span class="green-dot"></span>
-            Connected
-        </div>
+<div class="connection">
+<span class="green-dot"></span>
+<span id="connectionText">Connected</span>
+</div>
 
-        <select
-            class="account-select"
-            id="account">
+<select
+class="account-select"
+id="account">
 
-            <option value="demo">
-                Demo $10,000
-            </option>
+<option value="demo">
+Demo Account
+</option>
 
-            <option value="real">
-                Real Account
-            </option>
+<option value="real">
+Real Account
+</option>
 
-        </select>
+</select>
 
-    </div>
+</div>
 
 </header>
 
@@ -885,299 +836,294 @@ th{
 <section class="content">
 
 
-<!-- =========================
-     STATS
-========================= -->
+<!-- NOTICE -->
+
+<div
+class="notice"
+id="notice">
+</div>
+
+
+<!-- STATS -->
 
 <div class="stats">
 
-    <div class="stat">
+<div class="stat">
 
-        <div class="stat-label">
-            BALANCE
-        </div>
+<div class="stat-label">
+BALANCE
+</div>
 
-        <div
-            class="stat-value"
-            id="balance">
+<div
+class="stat-value"
+id="balance">
 
-            $10,000.00
+$10,000.00
 
-        </div>
-
-    </div>
-
-
-    <div class="stat">
-
-        <div class="stat-label">
-            TODAY'S P/L
-        </div>
-
-        <div
-            class="stat-value profit"
-            id="todayPL">
-
-            $0.00
-
-        </div>
-
-    </div>
-
-
-    <div class="stat">
-
-        <div class="stat-label">
-            LAST TRADE
-        </div>
-
-        <div
-            class="stat-value"
-            id="lastTrade">
-
-            —
-
-        </div>
-
-    </div>
-
-
-    <div class="stat">
-
-        <div class="stat-label">
-            STATUS
-        </div>
-
-        <div
-            class="stat-value profit"
-            style="font-size:16px"
-            id="status">
-
-            READY
-
-        </div>
-
-    </div>
+</div>
 
 </div>
 
 
-<!-- =========================
-     MARKET BAR
-========================= -->
+<div class="stat">
+
+<div class="stat-label">
+TODAY'S P/L
+</div>
+
+<div
+class="stat-value profit"
+id="todayPL">
+
+$0.00
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-label">
+LAST TRADE
+</div>
+
+<div
+class="stat-value"
+id="lastTrade">
+
+—
+
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-label">
+STATUS
+</div>
+
+<div
+class="stat-value profit"
+style="font-size:16px"
+id="status">
+
+READY
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- MARKET -->
 
 <div class="market-bar">
 
-    <select
-        class="market-select"
-        id="market">
+<select
+class="market-select"
+id="market">
 
-        <option value="R_100">
-            Volatility 100 (1s) Index
-        </option>
+<option value="R_100">
+Volatility 100 (1s) Index
+</option>
 
-        <option value="R_75">
-            Volatility 75 (1s) Index
-        </option>
+<option value="R_75">
+Volatility 75 (1s) Index
+</option>
 
-        <option value="R_50">
-            Volatility 50 (1s) Index
-        </option>
+<option value="R_50">
+Volatility 50 (1s) Index
+</option>
 
-        <option value="R_25">
-            Volatility 25 (1s) Index
-        </option>
+<option value="R_25">
+Volatility 25 (1s) Index
+</option>
 
-        <option value="R_10">
-            Volatility 10 (1s) Index
-        </option>
+<option value="R_10">
+Volatility 10 (1s) Index
+</option>
 
-    </select>
+</select>
 
 
-    <div
-        class="price"
-        id="price">
+<div
+class="price"
+id="price">
 
-        Waiting for tick...
+Waiting for tick...
 
-    </div>
+</div>
 
 </div>
 
 
-<!-- =========================
-     GRID
-========================= -->
+<!-- GRID -->
 
 <div class="grid">
 
 
-<!-- =========================
-     LEFT SIDE
-========================= -->
+<!-- LEFT -->
 
 <div>
 
 
-<!-- LIVE CHART -->
+<!-- CHART -->
 
 <div class="panel">
 
-    <div class="panel-head">
+<div class="panel-head">
 
-        <strong>
-            Live Chart
-        </strong>
+<strong>
+Live Chart
+</strong>
 
-        <span id="tickState">
-            WAITING
-        </span>
+<span id="tickState">
+WAITING
+</span>
 
-    </div>
+</div>
 
-    <div class="panel-body">
+<div class="panel-body">
 
-        <div class="chart-wrap">
+<div class="chart-wrap">
 
-            <div class="chart-grid"></div>
+<div class="chart-grid"></div>
 
-            <canvas id="chart"></canvas>
+<canvas id="chart"></canvas>
 
-            <div
-                class="chart-price"
-                id="chartPrice">
+<div
+class="chart-price"
+id="chartPrice">
 
-                —
+—
 
-            </div>
+</div>
 
-            <div
-                class="chart-digit"
-                id="chartDigit">
+<div
+class="chart-digit"
+id="chartDigit">
 
-                —
+—
 
-            </div>
+</div>
 
-        </div>
+</div>
 
-    </div>
+</div>
 
 </div>
 
 
-<!-- LIVE MARKET -->
+<!-- LIVE DIGITS -->
 
 <div
-    class="panel"
-    style="margin-top:18px">
+class="panel"
+style="margin-top:18px">
 
-    <div class="panel-head">
+<div class="panel-head">
 
-        <strong>
-            Live Digits
-        </strong>
+<strong>
+Live Digits
+</strong>
 
-        <span>
-            LAST 100 TICKS
-        </span>
+<span>
+LAST 100 TICKS
+</span>
 
-    </div>
+</div>
 
-    <div class="panel-body">
+<div class="panel-body">
 
-        <div class="live-status">
+<div class="live-status">
 
-            <span>
-                LAST DIGIT
-            </span>
+<span>
+LAST DIGIT
+</span>
 
-            <b id="liveConnection">
-                LIVE
-            </b>
+<b id="liveConnection">
+LIVE
+</b>
 
-        </div>
-
-
-        <div class="last-digit">
-
-            <div
-                class="big-digit"
-                id="bigDigit">
-
-                —
-
-            </div>
-
-        </div>
+</div>
 
 
-        <div class="digit-label">
-            CURRENT LAST DIGIT
-        </div>
+<div class="last-digit">
+
+<div
+class="big-digit"
+id="bigDigit">
+
+—
+
+</div>
+
+</div>
 
 
-        <!-- HISTORY -->
-
-        <div
-            class="history-digits"
-            id="historyDigits">
-        </div>
+<div class="digit-label">
+CURRENT LAST DIGIT
+</div>
 
 
-        <!-- FREQUENCY -->
-
-        <div class="freq-title">
-            LAST 100 TICKS — DIGIT FREQUENCY
-        </div>
-
-        <div
-            class="frequency"
-            id="frequency">
-        </div>
+<div
+class="history-digits"
+id="historyDigits">
+</div>
 
 
-        <!-- OVER UNDER -->
-
-        <div class="ou-analysis">
-
-            <div class="ou-box">
-
-                <small>
-                    OVER 5 — 6,7,8,9
-                </small>
-
-                <strong
-                    class="over-text"
-                    id="overPercent">
-
-                    0%
-
-                </strong>
-
-            </div>
+<div class="freq-title">
+LAST 100 TICKS — DIGIT FREQUENCY
+</div>
 
 
-            <div class="ou-box">
+<div
+class="frequency"
+id="frequency">
+</div>
 
-                <small>
-                    UNDER 5 — 0,1,2,3,4
-                </small>
 
-                <strong
-                    class="under-text"
-                    id="underPercent">
+<div class="ou-analysis">
 
-                    0%
+<div class="ou-box">
 
-                </strong>
+<small>
+OVER 5 — 6,7,8,9
+</small>
 
-            </div>
+<strong
+class="over-text"
+id="overPercent">
 
-        </div>
+0%
 
-    </div>
+</strong>
+
+</div>
+
+
+<div class="ou-box">
+
+<small>
+UNDER 5 — 0,1,2,3,4
+</small>
+
+<strong
+class="under-text"
+id="underPercent">
+
+0%
+
+</strong>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
@@ -1186,313 +1132,290 @@ th{
 
 <div class="panel history-panel">
 
-    <div class="panel-head">
+<div class="panel-head">
 
-        <strong>
-            Recent Manual Trades
-        </strong>
+<strong>
+Recent Manual Trades
+</strong>
 
-        <span>
-            MANUAL ONLY
-        </span>
+<span>
+MANUAL ONLY
+</span>
 
-    </div>
-
-
-    <div class="table-wrap">
-
-        <table>
-
-            <thead>
-
-                <tr>
-                    <th>TIME</th>
-                    <th>MARKET</th>
-                    <th>TYPE</th>
-                    <th>ENTRY</th>
-                    <th>EXIT</th>
-                    <th>STAKE</th>
-                    <th>RESULT</th>
-                </tr>
-
-            </thead>
+</div>
 
 
-            <tbody id="tradeHistory">
+<div class="table-wrap">
 
-                <tr>
+<table>
 
-                    <td
-                        colspan="7"
-                        class="empty">
+<thead>
 
-                        No trades yet
+<tr>
 
-                    </td>
+<th>TIME</th>
+<th>MARKET</th>
+<th>TYPE</th>
+<th>ENTRY</th>
+<th>EXIT</th>
+<th>STAKE</th>
+<th>RESULT</th>
 
-                </tr>
+</tr>
 
-            </tbody>
+</thead>
 
-        </table>
 
-    </div>
+<tbody id="tradeHistory">
+
+<tr>
+
+<td
+colspan="7"
+class="empty">
+
+No trades yet
+
+</td>
+
+</tr>
+
+</tbody>
+
+</table>
 
 </div>
 
 </div>
 
+</div>
 
-<!-- =========================
-     RIGHT TRADE PANEL
-========================= -->
+
+<!-- RIGHT -->
 
 <div
-    class="panel trade-panel">
+class="panel trade-panel">
 
-    <div class="panel-head">
+<div class="panel-head">
 
-        <strong>
-            Manual Trade
-        </strong>
+<strong>
+Manual Trade
+</strong>
 
-        <span>
-            OVER / UNDER
-        </span>
+<span>
+OVER / UNDER
+</span>
 
-    </div>
+</div>
 
 
-    <div class="panel-body">
+<div class="panel-body">
 
 
-        <!-- CONTRACT -->
+<!-- CONTRACT -->
 
-        <div class="control">
+<div class="control">
 
-            <label>
-                CONTRACT
-            </label>
+<label>
+CONTRACT
+</label>
 
 
-            <div class="contract-tabs">
+<div class="contract-tabs">
 
-                <button
-                    class="contract-tab active"
-                    id="overTab"
-                    onclick="setType('OVER')">
+<button
+class="contract-tab active"
+id="overTab"
+onclick="setType('OVER')">
 
-                    OVER
+OVER
 
-                </button>
+</button>
 
 
-                <button
-                    class="contract-tab"
-                    id="underTab"
-                    onclick="setType('UNDER')">
+<button
+class="contract-tab"
+id="underTab"
+onclick="setType('UNDER')">
 
-                    UNDER
+UNDER
 
-                </button>
+</button>
 
-            </div>
+</div>
 
-        </div>
+</div>
 
 
-        <!-- PREDICTION -->
+<!-- PREDICTION -->
 
-        <div class="control">
+<div class="control">
 
-            <label>
-                PREDICTION
-            </label>
+<label>
+PREDICTION
+</label>
 
 
-            <div class="prediction">
+<div class="prediction">
 
-                <button onclick="setPrediction(0)">
-                    0
-                </button>
+<button onclick="setPrediction(0)">0</button>
+<button onclick="setPrediction(1)">1</button>
+<button onclick="setPrediction(2)">2</button>
+<button onclick="setPrediction(3)">3</button>
+<button onclick="setPrediction(4)">4</button>
+<button onclick="setPrediction(5)">5</button>
 
-                <button onclick="setPrediction(1)">
-                    1
-                </button>
+<button
+class="active"
+onclick="setPrediction(6)">
 
-                <button onclick="setPrediction(2)">
-                    2
-                </button>
+6
 
-                <button onclick="setPrediction(3)">
-                    3
-                </button>
+</button>
 
-                <button onclick="setPrediction(4)">
-                    4
-                </button>
+<button onclick="setPrediction(7)">7</button>
+<button onclick="setPrediction(8)">8</button>
+<button onclick="setPrediction(9)">9</button>
 
-                <button onclick="setPrediction(5)">
-                    5
-                </button>
+</div>
 
-                <button
-                    class="active"
-                    onclick="setPrediction(6)">
+</div>
 
-                    6
 
-                </button>
+<!-- STAKE -->
 
-                <button onclick="setPrediction(7)">
-                    7
-                </button>
+<div class="control">
 
-                <button onclick="setPrediction(8)">
-                    8
-                </button>
+<label>
+STAKE
+</label>
 
-                <button onclick="setPrediction(9)">
-                    9
-                </button>
+<input
+type="number"
+id="stake"
+value="1"
+min="0.35"
+step="0.01">
 
-            </div>
+</div>
 
-        </div>
 
+<!-- DURATION -->
 
-        <!-- STAKE -->
+<div class="control">
 
-        <div class="control">
+<label>
+DURATION
+</label>
 
-            <label>
-                STAKE
-            </label>
+<select id="duration">
 
-            <input
-                type="number"
-                id="stake"
-                value="1"
-                min="0.35"
-                step="0.01">
+<option value="1">
+1 Tick
+</option>
 
-        </div>
+<option value="2">
+2 Ticks
+</option>
 
+<option value="3">
+3 Ticks
+</option>
 
-        <!-- DURATION -->
+<option value="5">
+5 Ticks
+</option>
 
-        <div class="control">
+<option value="10">
+10 Ticks
+</option>
 
-            <label>
-                DURATION
-            </label>
+</select>
 
-            <select id="duration">
+</div>
 
-                <option value="1">
-                    1 Tick
-                </option>
 
-                <option value="2">
-                    2 Ticks
-                </option>
+<!-- PAYOUT -->
 
-                <option value="3">
-                    3 Ticks
-                </option>
+<div class="payout">
 
-                <option value="5">
-                    5 Ticks
-                </option>
+<span>
+EXPECTED PAYOUT
+</span>
 
-                <option value="10">
-                    10 Ticks
-                </option>
+<strong id="payout">
+—
+</strong>
 
-            </select>
+</div>
 
-        </div>
 
+<!-- BUY -->
 
-        <!-- PAYOUT -->
+<div class="buy-buttons">
 
-        <div class="payout">
+<button
+class="buy buy-over"
+id="buyOver"
+onclick="buy('OVER')">
 
-            <span>
-                EXPECTED PAYOUT
-            </span>
+BUY OVER
 
-            <strong id="payout">
-                —
-            </strong>
+</button>
 
-        </div>
 
+<button
+class="buy buy-under"
+id="buyUnder"
+onclick="buy('UNDER')">
 
-        <!-- BUY BUTTONS -->
+BUY UNDER
 
-        <div class="buy-buttons">
+</button>
 
-            <button
-                class="buy buy-over"
-                onclick="buy('OVER')">
+</div>
 
-                BUY OVER
 
-            </button>
+<!-- SELECTED -->
 
+<div class="selected-contract">
 
-            <button
-                class="buy buy-under"
-                onclick="buy('UNDER')">
+CONTRACT:
+<strong id="selectedContract">
+OVER 6
+</strong>
 
-                BUY UNDER
+<br>
 
-            </button>
+DURATION:
+<strong id="selectedDuration">
+1 Tick
+</strong>
 
-        </div>
+<br>
 
+STAKE:
+<strong id="selectedStake">
+$1.00
+</strong>
 
-        <!-- SELECTED CONTRACT -->
+</div>
 
-        <div class="selected-contract">
 
-            CONTRACT:
-            <strong id="selectedContract">
-                OVER 6
-            </strong>
+<div style="
+font-size:10px;
+color:#61758d;
+line-height:1.5;
+margin-top:13px;
+">
 
-            <br>
+Manual trading only.
+Trades are sent to the selected
+Deriv account after authorization.
 
-            DURATION:
-            <strong id="selectedDuration">
-                1 Tick
-            </strong>
+</div>
 
-            <br>
-
-            STAKE:
-            <strong id="selectedStake">
-                $1.00
-            </strong>
-
-        </div>
-
-
-        <div style="
-            font-size:10px;
-            color:#61758d;
-            line-height:1.5;
-            margin-top:13px;
-        ">
-
-            Manual trading only.
-            No automatic trading or bot logic
-            is included in this frontend.
-
-        </div>
-
-    </div>
+</div>
 
 </div>
 
@@ -1508,15 +1431,54 @@ th{
 
 <script>
 
+/* =====================================================
+   DOLLARTICKS MANUAL FRONTEND
+===================================================== */
+
+
+/* =========================
+   CONFIG
+========================= */
+
+/*
+   IMPORTANT:
+
+   If your Cloudflare file is:
+
+   functions/api/trading.js
+
+   then this route is correct:
+
+   /api/trading
+
+   If your trading.js is in another
+   functions path, change only this
+   value.
+*/
+
+const TRADING_ENDPOINT =
+    "/api/trading";
+
+
 /* =========================
    STATE
 ========================= */
 
 let tickHistory = [];
+
 let priceHistory = [];
 
 let selectedType = "OVER";
+
 let selectedPrediction = 6;
+
+let currentAccountType = "demo";
+
+let currentBalance = 10000;
+
+let todayPL = 0;
+
+let activeContract = null;
 
 
 /* =========================
@@ -1531,19 +1493,60 @@ const ctx =
 
 
 /* =========================
-   CANVAS SIZE
+   NOTICE
+========================= */
+
+function showNotice(
+    message,
+    type="error"
+){
+
+    const notice =
+        document.getElementById(
+            "notice"
+        );
+
+    notice.textContent =
+        message;
+
+    notice.className =
+        "notice show " +
+        type;
+
+}
+
+
+function hideNotice(){
+
+    const notice =
+        document.getElementById(
+            "notice"
+        );
+
+    notice.className =
+        "notice";
+
+}
+
+
+/* =========================
+   CHART RESIZE
 ========================= */
 
 function resizeChart(){
 
     const rect =
-        canvas.parentElement.getBoundingClientRect();
+        canvas.parentElement
+            .getBoundingClientRect();
+
+    const ratio =
+        window.devicePixelRatio || 1;
 
     canvas.width =
-        rect.width * window.devicePixelRatio;
+        rect.width * ratio;
 
     canvas.height =
-        rect.height * window.devicePixelRatio;
+        rect.height * ratio;
 
     canvas.style.width =
         rect.width + "px";
@@ -1551,13 +1554,19 @@ function resizeChart(){
     canvas.style.height =
         rect.height + "px";
 
-    ctx.scale(
-        window.devicePixelRatio,
-        window.devicePixelRatio
+    ctx.setTransform(
+        ratio,
+        0,
+        0,
+        ratio,
+        0,
+        0
     );
 
     drawChart();
+
 }
+
 
 window.addEventListener(
     "resize",
@@ -1566,7 +1575,7 @@ window.addEventListener(
 
 
 /* =========================
-   CHART
+   DRAW CHART
 ========================= */
 
 function drawChart(){
@@ -1584,12 +1593,19 @@ function drawChart(){
         height
     );
 
-    if(priceHistory.length < 2){
+
+    if(
+        priceHistory.length < 2
+    ){
+
         return;
+
     }
+
 
     const values =
         priceHistory.slice(-50);
+
 
     const min =
         Math.min(...values);
@@ -1600,51 +1616,80 @@ function drawChart(){
     const range =
         max - min || 1;
 
+
     ctx.beginPath();
 
-    values.forEach((value,index)=>{
 
-        const x =
-            8 +
-            index *
-            ((width - 16) /
-            (values.length - 1));
+    values.forEach(
+        (value,index)=>{
 
-        const y =
-            height -
-            15 -
-            ((value - min) / range) *
-            (height - 30);
+            const x =
+                8 +
+                index *
+                (
+                    (width - 16) /
+                    (values.length - 1)
+                );
 
-        if(index === 0){
-            ctx.moveTo(x,y);
-        }else{
-            ctx.lineTo(x,y);
+
+            const y =
+                height -
+                15 -
+                (
+                    (value - min) /
+                    range
+                ) *
+                (height - 30);
+
+
+            if(index === 0){
+
+                ctx.moveTo(
+                    x,
+                    y
+                );
+
+            }else{
+
+                ctx.lineTo(
+                    x,
+                    y
+                );
+
+            }
+
         }
+    );
 
-    });
 
     ctx.strokeStyle =
         "#19d58b";
 
-    ctx.lineWidth = 2;
+    ctx.lineWidth =
+        2;
 
     ctx.stroke();
 
 
-    /* CURRENT POINT */
-
     const last =
-        values[values.length - 1];
+        values[
+            values.length - 1
+        ];
+
 
     const x =
         width - 8;
 
+
     const y =
         height -
         15 -
-        ((last - min) / range) *
+        (
+            (last - min) /
+            range
+        ) *
         (height - 30);
+
 
     ctx.beginPath();
 
@@ -1665,60 +1710,102 @@ function drawChart(){
 
 
 /* =========================
-   FRONTEND TICK DISPLAY
+   DISPLAY TICK
 ========================= */
 
-function showTick(price){
+function displayTick(
+    price
+){
 
-    const text =
-        String(price);
+    const numericPrice =
+        Number(price);
+
+
+    if(
+        !Number.isFinite(
+            numericPrice
+        )
+    ){
+
+        return;
+
+    }
+
+
+    /*
+       Deriv synthetic index
+       prices can have decimals.
+
+       We use the final displayed
+       digit as the last digit.
+    */
+
+    const formatted =
+        numericPrice.toFixed(2);
 
     const digit =
         Number(
-            text.replace(/\D/g,"").slice(-1)
+            formatted.slice(-1)
         );
 
-    if(Number.isNaN(digit)){
-        return;
-    }
 
-    tickHistory.push(digit);
-
-    if(tickHistory.length > 100){
-        tickHistory.shift();
-    }
-
-    priceHistory.push(
-        Number(price)
+    tickHistory.push(
+        digit
     );
 
-    if(priceHistory.length > 100){
-        priceHistory.shift();
+
+    if(
+        tickHistory.length > 100
+    ){
+
+        tickHistory.shift();
+
     }
+
+
+    priceHistory.push(
+        numericPrice
+    );
+
+
+    if(
+        priceHistory.length > 100
+    ){
+
+        priceHistory.shift();
+
+    }
+
 
     document.getElementById(
         "bigDigit"
-    ).textContent = digit;
+    ).textContent =
+        digit;
+
 
     document.getElementById(
         "price"
     ).textContent =
-        Number(price).toFixed(2);
+        formatted;
+
 
     document.getElementById(
         "chartPrice"
     ).textContent =
-        Number(price).toFixed(2);
+        formatted;
+
 
     document.getElementById(
         "chartDigit"
     ).textContent =
         digit;
 
+
     document.getElementById(
         "tickState"
     ).textContent =
         "LIVE";
+
 
     renderHistory();
 
@@ -1730,33 +1817,7 @@ function showTick(price){
 
 
 /* =========================
-   DEMO PREVIEW DATA
-=========================
-
-   This is ONLY frontend preview
-   data.
-
-   It will be replaced by the
-   real Deriv tick stream when
-   trading.js is connected.
-========================= */
-
-function generatePreviewTick(){
-
-    const base =
-        733.50 +
-        Math.random() * 0.50;
-
-    const price =
-        Number(base.toFixed(2));
-
-    showTick(price);
-
-}
-
-
-/* =========================
-   HISTORY DIGITS
+   HISTORY
 ========================= */
 
 function renderHistory(){
@@ -1768,31 +1829,42 @@ function renderHistory(){
 
     box.innerHTML = "";
 
+
     const recent =
         tickHistory.slice(-20);
+
 
     recent.forEach(
         (digit,index)=>{
 
-            const el =
-                document.createElement("div");
+            const element =
+                document.createElement(
+                    "div"
+                );
 
-            el.className =
+            element.className =
                 "history-digit";
+
 
             if(
                 index ===
                 recent.length - 1
             ){
-                el.classList.add(
+
+                element.classList.add(
                     "latest"
                 );
+
             }
 
-            el.textContent =
+
+            element.textContent =
                 digit;
 
-            box.appendChild(el);
+
+            box.appendChild(
+                element
+            );
 
         }
     );
@@ -1809,11 +1881,15 @@ function renderFrequency(){
     const counts =
         new Array(10).fill(0);
 
+
     tickHistory.forEach(
         digit=>{
+
             counts[digit]++;
+
         }
     );
+
 
     const box =
         document.getElementById(
@@ -1822,7 +1898,12 @@ function renderFrequency(){
 
     box.innerHTML = "";
 
-    for(let i=0;i<10;i++){
+
+    for(
+        let i=0;
+        i<10;
+        i++
+    ){
 
         const percentage =
             tickHistory.length
@@ -1835,31 +1916,36 @@ function renderFrequency(){
             :
             "0.0";
 
-        const el =
-            document.createElement("div");
 
-        el.className =
+        const element =
+            document.createElement(
+                "div"
+            );
+
+
+        element.className =
             "freq-box";
 
-        el.innerHTML = `
-            <b>${i}</b>
-            <span>${percentage}%</span>
-        `;
 
-        box.appendChild(el);
+        element.innerHTML =
+            `
+                <b>${i}</b>
+                <span>${percentage}%</span>
+            `;
+
+
+        box.appendChild(
+            element
+        );
 
     }
 
-
-    /* OVER 5 = 6,7,8,9 */
 
     const over =
         tickHistory.filter(
             d => d >= 6
         ).length;
 
-
-    /* UNDER 5 = 0,1,2,3,4 */
 
     const under =
         tickHistory.filter(
@@ -1868,20 +1954,17 @@ function renderFrequency(){
 
 
     const total =
-        over + under +
-        tickHistory.filter(
-            d => d === 5
-        ).length;
+        tickHistory.length;
 
 
     document.getElementById(
         "overPercent"
     ).textContent =
-        tickHistory.length
+        total
         ?
         (
             over /
-            tickHistory.length *
+            total *
             100
         ).toFixed(1) + "%"
         :
@@ -1891,11 +1974,11 @@ function renderFrequency(){
     document.getElementById(
         "underPercent"
     ).textContent =
-        tickHistory.length
+        total
         ?
         (
             under /
-            tickHistory.length *
+            total *
             100
         ).toFixed(1) + "%"
         :
@@ -1908,10 +1991,13 @@ function renderFrequency(){
    CONTRACT TYPE
 ========================= */
 
-function setType(type){
+function setType(
+    type
+){
 
     selectedType =
         type;
+
 
     document.getElementById(
         "overTab"
@@ -1920,12 +2006,14 @@ function setType(type){
         type === "OVER"
     );
 
+
     document.getElementById(
         "underTab"
     ).classList.toggle(
         "active",
         type === "UNDER"
     );
+
 
     updateSelectedContract();
 
@@ -1936,25 +2024,31 @@ function setType(type){
    PREDICTION
 ========================= */
 
-function setPrediction(number){
+function setPrediction(
+    number
+){
 
     selectedPrediction =
         number;
+
 
     document
         .querySelectorAll(
             ".prediction button"
         )
-        .forEach(btn=>{
+        .forEach(
+            button=>{
 
-            btn.classList.toggle(
-                "active",
-                Number(
-                    btn.textContent
-                ) === number
-            );
+                button.classList.toggle(
+                    "active",
+                    Number(
+                        button.textContent
+                    ) === number
+                );
 
-        });
+            }
+        );
+
 
     updateSelectedContract();
 
@@ -1978,7 +2072,7 @@ function updateSelectedContract(){
 
 
 /* =========================
-   STAKE / DURATION
+   TRADE PREVIEW
 ========================= */
 
 document.getElementById(
@@ -2000,7 +2094,7 @@ document.getElementById(
 function updateTradePreview(){
 
     const stake =
-        parseFloat(
+        Number(
             document.getElementById(
                 "stake"
             ).value
@@ -2008,9 +2102,11 @@ function updateTradePreview(){
 
 
     const duration =
-        document.getElementById(
-            "duration"
-        ).value;
+        Number(
+            document.getElementById(
+                "duration"
+            ).value
+        );
 
 
     document.getElementById(
@@ -2023,41 +2119,41 @@ function updateTradePreview(){
     document.getElementById(
         "selectedDuration"
     ).textContent =
+        duration === 1
+        ?
+        "1 Tick"
+        :
         duration +
-        (
-            duration === "1"
-            ? " Tick"
-            : " Ticks"
-        );
+        " Ticks";
 
 
-    if(stake <= 0){
+    /*
+       This is only a visual estimate.
+
+       Real payout will come from
+       the Deriv proposal response.
+    */
+
+    if(
+        stake > 0
+    ){
+
+        document.getElementById(
+            "payout"
+        ).textContent =
+            "$" +
+            (
+                stake * 1.90
+            ).toFixed(2);
+
+    }else{
 
         document.getElementById(
             "payout"
         ).textContent =
             "—";
 
-        return;
     }
-
-
-    /*
-        FRONTEND PREVIEW ONLY.
-
-        Real payout will later be
-        supplied by Deriv proposal.
-    */
-
-    const estimated =
-        stake * 1.90;
-
-
-    document.getElementById(
-        "payout"
-    ).textContent =
-        "$" +
-        estimated.toFixed(2);
 
 }
 
@@ -2066,59 +2162,230 @@ updateTradePreview();
 
 
 /* =========================
-   BUY BUTTON
+   API REQUEST
 ========================= */
 
-function buy(type){
+async function tradingRequest(
+    payload
+){
 
-    const stake =
-        parseFloat(
-            document.getElementById(
-                "stake"
-            ).value
+    const response =
+        await fetch(
+            TRADING_ENDPOINT,
+            {
+                method:"POST",
+
+                headers:{
+                    "Content-Type":
+                        "application/json"
+                },
+
+                credentials:
+                    "include",
+
+                body:
+                    JSON.stringify(
+                        payload
+                    )
+            }
         );
 
 
-    if(
-        !stake ||
-        stake <= 0
-    ){
+    let data;
 
-        alert(
-            "Please enter a valid stake."
+
+    try{
+
+        data =
+            await response.json();
+
+    }catch{
+
+        throw new Error(
+            "DollarTicks received an invalid server response."
         );
 
-        return;
     }
 
 
-    const market =
+    if(
+        !response.ok ||
+        data.ok === false
+    ){
+
+        throw new Error(
+            data.error ||
+            "Trading request failed."
+        );
+
+    }
+
+
+    return data;
+
+}
+
+
+/* =========================
+   ACCOUNT
+========================= */
+
+async function loadAccount(){
+
+    try{
+
+        const response =
+            await fetch(
+                TRADING_ENDPOINT +
+                "?account_type=" +
+                encodeURIComponent(
+                    currentAccountType
+                ),
+                {
+                    method:"GET",
+                    credentials:"include",
+                    cache:"no-store"
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        if(
+            !response.ok ||
+            data.ok === false
+        ){
+
+            throw new Error(
+                data.error ||
+                "Could not load account."
+            );
+
+        }
+
+
+        currentBalance =
+            Number(
+                data.account?.balance ??
+                0
+            );
+
+
+        updateBalanceDisplay();
+
         document.getElementById(
-            "market"
+            "connectionText"
+        ).textContent =
+            "Connected";
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "READY";
+
+
+    }catch(error){
+
+        console.error(
+            "Account error:",
+            error
         );
 
 
-    const marketName =
-        market.options[
-            market.selectedIndex
-        ].text;
-
-
-    const duration =
         document.getElementById(
-            "duration"
-        ).value;
+            "connectionText"
+        ).textContent =
+            "Session unavailable";
 
 
-    const entry =
-        tickHistory.length
-        ?
-        tickHistory[
-            tickHistory.length - 1
-        ]
-        :
-        "—";
+        document.getElementById(
+            "status"
+        ).textContent =
+            "LOGIN REQUIRED";
 
+    }
+
+}
+
+
+function updateBalanceDisplay(){
+
+    document.getElementById(
+        "balance"
+    ).textContent =
+        "$" +
+        Number(
+            currentBalance
+        ).toFixed(2);
+
+}
+
+
+/* =========================
+   ACCOUNT SWITCH
+========================= */
+
+document.getElementById(
+    "account"
+).addEventListener(
+    "change",
+    async function(){
+
+        currentAccountType =
+            this.value;
+
+
+        document.getElementById(
+            "sideAccount"
+        ).textContent =
+            this.value === "real"
+            ?
+            "Real Account"
+            :
+            "Demo Account";
+
+
+        hideNotice();
+
+
+        await loadAccount();
+
+    }
+);
+
+
+/* =========================
+   DISABLE BUY
+========================= */
+
+function setBuyButtonsDisabled(
+    disabled
+){
+
+    document.getElementById(
+        "buyOver"
+    ).disabled =
+        disabled;
+
+
+    document.getElementById(
+        "buyUnder"
+    ).disabled =
+        disabled;
+
+}
+
+
+/* =========================
+   CREATE HISTORY ROW
+========================= */
+
+function createTradeRow(
+    trade
+){
 
     const table =
         document.getElementById(
@@ -2126,11 +2393,13 @@ function buy(type){
         );
 
 
-    if(
-        table.children.length === 1 &&
-        table.children[0]
-            .querySelector(".empty")
-    ){
+    const empty =
+        table.querySelector(
+            ".empty"
+        );
+
+
+    if(empty){
 
         table.innerHTML = "";
 
@@ -2138,155 +2407,746 @@ function buy(type){
 
 
     const row =
-        document.createElement("tr");
+        document.createElement(
+            "tr"
+        );
 
 
-    row.innerHTML = `
+    row.dataset.contractId =
+        trade.contractId;
 
-        <td>
-            ${new Date()
-                .toLocaleTimeString()}
+
+    row.innerHTML =
+        `
+        <td>${trade.time}</td>
+
+        <td>${trade.market}</td>
+
+        <td>${trade.type}</td>
+
+        <td class="entry-cell">
+            ${trade.entry ?? "—"}
         </td>
 
-        <td>
-            ${marketName
-                .replace(" Index","")}
-        </td>
-
-        <td>
-            ${type} ${selectedPrediction}
-        </td>
-
-        <td>
-            ${entry}
-        </td>
-
-        <td>
+        <td class="exit-cell">
             —
         </td>
 
         <td>
-            $${stake.toFixed(2)}
+            $${trade.stake.toFixed(2)}
         </td>
 
-        <td class="pending">
-            FRONTEND
+        <td class="result-cell pending">
+            OPEN
         </td>
-
-    `;
-
-
-    table.prepend(row);
+        `;
 
 
-    document.getElementById(
-        "lastTrade"
-    ).textContent =
-        type +
-        " " +
-        selectedPrediction;
+    table.prepend(
+        row
+    );
+
+
+    return row;
+
+}
+
+
+/* =========================
+   BUY
+========================= */
+
+async function buy(
+    type
+){
+
+    hideNotice();
+
+
+    if(
+        activeContract
+    ){
+
+        showNotice(
+            "A contract is already being monitored. Please wait for it to finish.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const stake =
+        Number(
+            document.getElementById(
+                "stake"
+            ).value
+        );
+
+
+    const duration =
+        Number(
+            document.getElementById(
+                "duration"
+            ).value
+        );
+
+
+    if(
+        !Number.isFinite(stake) ||
+        stake <= 0
+    ){
+
+        showNotice(
+            "Please enter a valid stake.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    if(
+        stake > currentBalance
+    ){
+
+        showNotice(
+            "Your stake is greater than the available balance.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    const market =
+        document.getElementById(
+            "market"
+        ).value;
 
 
     /*
-        IMPORTANT:
+       OVER 5 style contract:
 
-        This frontend version does NOT
-        send a contract to Deriv yet.
+       DIGITOVER barrier 5
 
-        The next stage will connect this
-        exact BUY button to trading.js.
+       UNDER 5 style contract:
+
+       DIGITUNDER barrier 5
+
+       The selected digit is used
+       as the barrier.
     */
 
-    console.log(
-        "Manual trade request:",
-        {
-            type:type,
-            prediction:selectedPrediction,
-            stake:stake,
-            duration:duration,
-            market:market.value
+    const contractType =
+        type === "OVER"
+        ?
+        "DIGITOVER"
+        :
+        "DIGITUNDER";
+
+
+    const barrier =
+        selectedPrediction;
+
+
+    const durationUnit =
+        "t";
+
+
+    const marketText =
+        document.getElementById(
+            "market"
+        ).options[
+            document.getElementById(
+                "market"
+            ).selectedIndex
+        ].text;
+
+
+    setBuyButtonsDisabled(
+        true
+    );
+
+
+    document.getElementById(
+        "status"
+    ).textContent =
+        "PLACING";
+
+
+    try{
+
+        const data =
+            await tradingRequest({
+
+                action:
+                    "buy",
+
+                account_type:
+                    currentAccountType,
+
+                market:
+                    market,
+
+                underlying_symbol:
+                    market,
+
+                contract_type:
+                    contractType,
+
+                barrier:
+                    barrier,
+
+                stake:
+                    stake,
+
+                duration:
+                    duration,
+
+                duration_unit:
+                    durationUnit
+
+            });
+
+
+        if(
+            !data.contract ||
+            !data.contract.contract_id
+        ){
+
+            throw new Error(
+                "Deriv did not return a contract ID."
+            );
+
         }
+
+
+        const contract =
+            data.contract;
+
+
+        activeContract = {
+
+            contractId:
+                Number(
+                    contract.contract_id
+                ),
+
+            row:
+                null,
+
+            stake:
+                stake
+
+        };
+
+
+        const entry =
+            contract.entry_spot ??
+            "—";
+
+
+        activeContract.row =
+            createTradeRow({
+
+                contractId:
+                    contract.contract_id,
+
+                time:
+                    new Date()
+                        .toLocaleTimeString(),
+
+                market:
+                    marketText.replace(
+                        " Index",
+                        ""
+                    ),
+
+                type:
+                    type +
+                    " " +
+                    selectedPrediction,
+
+                entry:
+                    entry,
+
+                stake:
+                    stake
+
+            });
+
+
+        if(
+            Number.isFinite(
+                Number(
+                    data.account?.balance
+                )
+            )
+        ){
+
+            currentBalance =
+                Number(
+                    data.account.balance
+                );
+
+            updateBalanceDisplay();
+
+        }
+
+
+        document.getElementById(
+            "lastTrade"
+        ).textContent =
+            type +
+            " " +
+            selectedPrediction;
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "OPEN";
+
+
+        showNotice(
+            "Contract purchased successfully.",
+            "success"
+        );
+
+
+        /*
+           Start checking the contract
+           until Deriv reports the final
+           result.
+        */
+
+        monitorContract();
+
+    }catch(error){
+
+        console.error(
+            "BUY ERROR:",
+            error
+        );
+
+
+        showNotice(
+            error.message ||
+            "Trade could not be placed.",
+            "error"
+        );
+
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "READY";
+
+
+        setBuyButtonsDisabled(
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================
+   CONTRACT STATUS
+========================= */
+
+async function getContractStatus(
+    contractId
+){
+
+    return await tradingRequest({
+
+        action:
+            "contract_status",
+
+        account_type:
+            currentAccountType,
+
+        contract_id:
+            contractId
+
+    });
+
+}
+
+
+/* =========================
+   MONITOR CONTRACT
+========================= */
+
+async function monitorContract(){
+
+    if(
+        !activeContract
+    ){
+
+        return;
+
+    }
+
+
+    const contractId =
+        activeContract.contractId;
+
+
+    const row =
+        activeContract.row;
+
+
+    let finished =
+        false;
+
+
+    /*
+       Poll every 2 seconds.
+
+       The backend may return OPEN
+       while the contract is still
+       running.
+    */
+
+    for(
+        let attempt=0;
+        attempt<90;
+        attempt++
+    ){
+
+        try{
+
+            const data =
+                await getContractStatus(
+                    contractId
+                );
+
+
+            const contract =
+                data.contract;
+
+
+            if(!contract){
+
+                await sleep(
+                    2000
+                );
+
+                continue;
+
+            }
+
+
+            /* ENTRY */
+
+            if(
+                contract.entry_spot !==
+                null &&
+                contract.entry_spot !==
+                undefined
+            ){
+
+                row.querySelector(
+                    ".entry-cell"
+                ).textContent =
+                    contract.entry_spot;
+
+            }
+
+
+            /*
+               Only finish when Deriv
+               actually reports WON/LOST
+               or the contract is sold/
+               expired.
+            */
+
+            const status =
+                String(
+                    contract.status ||
+                    ""
+                ).toUpperCase();
+
+
+            const final =
+                status === "WON" ||
+                status === "LOST" ||
+                contract.is_sold === true;
+
+
+            if(
+                final
+            ){
+
+                finished =
+                    true;
+
+
+                const exit =
+                    contract.exit_spot ??
+                    contract.sell_price ??
+                    "—";
+
+
+                row.querySelector(
+                    ".exit-cell"
+                ).textContent =
+                    exit;
+
+
+                const resultCell =
+                    row.querySelector(
+                        ".result-cell"
+                    );
+
+
+                const profit =
+                    Number(
+                        contract.profit ??
+                        0
+                    );
+
+
+                if(
+                    status === "WON" ||
+                    profit > 0
+                ){
+
+                    resultCell.textContent =
+                        "WON";
+
+                    resultCell.className =
+                        "result-cell win";
+
+
+                }else{
+
+                    resultCell.textContent =
+                        "LOST";
+
+                    resultCell.className =
+                        "result-cell loss";
+
+                }
+
+
+                todayPL +=
+                    profit;
+
+
+                document.getElementById(
+                    "todayPL"
+                ).textContent =
+                    (
+                        todayPL >= 0
+                        ? "$"
+                        : "-$"
+                    ) +
+                    Math.abs(
+                        todayPL
+                    ).toFixed(2);
+
+
+                /*
+                   Refresh balance from the
+                   backend after completion.
+                */
+
+                await loadAccount();
+
+
+                document.getElementById(
+                    "status"
+                ).textContent =
+                    "READY";
+
+
+                showNotice(
+                    status === "WON" ||
+                    profit > 0
+                    ?
+                    "Trade won."
+                    :
+                    "Trade lost.",
+                    status === "WON" ||
+                    profit > 0
+                    ?
+                    "success"
+                    :
+                    "error"
+                );
+
+
+                break;
+
+            }
+
+        }catch(error){
+
+            console.error(
+                "CONTRACT STATUS ERROR:",
+                error
+            );
+
+        }
+
+
+        await sleep(
+            2000
+        );
+
+    }
+
+
+    if(
+        !finished
+    ){
+
+        /*
+           We don't mark an unfinished
+           contract as lost.
+
+           We simply tell the user that
+           monitoring timed out.
+        */
+
+        document.getElementById(
+            "status"
+        ).textContent =
+            "CHECKING";
+
+
+        showNotice(
+            "The contract is still open. Please check again shortly.",
+            "error"
+        );
+
+    }
+
+
+    activeContract =
+        null;
+
+
+    setBuyButtonsDisabled(
+        false
     );
 
 }
 
 
 /* =========================
-   ACCOUNT SELECT
+   SLEEP
+========================= */
+
+function sleep(
+    milliseconds
+){
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                milliseconds
+            )
+    );
+
+}
+
+
+/* =========================
+   MARKET CHANGE
 ========================= */
 
 document.getElementById(
-    "account"
+    "market"
 ).addEventListener(
     "change",
     function(){
 
-        if(
-            this.value === "real"
-        ){
+        /*
+           The actual live tick
+           subscription will be connected
+           in the next frontend integration
+           stage.
+        */
 
-            document.getElementById(
-                "sideAccount"
-            ).textContent =
-                "Real Account";
+        document.getElementById(
+            "price"
+        ).textContent =
+            "Waiting for tick...";
 
-        }else{
-
-            document.getElementById(
-                "sideAccount"
-            ).textContent =
-                "Demo Account";
-
-        }
+        document.getElementById(
+            "tickState"
+        ).textContent =
+            "WAITING";
 
     }
 );
 
 
 /* =========================
-   INITIAL PREVIEW DATA
+   INITIAL DISPLAY
 ========================= */
 
-for(
-    let i=0;
-    i<30;
-    i++
-){
+function initialisePreview(){
 
-    const price =
-        733.50 +
-        Math.random() *
-        0.50;
+    /*
+       Small visual starting set.
 
-    showTick(
-        Number(
-            price.toFixed(2)
-        )
+       This does NOT place trades.
+
+       These values will be replaced
+       by the actual Deriv tick stream.
+    */
+
+    const startingPrices = [
+
+        733.72,
+        733.75,
+        733.71,
+        733.78,
+        733.82,
+        733.76,
+        733.79,
+        733.83,
+        733.81,
+        733.86
+
+    ];
+
+
+    startingPrices.forEach(
+        price =>
+            displayTick(
+                price
+            )
     );
 
 }
 
 
 /* =========================
-   PREVIEW TICKS
+   START
 ========================= */
 
-setInterval(
-    generatePreviewTick,
-    1000
-);
-
-
-/* =========================
-   START CHART
-========================= */
+initialisePreview();
 
 setTimeout(
     resizeChart,
-    50
+    100
 );
+
+loadAccount();
 
 </script>
 
 </body>
-   </html>
+    </html>
